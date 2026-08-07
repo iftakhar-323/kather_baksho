@@ -1,7 +1,8 @@
 # Backend
 backend/katherbox
-backend/katherbox.db
 backend/*.exe
+backend/.env
+backend/.env.*.local
 
 # Frontend
 frontend/node_modules/

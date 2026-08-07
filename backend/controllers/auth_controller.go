@@ -1,9 +1,14 @@
 package controllers
 
 import (
+	"crypto/rand"
+	"fmt"
+	"math/big"
 	"net/http"
+	"time"
 
 	"katherbox/database"
+	"katherbox/mailer"
 	"katherbox/models"
 	"katherbox/utils"
 
@@ -51,14 +56,22 @@ func Register(c *gin.Context) {
 
 	token, _ := utils.GenerateJWT(user.ID, user.Email, user.Role)
 
+	// Issue a 6-digit verification code (15-min TTL) and best-effort send
+	// the welcome email. The send call is safe to ignore if no Brevo key is
+	// configured — it just logs the would-be subject line.
+	if code, err := issueVerificationCode(user.ID); err == nil {
+		_ = mailer.Send(mailer.VerifyEmail(user.Email, code))
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
 		"token":   token,
 		"user": gin.H{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-			"role":  user.Role,
+			"id":             user.ID,
+			"name":           user.Name,
+			"email":          user.Email,
+			"role":           user.Role,
+			"email_verified": user.EmailVerified,
 		},
 	})
 }
@@ -393,4 +406,127 @@ func SetDefaultAddress(c *gin.Context) {
 	database.DB.Model(&models.Address{}).Where("user_id = ?", userID).Update("is_default", false)
 	database.DB.Model(&addr).Update("is_default", true)
 	c.JSON(http.StatusOK, gin.H{"message": "Default address updated"})
+}
+
+// =====================================================================
+// Email verification (Sprint F1 — Brevo mailer)
+// =====================================================================
+
+const verifyTTL = 15 * time.Minute
+
+type VerifyEmailInput struct {
+	Email string `json:"email" binding:"required"`
+	Code  string `json:"code" binding:"required"`
+}
+
+// issueVerificationCode writes a fresh row for the user and returns the
+// 6-digit code as a string. Any previous unconsumed codes are left in the
+// table — VerifyEmail picks the newest matching one.
+func issueVerificationCode(userID uint) (string, error) {
+	code, err := randomCode(6)
+	if err != nil {
+		return "", err
+	}
+	row := models.EmailVerification{
+		UserID:    userID,
+		Code:      code,
+		ExpiresAt: time.Now().Add(verifyTTL),
+	}
+	if err := database.DB.Create(&row).Error; err != nil {
+		return "", err
+	}
+	return code, nil
+}
+
+// randomCode returns an n-digit decimal string using crypto/rand.
+func randomCode(n int) (string, error) {
+	if n <= 0 {
+		return "", fmt.Errorf("randomCode: length must be positive")
+	}
+	out := make([]byte, n)
+	for i := 0; i < n; i++ {
+		// bias is negligible at n=6
+		n, err := rand.Int(rand.Reader, big.NewInt(10))
+		if err != nil {
+			return "", err
+		}
+		out[i] = byte('0') + byte(n.Int64())
+	}
+	return string(out), nil
+}
+
+// POST /api/auth/verify — body: { email, code }
+// Public (no JWT) so freshly-registered users can verify before login.
+func VerifyEmail(c *gin.Context) {
+	var input VerifyEmailInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or code"})
+		return
+	}
+	if user.EmailVerified {
+		c.JSON(http.StatusOK, gin.H{"message": "Email already verified"})
+		return
+	}
+
+	var row models.EmailVerification
+	err := database.DB.
+		Where("user_id = ? AND code = ? AND consumed_at IS NULL", user.ID, input.Code).
+		Order("created_at DESC").
+		First(&row).Error
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired code"})
+		return
+	}
+	if time.Now().After(row.ExpiresAt) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code expired — request a new one"})
+		return
+	}
+
+	now := time.Now()
+	database.DB.Model(&row).Update("consumed_at", &now)
+	database.DB.Model(&user).Update("email_verified", true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":       "Email verified",
+		"email_verified": true,
+	})
+}
+
+// POST /api/auth/resend-verification — body: { email }
+// Public: lets the user re-trigger an email without being logged in.
+// Rate-limiting is intentionally out of scope (handled in reverse-proxy in
+// production); for dev, 1 row per call is fine.
+func ResendVerification(c *gin.Context) {
+	var input struct {
+		Email string `json:"email" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+		// Don't leak whether the email exists
+		c.JSON(http.StatusOK, gin.H{"message": "If the email exists, a new code was sent"})
+		return
+	}
+	if user.EmailVerified {
+		c.JSON(http.StatusOK, gin.H{"message": "Email already verified"})
+		return
+	}
+
+	code, err := issueVerificationCode(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to issue code"})
+		return
+	}
+	_ = mailer.Send(mailer.VerifyEmail(user.Email, code))
+	c.JSON(http.StatusOK, gin.H{"message": "If the email exists, a new code was sent"})
 }

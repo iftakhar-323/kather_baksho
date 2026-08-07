@@ -9,9 +9,14 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env if present (silently ignore when missing so production
+	// environments that set vars in the shell still work).
+	_ = godotenv.Load()
+
 	database.ConnectDatabase()
 	database.DB.AutoMigrate(
 		&models.Product{},
@@ -59,6 +64,7 @@ func main() {
 		&models.UserMembership{},
 		&models.Review{},
 		&models.Category{},
+		&models.EmailVerification{},
 	)
 
 	router := gin.Default()

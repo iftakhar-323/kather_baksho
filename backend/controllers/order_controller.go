@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"katherbox/database"
+	"katherbox/mailer"
 	"katherbox/models"
 
 	"github.com/gin-gonic/gin"
@@ -128,6 +129,14 @@ func Checkout(c *gin.Context) {
 	}
 
 	database.DB.Preload("Items.Product").First(&order, order.ID)
+
+	// Best-effort order-confirmation email. The send is safe to ignore
+	// when no mailer key is configured.
+	var u models.User
+	if err := database.DB.Select("email").First(&u, userID).Error; err == nil && u.Email != "" {
+		_ = mailer.Send(mailer.OrderPlaced(u.Email, uintToStr(order.ID), finalTotal))
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"order":          order,
 		"subtotal":       totalPrice,

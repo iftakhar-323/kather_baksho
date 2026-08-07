@@ -3,7 +3,8 @@
 > One file that captures everything built so far and answers the key question:
 > **Do any features depend on external APIs or third-party services? → NO.**
 > Everything runs locally on `http://localhost:8081` (Go backend) + `http://localhost:5173` (Vite frontend).
-> No Stripe, no Cloudinary, no SMTP, no OAuth, no SMS, no push service, no payment gateway.
+> No Stripe, no Cloudinary, no OAuth, no SMS, no push service, no payment gateway.
+Transactional email → Brevo (free tier, optional `BREVO_API_KEY`).
 > LocalStorage on the frontend + SQLite + JWT on the backend — that's the entire stack.
 
 ---
@@ -100,7 +101,7 @@ REST endpoints mounted under `/api/`:
 - `/auth/me` profile fetch
 - Forgot/reset password (dev token surfaced in response)
 - Profile page: address book, change password, delete account
-- Email-verify banner (UI only — no SMTP wired)
+- Email-verify banner wired to Brevo → 6-digit code via `/auth/verify`
 
 ### Sprint B — Catalogue + Cart
 - Product CRUD + admin panel (7 tabs)
@@ -161,7 +162,7 @@ Admin login: see `DUMMY_USERS.md` (deleted — recreate by promoting a user via 
 |----------------------|----------------|-----------------------------------------------------|
 | Payments             | ⏭️ deferred    | Cart shows total; "place order" succeeds without gateway |
 | Image storage        | ⏭️ deferred    | Emoji placeholders 🌿 🪵 🧴 on cards + detail       |
-| SMTP / email         | ⏭️ deferred    | Verification banner is UI-only                      |
+| SMTP / email         | ✅ wired      | `backend/mailer/` → Brevo API (300 emails/day, free) |
 | OAuth (Google/FB)    | ⏭️ deferred    | Email + password only                               |
 | SMS / push           | ⏭️ deferred    | No service                                         |
 | Maps / live tracking | ⏭️ deferred    | Static "Dispatched" status in Orders                |

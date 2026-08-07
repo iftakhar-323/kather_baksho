@@ -26,5 +26,9 @@ func AuthRoutes(router *gin.Engine) {
 		authGroup.PUT("/addresses/:id", middleware.AuthMiddleware(), controllers.UpdateAddress)
 		authGroup.DELETE("/addresses/:id", middleware.AuthMiddleware(), controllers.DeleteAddress)
 		authGroup.PUT("/addresses/:id/default", middleware.AuthMiddleware(), controllers.SetDefaultAddress)
+
+		// Email verification (Sprint F1)
+		authGroup.POST("/verify", controllers.VerifyEmail)               // public
+		authGroup.POST("/resend-verification", controllers.ResendVerification) // public
 	}
 }
