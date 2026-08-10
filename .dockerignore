@@ -15,6 +15,7 @@
 
 # Go / Backend binaries & DB
 **/*.db
+!katherbox.db
 **/*.db-journal
 **/katherbox
 **/seedusers

@@ -33,6 +33,9 @@ WORKDIR /app
 # Create directory for persistent SQLite DB volume
 RUN mkdir -p /app/data
 
+# Copy the initial SQLite database
+COPY katherbox.db /app/data/katherbox.db
+
 # Copy compiled binaries from builder stage
 COPY --from=builder /app/katherbox /app/
 COPY --from=builder /app/seedusers /app/
