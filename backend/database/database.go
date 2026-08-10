@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -10,7 +11,12 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	database, err := gorm.Open(sqlite.Open("katherbox.db"), &gorm.Config{})
+	dbPath := os.Getenv("DB_PATH")
+	if dbPath == "" {
+		dbPath = "katherbox.db"
+	}
+
+	database, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect database:", err)
 	}

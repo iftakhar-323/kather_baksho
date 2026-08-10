@@ -47,7 +47,7 @@ export default function Subscriptions() {
       .catch((e) => setError(e?.response?.data?.error || e.message))
       .finally(() => setLoading(false));
   };
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const subscribe = async (plan) => {
     setMsg("");

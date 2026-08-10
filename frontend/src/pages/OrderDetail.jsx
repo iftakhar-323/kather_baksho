@@ -10,6 +10,7 @@ import {
 } from "../api/orderExt";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import DeliveryTrack from "../components/DeliveryTrack";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -72,7 +73,7 @@ export default function OrderDetail({ order, onBack }) {
       });
   };
 
-  useEffect(load, [order.id]);
+  useEffect(() => { load(); }, [order.id]);
 
   const onViewInvoice = () => {
     openInvoice(order.id)
@@ -160,6 +161,29 @@ export default function OrderDetail({ order, onBack }) {
           total: Number(order.total_price || 0).toLocaleString(),
         })}
       </p>
+
+      <div className="mb-16 mt-16">
+        <DeliveryTrack status={order.status} createdAt={order.created_at} />
+      </div>
+
+      <div className="card card-pad mb-16" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div>
+          <span className="field-label">Payment Method</span>
+          <span className={`pay-pill pay-pill-${order.payment_method || 'cod'}`}>
+            {order.payment_method || 'cod'}
+          </span>
+        </div>
+        <div>
+          <span className="field-label">Payment Status</span>
+          <span className="tag tag-leaf">{order.payment_status || (order.payment_method === 'cod' ? 'Pending COD' : 'Paid')}</span>
+        </div>
+        {order.transaction_id && (
+          <div>
+            <span className="field-label">Transaction ID</span>
+            <strong style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{order.transaction_id}</strong>
+          </div>
+        )}
+      </div>
 
       <div className="row gap-8 mb-16" style={{ flexWrap: "wrap" }}>
         <button className="btn btn-secondary btn-sm" onClick={onViewInvoice}>

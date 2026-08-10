@@ -47,16 +47,19 @@ import Care from "./pages/Care";
 import CorporateOrders from "./pages/CorporateOrders";
 import OrderDetail from "./pages/OrderDetail";
 import GiftCards from "./pages/GiftCards";
+import Dashboard from "./pages/Dashboard";
+import GlobalSearch from "./components/GlobalSearch";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LangToggle from "./components/LangToggle";
 import { I18nProvider, useTranslation } from "./i18n/I18nProvider";
 
 // Primary (always-visible) nav links — keep these short so the bar stays compact.
 const PRIMARY_NAV_ITEMS = [
-  { key: "home",     tKey: "nav.shop",      emoji: "" },
-  { key: "wishlist", tKey: "nav.wishlist",  emoji: "" },
-  { key: "cart",     tKey: "nav.cart",      emoji: "" },
-  { key: "orders",   tKey: "nav.orders",    emoji: "" },
+  { key: "home",      tKey: "nav.shop",      emoji: "" },
+  { key: "dashboard", tKey: "nav.dashboard", emoji: "" },
+  { key: "wishlist",  tKey: "nav.wishlist",  emoji: "" },
+  { key: "cart",      tKey: "nav.cart",      emoji: "" },
+  { key: "orders",    tKey: "nav.orders",    emoji: "" },
 ];
 
 // Overflow items — surfaced through a single "More" dropdown so the bar stays
@@ -87,7 +90,7 @@ const CUSTOMER_ONLY = new Set([
   "cart", "orders", "order-detail", "wishlist", "reminders",
   "seasonal", "subscriptions", "consultations", "corporate",
   "community", "loyalty", "blog", "communityqa", "care",
-  "corp-portal", "gift-cards",
+  "corp-portal", "gift-cards", "dashboard",
 ]);
 
 // View → path. Unknown keys fall back to "/".
@@ -388,6 +391,8 @@ function Navbar() {
           </nav>
         )}
 
+        {user && !isAdmin && <GlobalSearch />}
+
         <span className="nav-spacer" />
 
         <div className="nav-actions">
@@ -636,6 +641,7 @@ function MainApp() {
           <Route path="/care"          element={<CustomerOnly isAdmin={isAdmin}><Care /></CustomerOnly>} />
           <Route path="/corp-portal"   element={<CustomerOnly isAdmin={isAdmin}><CorporateOrders /></CustomerOnly>} />
           <Route path="/gift-cards"    element={<CustomerOnly isAdmin={isAdmin}><GiftCards /></CustomerOnly>} />
+          <Route path="/dashboard"    element={<CustomerOnly isAdmin={isAdmin}><Dashboard /></CustomerOnly>} />
 
           {/* 404 fallback → home */}
           <Route path="*" element={<Navigate to="/" replace />} />

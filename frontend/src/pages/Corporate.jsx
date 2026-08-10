@@ -21,7 +21,7 @@ export default function Corporate() {
   const load = () => {
     getMyCorporateQuotes().then((r) => setQuotes(r.data || []));
   };
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const addRow = () => setRecipients([...recipients, { name: "", address: "" }]);
   const removeRow = (i) =>

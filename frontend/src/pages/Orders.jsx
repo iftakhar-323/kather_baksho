@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getMyOrders } from "../api/orders";
+import { addToCart } from "../api/cart";
+import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import DeliveryTrack from "../components/DeliveryTrack";
 
-const STATUS_FLOW = ["Pending", "Processing", "Packed", "On the Way", "Delivered"];
 const STATUS_KEYS = {
   "Pending": "orders.placed",
   "Processing": "orders.paid",
@@ -21,45 +23,6 @@ function emojiFor(category) {
   return "🪵";
 }
 
-function DeliveryTrack({ status, createdAt }) {
-  const { t } = useTranslation();
-  const idx = STATUS_FLOW.indexOf(status);
-  const ok = idx >= 0;
-  const est = new Date(createdAt);
-  est.setDate(est.getDate() + 5);
-
-  return (
-    <div className="tracker">
-      <div className="est">
-        {t("orders.estimatedDelivery")}: <strong>{est.toLocaleDateString()}</strong>
-      </div>
-      <div className="steps">
-        {STATUS_FLOW.map((s, i) => {
-          const reached = ok && i <= idx;
-          const active = ok && i === idx;
-          const cls = active ? "dot active" : reached ? "dot done" : "dot";
-          return (
-            <div key={s} className="row" style={{ flex: 1, gap: 0 }}>
-              <span className={cls}>{reached ? "✓" : i + 1}</span>
-              {i < STATUS_FLOW.length - 1 && (
-                <span
-                  className={"bar" + (i < idx ? " done" : "")}
-                  style={{ marginLeft: 0 }}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-      <div className="labels">
-        {STATUS_FLOW.map((s) => (
-          <span key={s}>{t(STATUS_KEYS[s] || "orders.placed")}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function Orders() {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -67,6 +30,8 @@ export default function Orders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(null);
+  const [reordering, setReordering] = useState(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (!user) return;
@@ -78,6 +43,23 @@ export default function Orders() {
       })
       .finally(() => setLoading(false));
   }, [user]);
+
+  const handleReorder = async (order) => {
+    if (!order.items || order.items.length === 0) return;
+    setReordering(order.ID);
+    try {
+      // Re-add all items sequentially
+      for (const item of order.items) {
+        await addToCart(item.product_id, item.quantity);
+      }
+      toast.ok("Items added to cart");
+      window.__katherboxSetView?.("cart");
+    } catch (err) {
+      toast.err("Could not reorder all items. Some may be out of stock.");
+    } finally {
+      setReordering(null);
+    }
+  };
 
   if (!user) {
     return (
@@ -136,8 +118,11 @@ export default function Orders() {
                 style={{ flexWrap: "wrap", gap: 12, alignItems: "center" }}
               >
                 <div style={{ flex: 1, minWidth: 180 }}>
-                  <div style={{ fontWeight: 600 }}>
+                  <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
                     {t("orders.orderId", { id: o.ID })}
+                    <span className={`pay-pill pay-pill-${o.payment_method || 'cod'}`}>
+                      {o.payment_method || 'cod'}
+                    </span>
                   </div>
                   <div style={{ fontSize: 12.5, color: "var(--ink-400)" }}>
                     {new Date(o.created_at).toLocaleString()}
@@ -170,6 +155,14 @@ export default function Orders() {
                   title={t("orders.detailsTitle")}
                 >
                   {t("orders.detailsLabel")}
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => handleReorder(o)}
+                  disabled={reordering === o.ID}
+                  title="Add these items to cart again"
+                >
+                  {reordering === o.ID ? "Adding..." : "Buy Again 🔄"}
                 </button>
               </div>
 

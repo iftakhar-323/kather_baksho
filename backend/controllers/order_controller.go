@@ -17,6 +17,9 @@ type CheckoutInput struct {
 	CouponCode     string `json:"coupon_code"`
 	PointsToRedeem uint   `json:"points_to_redeem"`
 	GiftWrap       bool   `json:"gift_wrap"`
+	PaymentMethod  string `json:"payment_method"`
+	PaymentStatus  string `json:"payment_status"`
+	TransactionID  string `json:"transaction_id"`
 }
 
 // POST /api/orders/checkout - cart theke order banabe
@@ -79,12 +82,28 @@ func Checkout(c *gin.Context) {
 		finalTotal = 0
 	}
 
+	payMethod := input.PaymentMethod
+	if payMethod == "" {
+		payMethod = "cod"
+	}
+	payStatus := input.PaymentStatus
+	if payStatus == "" {
+		if payMethod == "cod" {
+			payStatus = "Pending COD"
+		} else {
+			payStatus = "Paid"
+		}
+	}
+
 	order := models.Order{
-		UserID:     userID,
-		TotalPrice: finalTotal,
-		Status:     "Pending",
-		GiftWrap:   input.GiftWrap,
-		Items:      orderItems,
+		UserID:        userID,
+		TotalPrice:    finalTotal,
+		Status:        "Pending",
+		PaymentMethod: payMethod,
+		PaymentStatus: payStatus,
+		TransactionID: input.TransactionID,
+		GiftWrap:      input.GiftWrap,
+		Items:         orderItems,
 	}
 	database.DB.Create(&order)
 

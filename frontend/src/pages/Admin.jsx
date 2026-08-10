@@ -19,7 +19,7 @@ import {
   adminListCorporate,
   adminUpdateCorporate,
 } from "../api/admin";
-import { createCoupon } from "../api/coupons";
+import { createCoupon, listCoupons, deleteCoupon } from "../api/coupons";
 import {
   getAnalyticsSummary,
   getTopCustomers,
@@ -263,7 +263,7 @@ function BlogCMS() {
       .catch(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -595,7 +595,7 @@ function RolesAdmin() {
       });
   };
 
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const onRoleChange = async (u, role) => {
     try {
@@ -696,7 +696,7 @@ function ReturnsAdmin() {
     );
   };
 
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const onUpdate = async (id, status) => {
     const m = await import("../api/orderExt");
@@ -768,7 +768,8 @@ function AdminRemindersTab() {
   const load = async () => {
     try {
       setLoading(true);
-      const data = await adminListReminders();
+      const res = await adminListReminders();
+      const data = res?.data ?? res ?? [];
       setRows(Array.isArray(data) ? data : data?.items || []);
       setError(null);
     } catch (e) {
@@ -839,7 +840,8 @@ function AdminSubscriptionsTab() {
   const load = async () => {
     try {
       setLoading(true);
-      const data = await adminListSubscriptions();
+      const res = await adminListSubscriptions();
+      const data = res?.data ?? res ?? [];
       setRows(Array.isArray(data) ? data : data?.items || []);
       setError(null);
     } catch (e) {
@@ -909,7 +911,8 @@ function AdminConsultationsTab() {
   const load = async () => {
     try {
       setLoading(true);
-      const data = await adminListConsultations();
+      const res = await adminListConsultations();
+      const data = res?.data ?? res ?? [];
       setRows(Array.isArray(data) ? data : data?.items || []);
       setError(null);
     } catch (e) {
@@ -993,7 +996,8 @@ function AdminCorporateTab() {
   const load = async () => {
     try {
       setLoading(true);
-      const data = await adminListCorporate();
+      const res = await adminListCorporate();
+      const data = res?.data ?? res ?? [];
       setRows(Array.isArray(data) ? data : data?.items || []);
       setError(null);
     } catch (e) {
@@ -1505,6 +1509,7 @@ function OrdersTab() {
                 <th>Order</th>
                 <th>User</th>
                 <th>Date</th>
+                <th>Payment</th>
                 <th>Items</th>
                 <th>Total</th>
                 <th>Status</th>
@@ -1516,7 +1521,17 @@ function OrdersTab() {
                 <tr key={o.ID}>
                   <td style={{ fontWeight: 600 }}>#{o.ID}</td>
                   <td>{userLabel(o.user_id)}</td>
-                  <td>{new Date(o.created_at).toLocaleDateString()}</td>
+                  <td>{new Date(o.CreatedAt ?? o.created_at ?? Date.now()).toLocaleDateString()}</td>
+                  <td>
+                    <span className={`pay-pill pay-pill-${o.payment_method || 'cod'}`}>
+                      {o.payment_method || 'cod'}
+                    </span>
+                    {o.transaction_id && (
+                      <div style={{ fontSize: 11, color: 'var(--ink-400)', fontFamily: 'var(--mono)', marginTop: 2 }}>
+                        {o.transaction_id}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <div className="stack gap-4">
                       {(o.items || []).map((it) => (
@@ -2065,12 +2080,29 @@ function DashboardTab() {
 
 // ============ Coupons Tab ============
 function CouponsTab() {
+  const [coupons, setCoupons] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(10);
   const [minOrderTotal, setMinOrderTotal] = useState(0);
   const [expiresAt, setExpiresAt] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+
+  const load = () => {
+    setLoading(true);
+    listCoupons()
+      .then((res) => {
+        const data = res?.data ?? res ?? [];
+        setCoupons(Array.isArray(data) ? data : data?.items || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -2089,6 +2121,7 @@ function CouponsTab() {
       setDiscountPercent(10);
       setMinOrderTotal(0);
       setExpiresAt("");
+      load();
     } catch (err) {
       setMsg(err?.response?.data?.error || err.message);
     } finally {
@@ -2096,31 +2129,75 @@ function CouponsTab() {
     }
   };
 
+  const remove = async (id) => {
+    if (!window.confirm("Delete this coupon?")) return;
+    try {
+      await deleteCoupon(id);
+      load();
+    } catch (err) {
+      alert(err?.response?.data?.error || "Failed to delete");
+    }
+  };
+
   return (
-    <div className="card mt-16" style={{ maxWidth: 480, padding: 16 }}>
-      <h3 style={{ marginTop: 0 }}>Create coupon</h3>
-      <form className="auth-form" onSubmit={submit}>
-        <div>
-          <label className="field-label">Code</label>
-          <input className="input" value={code} onChange={(e) => setCode(e.target.value)} required placeholder="e.g. SPRING10" />
-        </div>
-        <div>
-          <label className="field-label">Discount %</label>
-          <input className="input" type="number" min="1" max="100" value={discountPercent} onChange={(e) => setDiscountPercent(e.target.value)} />
-        </div>
-        <div>
-          <label className="field-label">Minimum order ৳ (0 = none)</label>
-          <input className="input" type="number" min="0" value={minOrderTotal} onChange={(e) => setMinOrderTotal(e.target.value)} />
-        </div>
-        <div>
-          <label className="field-label">Expires (YYYY-MM-DD, blank = never)</label>
-          <input className="input" type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
-        </div>
-        <button type="submit" disabled={busy} className="btn btn-primary">
-          {busy ? "Saving…" : "Create coupon"}
-        </button>
-        {msg && <p style={{ color: msg.startsWith("✓") ? "var(--leaf-700)" : "var(--rose)" }}>{msg}</p>}
-      </form>
+    <div className="row gap-24 mt-16" style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
+      <div className="card" style={{ flex: 1, minWidth: 320, padding: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Active Coupons ({coupons.length})</h3>
+        {loading ? (
+          <div className="muted">Loading coupons…</div>
+        ) : coupons.length === 0 ? (
+          <div className="muted">No coupons created yet.</div>
+        ) : (
+          <div className="table">
+            <div className="thead">
+              <div>Code</div>
+              <div>Discount</div>
+              <div>Min Order</div>
+              <div>Expires</div>
+              <div></div>
+            </div>
+            {coupons.map((c) => (
+              <div className="trow" key={c.id ?? c.ID}>
+                <div style={{ fontWeight: 700, fontFamily: "var(--mono)" }}>{c.code}</div>
+                <div>{c.discount_percent}%</div>
+                <div>৳{c.min_order_total || 0}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{c.expires_at || "Never"}</div>
+                <div>
+                  <button className="btn btn-sm btn-danger" onClick={() => remove(c.id ?? c.ID)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="card" style={{ width: 340, padding: 16 }}>
+        <h3 style={{ marginTop: 0 }}>Create coupon</h3>
+        <form className="auth-form" onSubmit={submit}>
+          <div>
+            <label className="field-label">Code</label>
+            <input className="input" value={code} onChange={(e) => setCode(e.target.value)} required placeholder="e.g. SPRING10" />
+          </div>
+          <div>
+            <label className="field-label">Discount %</label>
+            <input className="input" type="number" min="1" max="100" value={discountPercent} onChange={(e) => setDiscountPercent(e.target.value)} />
+          </div>
+          <div>
+            <label className="field-label">Minimum order ৳ (0 = none)</label>
+            <input className="input" type="number" min="0" value={minOrderTotal} onChange={(e) => setMinOrderTotal(e.target.value)} />
+          </div>
+          <div>
+            <label className="field-label">Expires (YYYY-MM-DD, blank = never)</label>
+            <input className="input" type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+          </div>
+          <button type="submit" disabled={busy} className="btn btn-primary">
+            {busy ? "Saving…" : "Create coupon"}
+          </button>
+          {msg && <p style={{ color: msg.startsWith("✓") ? "var(--leaf-700)" : "var(--rose)" }}>{msg}</p>}
+        </form>
+      </div>
     </div>
   );
 }
@@ -2135,48 +2212,38 @@ function ReviewsAdmin() {
   const [autoFilled, setAutoFilled] = useState(false);
 
   const load = () => {
-    if (!productId) {
-      setRows([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
-    listProductReviews(productId)
-      .then((res) => {
-        const data = res.data || {};
-        setRows(data.reviews || []);
-        setHint(`${data.count || 0} reviews · avg ${Number(data.avg || 0).toFixed(2)}`);
-        setLoading(false);
-      })
-      .catch((err) => {
-        toast.err(err?.response?.data?.error || "Failed to load");
-        setLoading(false);
-      });
+    if (productId) {
+      listProductReviews(productId)
+        .then((res) => {
+          const data = res.data || {};
+          setRows(data.reviews || []);
+          setHint(`${data.count || 0} reviews · avg ${Number(data.avg || 0).toFixed(2)}`);
+          setLoading(false);
+        })
+        .catch((err) => {
+          toast.err(err?.response?.data?.error || "Failed to load");
+          setLoading(false);
+        });
+    } else {
+      API.get("/admin/reviews")
+        .then((res) => {
+          const data = res.data || {};
+          const list = data.reviews || [];
+          setRows(list);
+          setHint(`${list.length} total reviews across all products`);
+          setLoading(false);
+        })
+        .catch((err) => {
+          toast.err(err?.response?.data?.error || "Failed to load");
+          setLoading(false);
+        });
+    }
   };
 
-  // Auto-pick the first product on mount so the tab isn't empty by default.
   useEffect(() => {
-    if (autoFilled) return;
-    API.get("/products/?limit=1")
-      .then((res) => {
-        const first = (res.data?.items || [])[0] || (res.data?.products || [])[0];
-        const pid = first?.id ?? first?.ID;
-        if (pid) {
-          setProductId(String(pid));
-          setAutoFilled(true);
-        } else {
-          setLoading(false);
-        }
-      })
-      .catch(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!autoFilled) return; // wait for autofill
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, autoFilled]);
+  }, [productId]);
 
   const onDelete = async (id) => {
     if (!window.confirm("Delete this review?")) return;
@@ -2227,7 +2294,7 @@ function ReviewsAdmin() {
               <div>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>
               <div style={{ maxWidth: 340 }}>{r.comment || <span className="muted">—</span>}</div>
               <div className="muted" style={{ fontSize: 12 }}>
-                {new Date(r.created_at).toLocaleDateString()}
+                {new Date(r.CreatedAt ?? r.created_at ?? Date.now()).toLocaleDateString()}
               </div>
               <div>
                 <button className="btn btn-sm btn-danger" onClick={() => onDelete(r.id ?? r.ID)}>
@@ -2264,7 +2331,7 @@ function CategoriesAdmin() {
       });
   };
 
-  useEffect(load, []);
+  useEffect(() => { load(); }, []);
 
   const openNew = () => {
     setEditing(null);

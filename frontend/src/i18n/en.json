@@ -5,6 +5,7 @@
   },
   "nav": {
     "shop": "Shop",
+    "dashboard": "Dashboard",
     "wishlist": "Wishlist",
     "cart": "Cart",
     "orders": "Orders",

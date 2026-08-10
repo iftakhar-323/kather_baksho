@@ -38,5 +38,8 @@ func AdminRoutes(router *gin.Engine) {
 		// users + roles
 		g.GET("/users", controllers.AdminListUsers)
 		g.PUT("/users/:id/role", controllers.AdminUpdateUserRole)
+
+		// reviews
+		g.GET("/reviews", controllers.AdminListReviews)
 	}
 }

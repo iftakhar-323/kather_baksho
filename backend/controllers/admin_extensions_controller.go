@@ -15,8 +15,7 @@ import (
 func AdminListReminders(c *gin.Context) {
 	var list []models.CareReminder
 	database.DB.Preload("Product").
-		Where("completed = ?", false).
-		Order("next_due_date asc").
+		Order("completed asc, next_due_date asc").
 		Find(&list)
 	// hydrate user info manually (no User FK model)
 	type Out struct {

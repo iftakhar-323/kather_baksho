@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"strings"
 	"time"
 
 	"katherbox/database"
@@ -69,14 +71,38 @@ func main() {
 
 	router := gin.Default()
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+	allowedOrigins := []string{
+		"http://localhost:5173",
+		"http://localhost:5174",
+		"http://localhost:80",
+		"http://localhost",
+		"http://127.0.0.1:5173",
+		"http://127.0.0.1:5174",
+	}
+	if customOrigins := os.Getenv("ALLOWED_ORIGINS"); customOrigins != "" {
+		if customOrigins == "*" {
+			allowedOrigins = []string{"*"}
+		} else {
+			allowedOrigins = append(allowedOrigins, strings.Split(customOrigins, ",")...)
+		}
+	}
+
+	corsConfig := cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}
+
+	if len(allowedOrigins) == 1 && allowedOrigins[0] == "*" {
+		corsConfig.AllowAllOrigins = true
+		corsConfig.AllowCredentials = false
+	} else {
+		corsConfig.AllowOrigins = allowedOrigins
+	}
+
+	router.Use(cors.New(corsConfig))
 
 	routes.ProductRoutes(router)
 	routes.AuthRoutes(router)
@@ -108,5 +134,13 @@ func main() {
 	routes.ReviewRoutes(router)
 	routes.CategoryRoutes(router)
 
-	router.Run(":8081")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+	if !strings.HasPrefix(port, ":") {
+		port = ":" + port
+	}
+
+	router.Run(port)
 }

@@ -4,11 +4,14 @@ import "gorm.io/gorm"
 
 type Order struct {
 	gorm.Model
-	UserID     uint        `json:"user_id"`
-	TotalPrice float64     `json:"total_price"`
-	Status     string      `json:"status"` // Pending, Processing, Packed, On the Way, Delivered
-	GiftWrap   bool        `json:"gift_wrap" gorm:"default:false"`
-	Items      []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
+	UserID        uint        `json:"user_id"`
+	TotalPrice    float64     `json:"total_price"`
+	Status        string      `json:"status"` // Pending, Processing, Packed, On the Way, Delivered
+	PaymentMethod string      `json:"payment_method" gorm:"default:'cod'"`
+	PaymentStatus string      `json:"payment_status" gorm:"default:'Pending'"`
+	TransactionID string      `json:"transaction_id"`
+	GiftWrap      bool        `json:"gift_wrap" gorm:"default:false"`
+	Items         []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
 }
 
 type OrderItem struct {

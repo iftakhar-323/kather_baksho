@@ -9,6 +9,7 @@ import { checkout } from "../api/orders";
 import { getMe } from "../api/auth";
 import { applyCoupon } from "../api/coupons";
 import { useTranslation } from "../i18n/I18nProvider";
+import PaymentModal from "../components/PaymentModal";
 
 const FREE_SHIPPING_THRESHOLD = 1500; // ৳
 const GIFT_WRAP_FEE = 50;
@@ -61,6 +62,7 @@ export default function Cart({ onOrderPlaced }) {
   const [confirm, setConfirm] = useState(null);     // {title, body, danger, onConfirm}
   const [toast, setToast] = useState(null);         // {tone, msg}
   const [collapsed, setCollapsed] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const showToast = (tone, msg) => {
     setToast({ tone, msg });
@@ -217,41 +219,32 @@ export default function Cart({ onOrderPlaced }) {
 
   const handleCheckout = () => {
     if (items.length === 0) return;
-    const pointsNote = pointsDiscount
-      ? t("cart.placeOrderPointsNote", { count: pointsDiscount })
-      : "";
-    const couponNote = couponDiscount
-      ? t("cart.placeOrderCouponNote", { code: couponCode })
-      : "";
-    setConfirm({
-      title: t("cart.confirmTitle"),
-      body: t("cart.placeOrderConfirm", { total: fmtBDT(total), pointsNote, couponNote }),
-      danger: false,
-      confirmText: checkingOut
-        ? t("cart.checkoutPlacing")
-        : t("cart.checkoutConfirm", { total: fmtBDT(total) }),
-      onConfirm: async () => {
-        setConfirm(null);
-        try {
-          setCheckingOut(true);
-          const res = await checkout({
-            coupon_code: couponInfo ? couponCode : "",
-            points_to_redeem: pointsToUse || 0,
-            gift_wrap: giftWrap,
-          });
-          setOrder(res.data);
-          getMe().then((r) => setUserPoints(r.data.points || 0)).catch(() => {});
-          load();
-          showToast("ok", t("cart.orderPlaced", { id: res.data.order.ID }));
-        } catch (err) {
-          const msg = err.response?.data?.error || t("cart.checkoutFailed");
-          setError(msg);
-          showToast("err", msg);
-        } finally {
-          setCheckingOut(false);
-        }
-      },
-    });
+    setShowPaymentModal(true);
+  };
+
+  const handleCompletePayment = async ({ paymentMethod, paymentStatus, transactionId }) => {
+    setShowPaymentModal(false);
+    try {
+      setCheckingOut(true);
+      const res = await checkout({
+        coupon_code: couponInfo ? couponCode : "",
+        points_to_redeem: pointsToUse || 0,
+        gift_wrap: giftWrap,
+        payment_method: paymentMethod,
+        payment_status: paymentStatus,
+        transaction_id: transactionId,
+      });
+      setOrder(res.data);
+      getMe().then((r) => setUserPoints(r.data.points || 0)).catch(() => {});
+      load();
+      showToast("ok", t("cart.orderPlaced", { id: res.data.order.ID }));
+    } catch (err) {
+      const msg = err.response?.data?.error || t("cart.checkoutFailed");
+      setError(msg);
+      showToast("err", msg);
+    } finally {
+      setCheckingOut(false);
+    }
   };
 
   // ── Order confirmation screen ─────────────────────────────────────────────
@@ -274,6 +267,18 @@ export default function Cart({ onOrderPlaced }) {
           <div className="cart-summary-row"><span>{t("cart.subtotal")}</span><strong>{fmtBDT(sub)}</strong></div>
           {disc > 0 && (
             <div className="cart-summary-row cart-savings"><span>{t("cart.youSaved")}</span><strong>−{fmtBDT(disc)}</strong></div>
+          )}
+          <div className="cart-summary-row">
+            <span>Payment Method</span>
+            <span className={`pay-pill pay-pill-${order.order.payment_method || 'cod'}`}>
+              {order.order.payment_method || 'cod'}
+            </span>
+          </div>
+          {order.order.transaction_id && (
+            <div className="cart-summary-row">
+              <span>Transaction ID</span>
+              <strong style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{order.order.transaction_id}</strong>
+            </div>
           )}
           <div className="cart-summary-row cart-summary-total"><span>{t("cart.totalPaid")}</span><strong>{fmtBDT(order.order.total_price)}</strong></div>
         </div>
@@ -691,6 +696,17 @@ export default function Cart({ onOrderPlaced }) {
         <div className={`cart-toast cart-toast-${toast.tone}`} role="status">
           {toast.msg}
         </div>
+      )}
+
+      {/* Payment Gateway Modal */}
+      {showPaymentModal && (
+        <PaymentModal
+          total={total}
+          items={items}
+          user={user}
+          onClose={() => setShowPaymentModal(false)}
+          onComplete={handleCompletePayment}
+        />
       )}
     </div>
   );

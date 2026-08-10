@@ -161,7 +161,7 @@ func ensureUser() models.User {
 
 func pickUserID() uint {
 	var u models.User
-	if err := database.DB.Where("role = ?", "customer").Order("RANDOM()").First(&u).Error; err == nil {
+	if err := database.DB.Order("RANDOM()").First(&u).Error; err == nil {
 		return u.ID
 	}
 	return ensureUser().ID
@@ -428,6 +428,102 @@ func seedRoles() (created int) {
 	return len(users)
 }
 
+func seedOrders() (created int) {
+	var have int64
+	database.DB.Model(&models.Order{}).Count(&have)
+	payMethods := []string{"bkash", "nagad", "rocket", "card", "cod"}
+	orderStatuses := []string{"Pending", "Processing", "Packed", "On the Way", "Delivered"}
+
+	for i := have; i < targetPerTable; i++ {
+		uid := pickUserID()
+		method := pickStr(payMethods)
+		status := pickStr(orderStatuses)
+		payStatus := "Paid"
+		if method == "cod" {
+			payStatus = "Pending COD"
+		}
+
+		pid1 := pickProductID()
+		pid2 := pickProductID()
+		if pid1 == 0 {
+			continue
+		}
+
+		items := []models.OrderItem{
+			{ProductID: pid1, Quantity: uint(rng.Intn(3) + 1), Price: 450.0},
+		}
+		if pid2 != 0 && pid2 != pid1 {
+			items = append(items, models.OrderItem{ProductID: pid2, Quantity: uint(rng.Intn(2) + 1), Price: 850.0})
+		}
+
+		tot := 0.0
+		for _, it := range items {
+			tot += it.Price * float64(it.Quantity)
+		}
+
+		txnID := fmt.Sprintf("TRX%06d%d", rng.Intn(999999), i)
+		ord := models.Order{
+			UserID:        uid,
+			TotalPrice:    tot,
+			Status:        status,
+			PaymentMethod: method,
+			PaymentStatus: payStatus,
+			TransactionID: txnID,
+			GiftWrap:      rng.Float64() > 0.5,
+			Items:         items,
+		}
+		database.DB.Create(&ord)
+		created++
+	}
+	return
+}
+
+func seedGiftCards() (created int) {
+	var have int64
+	database.DB.Model(&models.GiftCard{}).Count(&have)
+	balances := []float64{500, 1000, 2000, 3000, 5000}
+	for i := have; i < targetPerTable; i++ {
+		gc := models.GiftCard{
+			Code:      fmt.Sprintf("GIFT-%04d", 1000+i),
+			Balance:   pickFloat(balances),
+			IssuedTo:  fmt.Sprintf("Recipient #%d", i+1),
+			IssuedBy:  pickUserID(),
+			Active:    true,
+			ExpiresAt: futureDate(180),
+		}
+		database.DB.Create(&gc)
+		created++
+	}
+	return
+}
+
+func seedCommunity() (created int) {
+	var have int64
+	database.DB.Model(&models.CommunityQuestion{}).Count(&have)
+	qTitles := []string{
+		"How often should I water my Snake Plant during winter?",
+		"Yellow leaves on Monstera Deliciosa — overwatering or light issue?",
+		"Best soil mixture for indoor succulents in humid climate?",
+		"Is neem oil safe for flowering orchids?",
+		"How to control spider mites organically?",
+		"Recommended fertilizer NPK ratio for fiddle leaf fig?",
+	}
+	for i := have; i < targetPerTable; i++ {
+		q := models.CommunityQuestion{
+			UserID:    pickUserID(),
+			Author:    pickStr([]string{"PlantEnthusiast", "GreenThumbBD", "Tanvir_Green", "Sara_Plants", "Anik_Gardener"}),
+			Title:     fmt.Sprintf("%s (#%d)", pickStr(qTitles), i+1),
+			Body:      "Looking for expert advice from experienced plant owners! Any tips or recommendations would be appreciated.",
+			Tags:      "indoor,care,watering",
+			ProductID: pickProductID(),
+			Status:    pickStr([]string{"open", "answered", "resolved"}),
+		}
+		database.DB.Create(&q)
+		created++
+	}
+	return
+}
+
 // ---------- main ----------
 
 func main() {
@@ -449,6 +545,9 @@ func main() {
 		{"returns", seedReturns()},
 		{"reviews", seedReviews()},
 		{"blog", seedBlog()},
+		{"orders", seedOrders()},
+		{"gift_cards", seedGiftCards()},
+		{"community", seedCommunity()},
 		{"user_roles", seedRoles()},
 	}
 
@@ -458,7 +557,7 @@ func main() {
 
 	// final snapshot
 	fmt.Println("\n--- row counts after seed ---")
-	for _, t := range []string{"users", "products", "orders", "categories", "reviews", "coupons", "subscriptions", "consultations", "care_reminders", "corporate_quotes", "return_requests", "blog_posts"} {
+	for _, t := range []string{"users", "products", "orders", "categories", "reviews", "coupons", "subscriptions", "consultations", "care_reminders", "corporate_quotes", "return_requests", "blog_posts", "gift_cards", "community_questions"} {
 		var n int64
 		database.DB.Table(t).Count(&n)
 		fmt.Printf("  %-18s %d\n", t, n)

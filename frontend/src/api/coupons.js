@@ -6,3 +6,5 @@ export const applyCoupon = (code, order_total) =>
 
 // POST /api/admin/coupons  — admin only
 export const createCoupon = (data) => API.post("/admin/coupons", data);
+export const listCoupons = () => API.get("/admin/coupons");
+export const deleteCoupon = (id) => API.delete(`/admin/coupons/${id}`);

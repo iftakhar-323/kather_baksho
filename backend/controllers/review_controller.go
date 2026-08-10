@@ -192,3 +192,13 @@ func MyReviews(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, rs)
 }
+
+// GET /api/admin/reviews   (admin only) — all reviews across all products
+func AdminListReviews(c *gin.Context) {
+	var list []models.Review
+	database.DB.Order("created_at desc").Limit(100).Find(&list)
+	c.JSON(http.StatusOK, gin.H{
+		"reviews": list,
+		"count":   len(list),
+	})
+}

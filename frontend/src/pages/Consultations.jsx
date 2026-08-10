@@ -32,7 +32,7 @@ export default function Consultations() {
         setLoading(false);
       });
   };
-  useEffect(loadAll, []);
+  useEffect(() => { loadAll(); }, []);
 
   const book = async (e) => {
     e.preventDefault();

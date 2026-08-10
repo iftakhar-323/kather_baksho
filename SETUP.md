@@ -1,10 +1,31 @@
 # 🚀 Setup Guide — install KatherBox on a new machine
 
-Follow this end-to-end and you'll have the full app running locally in **under 10 minutes**.
+Follow this end-to-end and you'll have the full app running locally in **under 2 minutes** with Docker, or under 10 minutes with manual setup.
 
 ---
 
-## 0. Prerequisites
+## ⚡ Super-Quick Start: Docker (Recommended)
+
+If you have **Docker** and **Docker Compose** installed:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/<your-org>/kather_box.git
+cd kather_box
+
+# 2. Run the application
+docker compose up --build
+```
+
+Access the app at:
+- **Frontend App**: <http://localhost>
+- **Backend API**: <http://localhost:8081/api>
+
+To stop the app: `Ctrl + C` or `docker compose down`
+
+---
+
+## 0. Prerequisites (For Manual Local Development)
 
 | Tool    | Minimum | Check                |
 |---------|---------|----------------------|

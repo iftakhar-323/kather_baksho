@@ -65,7 +65,7 @@ export default function Care() {
       .catch(() => setLoading(false));
   };
 
-  useEffect(loadAll, []);
+  useEffect(() => { loadAll(); }, []);
 
   useEffect(() => {
     getCareCalendar(month)

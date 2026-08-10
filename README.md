@@ -55,6 +55,21 @@ See `backend/README.md` and `frontend/README.md` for the full picture.
 
 ## 3. Quick start (TL;DR)
 
+### Option A: Using Docker (Recommended)
+
+Run the full stack (Go backend + React frontend + SQLite storage + Nginx proxy) in **one command**:
+
+```bash
+docker compose up --build
+```
+
+- **Frontend**: <http://localhost> (Port 80)
+- **Backend API**: <http://localhost:8081>
+
+---
+
+### Option B: Local Manual Setup
+
 ```bash
 # 1. Backend
 cd backend
@@ -69,7 +84,7 @@ npm install
 npm run dev                     # Web → http://localhost:5173
 ```
 
-Open <http://localhost:5173> and log in.
+Open <http://localhost:5173> (or <http://localhost> with Docker) and log in.
 
 ---
 

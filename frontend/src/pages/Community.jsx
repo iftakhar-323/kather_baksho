@@ -33,7 +33,7 @@ export default function Community() {
       .then((r) => setPosts(r.data || []))
       .catch(() => setPosts([]));
   };
-  useEffect(reload, []);
+  useEffect(() => { reload(); }, []);
 
   const submitPost = async (e) => {
     e.preventDefault();

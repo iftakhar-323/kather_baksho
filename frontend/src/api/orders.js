@@ -1,7 +1,7 @@
 import API from "./axios";
 
 // POST /api/orders/checkout  — converts current cart into an order, clears cart
-export const checkout = () => API.post("/orders/checkout");
+export const checkout = (data) => API.post("/orders/checkout", data);
 
 // GET /api/orders/  — current user's order history
 export const getMyOrders = () => API.get("/orders/");
