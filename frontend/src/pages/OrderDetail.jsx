@@ -73,6 +73,7 @@ export default function OrderDetail({ order, onBack }) {
       });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [order.id]);
 
   const onViewInvoice = () => {

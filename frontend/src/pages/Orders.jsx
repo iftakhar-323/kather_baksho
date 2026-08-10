@@ -42,6 +42,7 @@ export default function Orders() {
         setError(t("orders.loadFailed"));
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleReorder = async (order) => {
@@ -54,7 +55,7 @@ export default function Orders() {
       }
       toast.ok("Items added to cart");
       window.__katherboxSetView?.("cart");
-    } catch (err) {
+    } catch (_err) {
       toast.err("Could not reorder all items. Some may be out of stock.");
     } finally {
       setReordering(null);

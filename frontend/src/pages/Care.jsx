@@ -65,6 +65,7 @@ export default function Care() {
       .catch(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadAll(); }, []);
 
   useEffect(() => {

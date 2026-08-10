@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getProducts } from "../api/products";
-import { fmtBDT, emojiFor } from "../utils/kb";
 import ProductCard from "./ProductCard";
 
 // Curated collections built purely from product data we already have.

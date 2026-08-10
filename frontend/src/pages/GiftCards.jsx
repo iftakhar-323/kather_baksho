@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  getGiftCardBalance,
   redeemGiftCard,
   // myGiftCards is not yet in shopping.js; fall back below
   createGiftCard,
@@ -41,6 +40,7 @@ export default function GiftCards() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const onCheckBalance = async (e) => {

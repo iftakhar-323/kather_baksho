@@ -23,7 +23,7 @@ import { useTranslation } from "../i18n/I18nProvider";
 
 export default function Profile({ onExit }) {
   const { t } = useTranslation();
-  const { user, refreshUser, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [tab, setTab] = useState("profile");
   const [toast, setToast] = useState(null);
 
@@ -271,7 +271,7 @@ function AddressBookTab({ onSaved }) {
     try {
       const res = await listAddresses();
       setItems(res.data.items || []);
-    } catch (e) {
+    } catch (_e) {
       onSaved(t("profile.loadAddressesFailed"), "error");
     } finally {
       setLoading(false);
