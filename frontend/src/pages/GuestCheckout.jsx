@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useCart } from "../context/AuthContext"; // local helper if exists
 import { placeGuestOrder } from "../api/shopping";
 import { useToast } from "../components/Toast";
 

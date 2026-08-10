@@ -123,6 +123,7 @@ function OtpInput({ length = 6, onComplete }) {
 
 // ── Main PaymentModal ────────────────────────────────────────────────────────
 export default function PaymentModal({ total, items, user, onClose, onComplete }) {
+  // eslint-disable-next-line no-unused-vars
   const { t } = useTranslation();
 
   // Steps: 0=Summary, 1=Delivery, 2=Payment, 3=OTP/Processing, 4=Success
@@ -139,7 +140,7 @@ export default function PaymentModal({ total, items, user, onClose, onComplete }
   const [mobileNo, setMobileNo] = useState("");
   const [pin, setPin] = useState("");
   const [cardNumber, setCardNumber] = useState("");
-  const [cardHolder, setCardHolder] = useState(user?.name || "");
+  const [cardHolder, _setCardHolder] = useState(user?.name || "");
   const [cardExp, setCardExp] = useState("");
   const [cardCvc, setCardCvc] = useState("");
 
@@ -215,7 +216,7 @@ export default function PaymentModal({ total, items, user, onClose, onComplete }
     startProcessing();
   };
 
-  const handleOtpComplete = (otp) => {
+  const handleOtpComplete = (_otp) => {
     setOtpVerified(true);
     setShowOtp(false);
     setProcessingStatus("OTP verified ✓ — Processing payment...");

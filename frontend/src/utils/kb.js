@@ -13,6 +13,7 @@ const safeGet = (key) => {
 const safeSet = (key, val) => {
   try { localStorage.setItem(key, val); } catch {}
 };
+// eslint-disable-next-line no-unused-vars
 const safeDel = (key) => {
   try { localStorage.removeItem(key); } catch {}
 };

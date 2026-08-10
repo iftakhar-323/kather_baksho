@@ -10,7 +10,7 @@ const I18nCtx = createContext({
   setLang: () => {},
   toggle: () => {},
   t: (k) => k,
-  has: (k) => false,
+  has: (_k) => false,
 });
 
 function lookup(dict, path) {
@@ -73,8 +73,10 @@ export function I18nProvider({ children }) {
   return <I18nCtx.Provider value={value}>{children}</I18nCtx.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTranslation() {
   return useContext(I18nCtx);
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const SUPPORTED_LANGS = Object.keys(DICTS);
