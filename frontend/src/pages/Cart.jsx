@@ -13,7 +13,7 @@ import PaymentModal from "../components/PaymentModal";
 
 const FREE_SHIPPING_THRESHOLD = 1500; // ৳
 const GIFT_WRAP_FEE = 50;
-const TAX_RATE = 0;          // single BDT-wide inclusive-pricing model
+const _TAX_RATE = 0;          // single BDT-wide inclusive-pricing model
 const SHIPPING_FEE = 60;
 
 function emojiFor(category, subcategory) {
@@ -184,7 +184,7 @@ export default function Cart({ onOrderPlaced }) {
           await removeCartItem(item.ID);
           load();
           showToast("ok", t("cart.itemRemoved"));
-        } catch (err) {
+        } catch {
           showToast("err", t("cart.removeFailed"));
         } finally {
           setBusyId(null);

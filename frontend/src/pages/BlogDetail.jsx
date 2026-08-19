@@ -40,6 +40,7 @@ export default function BlogDetail({ slug, onBack }) {
       });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     load();
   }, [slug]);

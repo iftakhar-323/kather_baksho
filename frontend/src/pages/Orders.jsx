@@ -55,7 +55,7 @@ export default function Orders() {
       }
       toast.ok("Items added to cart");
       window.__katherboxSetView?.("cart");
-    } catch (_err) {
+    } catch {
       toast.err("Could not reorder all items. Some may be out of stock.");
     } finally {
       setReordering(null);

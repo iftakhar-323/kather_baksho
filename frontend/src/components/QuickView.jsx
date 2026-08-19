@@ -42,7 +42,7 @@ export default function QuickView({ productId, onClose }) {
       await addToCart(product.ID, 1);
       toast.ok(`Added ${product.name} to cart`);
       onClose();
-    } catch (e) {
+    } catch {
       toast.err("Could not add to cart");
     } finally {
       setAdding(false);
@@ -54,7 +54,7 @@ export default function QuickView({ productId, onClose }) {
     try {
       await addToWishlist(product.ID);
       toast.ok("Saved to wishlist ♥");
-    } catch (e) {
+    } catch {
       toast.err("Could not save");
     }
   };

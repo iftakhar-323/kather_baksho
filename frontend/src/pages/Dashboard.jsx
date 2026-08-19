@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
-import { useTranslation } from "../i18n/I18nProvider";
+
 
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
@@ -27,7 +27,7 @@ function timeAgo(dateStr) {
 }
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);

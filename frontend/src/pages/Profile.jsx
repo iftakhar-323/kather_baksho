@@ -271,13 +271,14 @@ function AddressBookTab({ onSaved }) {
     try {
       const res = await listAddresses();
       setItems(res.data.items || []);
-    } catch (_e) {
+    } catch {
       onSaved(t("profile.loadAddressesFailed"), "error");
     } finally {
       setLoading(false);
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { reload(); }, []);
 
   const save = async (form) => {
