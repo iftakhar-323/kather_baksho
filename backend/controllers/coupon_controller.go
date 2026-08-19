@@ -78,3 +78,15 @@ func ListCoupons(c *gin.Context) {
         }
         c.JSON(http.StatusOK, gin.H{"items": rows, "total": len(rows)})
 }
+
+// DELETE /api/admin/coupons/:id - admin deletes a coupon
+func DeleteCoupon(c *gin.Context) {
+	id := c.Param("id")
+	var coupon models.Coupon
+	if err := database.DB.First(&coupon, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Coupon not found"})
+		return
+	}
+	database.DB.Delete(&coupon)
+	c.JSON(http.StatusOK, gin.H{"message": "Coupon deleted successfully"})
+}

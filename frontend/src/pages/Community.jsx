@@ -274,6 +274,13 @@ export default function Community() {
               <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>
                 {p.body}
               </div>
+
+              {p.like_count > 0 && p.liked_by_names?.length > 0 && (
+                <div style={{ fontSize: 13, color: "var(--leaf-600)", marginBottom: 12 }}>
+                  <strong>Liked by:</strong> {p.liked_by_names.join(", ")}
+                </div>
+              )}
+
               <div className="row gap-12" style={{ alignItems: "center" }}>
                 <button
                   className={
@@ -281,6 +288,7 @@ export default function Community() {
                     (p.liked_by_me ? "btn-primary" : "btn-secondary")
                   }
                   onClick={() => like(p.id)}
+                  title={p.liked_by_names?.length > 0 ? "Liked by: " + p.liked_by_names.join(", ") : ""}
                 >
                   {p.liked_by_me ? "♥" : "♡"} {p.like_count}
                 </button>

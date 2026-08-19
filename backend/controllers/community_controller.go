@@ -25,24 +25,46 @@ func ListPosts(c *gin.Context) {
 	// enrich with like-count + comment-count
 	type PostOut struct {
 		models.CommunityPost
-		LikeCount    int64 `json:"like_count"`
-		CommentCount int64 `json:"comment_count"`
-		LikedByMe    bool  `json:"liked_by_me"`
+		LikeCount    int64    `json:"like_count"`
+		CommentCount int64    `json:"comment_count"`
+		LikedByMe    bool     `json:"liked_by_me"`
+		LikedByNames []string `json:"liked_by_names"`
 	}
 	out := make([]PostOut, 0, len(posts))
 	uid := c.GetUint("user_id")
 	for _, p := range posts {
+		if p.Author == "" || p.Author == "Anonymous" {
+			var u models.User
+			if err := database.DB.First(&u, p.UserID).Error; err == nil && u.Name != "" {
+				p.Author = u.Name
+			}
+		}
+
 		var lc int64
 		var cc int64
 		var mine int64
 		database.DB.Model(&models.CommunityLike{}).Where("post_id = ?", p.ID).Count(&lc)
 		database.DB.Model(&models.CommunityComment{}).Where("post_id = ?", p.ID).Count(&cc)
 		database.DB.Model(&models.CommunityLike{}).Where("post_id = ? AND user_id = ?", p.ID, uid).Count(&mine)
+
+		var likeUsers []models.User
+		database.DB.Joins("JOIN community_likes ON community_likes.user_id = users.id").
+			Where("community_likes.post_id = ?", p.ID).Find(&likeUsers)
+		var likedByNames []string
+		for _, lu := range likeUsers {
+			if lu.Name != "" {
+				likedByNames = append(likedByNames, lu.Name)
+			} else {
+				likedByNames = append(likedByNames, lu.Email)
+			}
+		}
+
 		out = append(out, PostOut{
 			CommunityPost: p,
 			LikeCount:     lc,
 			CommentCount:  cc,
 			LikedByMe:     mine > 0,
+			LikedByNames:  likedByNames,
 		})
 	}
 	c.JSON(http.StatusOK, out)
@@ -57,8 +79,9 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 	author := ""
-	if u, ok := c.Get("user_name"); ok {
-		author, _ = u.(string)
+	var user models.User
+	if err := database.DB.Select("name").First(&user, userID).Error; err == nil {
+		author = user.Name
 	}
 	if input.Category == "" {
 		input.Category = "story"
@@ -84,6 +107,14 @@ func ListComments(c *gin.Context) {
 	id := c.Param("id")
 	var list []models.CommunityComment
 	database.DB.Where("post_id = ?", id).Order("created_at asc").Find(&list)
+	for i := range list {
+		if list[i].Author == "" || list[i].Author == "Anonymous" {
+			var u models.User
+			if err := database.DB.First(&u, list[i].UserID).Error; err == nil && u.Name != "" {
+				list[i].Author = u.Name
+			}
+		}
+	}
 	c.JSON(http.StatusOK, list)
 }
 
@@ -97,8 +128,9 @@ func AddComment(c *gin.Context) {
 		return
 	}
 	author := ""
-	if u, ok := c.Get("user_name"); ok {
-		author, _ = u.(string)
+	var user models.User
+	if err := database.DB.Select("name").First(&user, userID).Error; err == nil {
+		author = user.Name
 	}
 	postID, _ := strconv.Atoi(id)
 	comm := models.CommunityComment{

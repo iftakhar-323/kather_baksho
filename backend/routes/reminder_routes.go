@@ -13,5 +13,6 @@ func ReminderRoutes(router *gin.Engine) {
 	{
 		g.GET("/", controllers.GetReminders)
 		g.POST("/:id/complete", controllers.CompleteReminder)
+		g.DELETE("/:id", controllers.DeleteReminder)
 	}
 }

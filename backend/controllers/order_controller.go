@@ -51,13 +51,29 @@ func Checkout(c *gin.Context) {
 	}
 
 	// coupon discount
-	var discount float64
+	var couponDiscount float64
+	var appliedCouponCode string
 	if input.CouponCode != "" {
 		var coupon models.Coupon
 		if err := database.DB.Where("code = ?", input.CouponCode).First(&coupon).Error; err == nil && coupon.Active {
-			discount += totalPrice * coupon.DiscountPercent / 100
+			valid := true
+			if coupon.ExpiresAt != "" {
+				exp, err := time.Parse("2006-01-02", coupon.ExpiresAt)
+				if err == nil && time.Now().After(exp) {
+					valid = false
+				}
+			}
+			if totalPrice < coupon.MinOrderTotal {
+				valid = false
+			}
+			if valid {
+				couponDiscount = totalPrice * coupon.DiscountPercent / 100
+				appliedCouponCode = coupon.Code
+			}
 		}
 	}
+	
+	discount := couponDiscount
 
 	// Green Points redemption: 1 point = ৳1 discount
 	if input.PointsToRedeem > 0 {
@@ -103,20 +119,14 @@ func Checkout(c *gin.Context) {
 		PaymentStatus: payStatus,
 		TransactionID: input.TransactionID,
 		GiftWrap:      input.GiftWrap,
+		CouponCode:    appliedCouponCode,
+		DiscountAmount: couponDiscount,
 		Items:         orderItems,
 	}
 	database.DB.Create(&order)
 
-	// decrement product stock now that the order is placed
-	for _, item := range cart.Items {
-		database.DB.Model(&models.Product{}).
-			Where("id = ? AND stock >= ?", item.ProductID, item.Quantity).
-			Update("stock", gorm.Expr("CASE WHEN stock >= ? THEN stock - ? ELSE stock END",
-				item.Quantity, item.Quantity))
-	}
-
-	// cart khali kore dao
-	database.DB.Where("cart_id = ?", cart.ID).Delete(&models.CartItem{})
+	// cart khali kore dao (use Unscoped to hard delete so it doesn't linger)
+	database.DB.Unscoped().Where("cart_id = ?", cart.ID).Delete(&models.CartItem{})
 
 	// Green Points: 1 pt per 10 currency units spent (based on total before discount)
 	earned := uint(totalPrice / 10)
@@ -169,7 +179,7 @@ func GetMyOrders(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
 	var orders []models.Order
-	database.DB.Preload("Items.Product").Where("user_id = ?", userID).Order("created_at desc").Find(&orders)
+	database.DB.Preload("Items.Product").Where("user_id = ?", userID).Order("id desc").Find(&orders)
 
 	c.JSON(http.StatusOK, orders)
 }
@@ -238,7 +248,7 @@ func uintToStr(n uint) string {
 // GET /api/orders/all - shob order dekhe admin (admin only)
 func GetAllOrders(c *gin.Context) {
 	var orders []models.Order
-	database.DB.Preload("Items.Product").Order("created_at desc").Find(&orders)
+	database.DB.Preload("Items.Product").Order("id desc").Find(&orders)
 	c.JSON(http.StatusOK, orders)
 }
 

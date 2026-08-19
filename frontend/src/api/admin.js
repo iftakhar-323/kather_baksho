@@ -8,7 +8,7 @@ export const getMe = () => API.get("/auth/me");
 
 // ===== Admin Orders =====
 // GET /api/admin/orders - all orders across all users
-export const getAllOrders = () => API.get("/admin/orders");
+export const getAllOrders = () => API.get(`/admin/orders?t=${Date.now()}`);
 
 // POST /api/admin/orders - admin creates an order on behalf of a user.
 // Body: { user_id, status?, gift_wrap?, items:[{product_id, quantity}] }

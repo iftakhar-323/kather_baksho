@@ -59,8 +59,8 @@ export default function OrderDetail({ order, onBack }) {
   const load = () => {
     setLoading(true);
     Promise.all([
-      getOrderTimeline(order.id),
-      getEstimatedDelivery(order.id).catch(() => ({ data: null })),
+      getOrderTimeline(order.id || order.ID),
+      getEstimatedDelivery(order.id || order.ID).catch(() => ({ data: null })),
     ])
       .then(([tl, ed]) => {
         setEvents(tl.data || []);
@@ -74,15 +74,15 @@ export default function OrderDetail({ order, onBack }) {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { load(); }, [order.id]);
+  useEffect(() => { load(); }, [order.id || order.ID]);
 
   const onViewInvoice = () => {
-    openInvoice(order.id)
+    openInvoice(order.id || order.ID)
       .then(() => toast.ok(t("orderDetail.invoiceOpen")))
       .catch(() => toast.err(t("orderDetail.invoiceFail")));
   };
   const onViewReceipt = () => {
-    openReceipt(order.id)
+    openReceipt(order.id || order.ID)
       .then(() => toast.ok(t("orderDetail.receiptOpen")))
       .catch(() => toast.err(t("orderDetail.receiptFail")));
   };
@@ -100,7 +100,7 @@ export default function OrderDetail({ order, onBack }) {
         refund: requestRefund,
         exchange: requestExchange,
       }[action];
-      await fn(order.id, { reason: reason.trim(), notes: details });
+      await fn(order.id || order.ID, { reason: reason.trim(), notes: details });
       const successKey =
         action === "return"
           ? "orderDetail.submitReturn"
@@ -151,7 +151,7 @@ export default function OrderDetail({ order, onBack }) {
         className="row gap-8"
         style={{ alignItems: "center", flexWrap: "wrap" }}
       >
-        <h1 style={{ margin: 0 }}>{t("orderDetail.orderId", { id: order.id })}</h1>
+        <h1 style={{ margin: 0 }}>{t("orderDetail.orderId", { id: order.id || order.ID })}</h1>
         <span className={"tag " + statusColor}>
           {statusLabelKey ? t(statusLabelKey) : order.status}
         </span>

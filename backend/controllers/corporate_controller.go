@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"katherbox/database"
@@ -14,7 +15,7 @@ type CreateCorporateInput struct {
 	ContactName   string  `json:"contact_name" binding:"required"`
 	ContactEmail  string  `json:"contact_email" binding:"required"`
 	ContactPhone  string  `json:"contact_phone"`
-	Recipients    string  `json:"recipients" binding:"required"`     // JSON array string
+	Recipients    string  `json:"recipients" binding:"required"` // JSON array string
 	Message       string  `json:"message"`
 	BudgetPerGift float64 `json:"budget_per_gift"`
 }
@@ -27,13 +28,14 @@ func CreateCorporateQuote(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// quick & dirty recipient-count estimate (the JSON contains an array)
-	count := 0
-	for i := 0; i < len(input.Recipients); i++ {
-		if input.Recipients[i] == '{' {
-			count++
-		}
+
+	var recipientsArray []map[string]interface{}
+	if err := json.Unmarshal([]byte(input.Recipients), &recipientsArray); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid recipients JSON format"})
+		return
 	}
+	count := len(recipientsArray)
+
 	quote := models.CorporateQuote{
 		UserID:        userID,
 		CompanyName:   input.CompanyName,
@@ -98,4 +100,16 @@ func UpdateCorporateStatus(c *gin.Context) {
 		Type:    "corporate",
 	})
 	c.JSON(http.StatusOK, q)
+}
+
+// DELETE /api/admin/corporate/:id (admin)
+func DeleteCorporateQuote(c *gin.Context) {
+	id := c.Param("id")
+	var q models.CorporateQuote
+	if err := database.DB.First(&q, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Quote not found"})
+		return
+	}
+	database.DB.Delete(&q)
+	c.JSON(http.StatusOK, gin.H{"message": "Quote deleted successfully"})
 }

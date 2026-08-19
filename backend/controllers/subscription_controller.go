@@ -57,6 +57,7 @@ func CancelSubscription(c *gin.Context) {
 		return
 	}
 	sub.Status = "cancelled"
+	sub.CancelledAt = time.Now().Format(time.RFC3339)
 	database.DB.Save(&sub)
 	c.JSON(http.StatusOK, sub)
 }
@@ -72,6 +73,8 @@ func AdvanceSubscription(c *gin.Context) {
 		return
 	}
 	sub.NextDelivery = time.Now().AddDate(0, 0, sub.IntervalDays).Format("2006-01-02")
+	sub.DeliveriesCount += 1
+	sub.LastRenewedAt = time.Now().Format(time.RFC3339)
 	database.DB.Save(&sub)
 	c.JSON(http.StatusOK, sub)
 }

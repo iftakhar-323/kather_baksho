@@ -50,3 +50,18 @@ func CompleteReminder(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Reminder completed; next one scheduled."})
 }
+
+// DELETE /api/reminders/:id - permanently delete a reminder
+func DeleteReminder(c *gin.Context) {
+	userID := c.GetUint("user_id")
+	id := c.Param("id")
+
+	var r models.CareReminder
+	if err := database.DB.Where("id = ? AND user_id = ?", id, userID).First(&r).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Reminder not found"})
+		return
+	}
+
+	database.DB.Delete(&r)
+	c.JSON(http.StatusOK, gin.H{"message": "Reminder deleted"})
+}

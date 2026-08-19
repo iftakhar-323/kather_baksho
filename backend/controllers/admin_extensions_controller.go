@@ -14,19 +14,20 @@ import (
 // GET /api/admin/reminders - all pending reminders across users
 func AdminListReminders(c *gin.Context) {
 	var list []models.CareReminder
-	database.DB.Preload("Product").
-		Order("completed asc, next_due_date asc").
-		Find(&list)
-	// hydrate user info manually (no User FK model)
+	database.DB.Order("completed asc, next_due_date asc").Find(&list)
+	// hydrate user and product info manually
 	type Out struct {
 		models.CareReminder
-		UserEmail string `json:"user_email"`
+		UserEmail   string `json:"user_email"`
+		ProductName string `json:"product_name"`
 	}
 	out := make([]Out, 0, len(list))
 	for _, r := range list {
 		var u models.User
 		database.DB.First(&u, r.UserID)
-		out = append(out, Out{CareReminder: r, UserEmail: u.Email})
+		var p models.Product
+		database.DB.First(&p, r.ProductID)
+		out = append(out, Out{CareReminder: r, UserEmail: u.Email, ProductName: p.Name})
 	}
 	c.JSON(http.StatusOK, out)
 }
@@ -72,8 +73,7 @@ func AdminCancelSubscription(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Subscription not found"})
 		return
 	}
-	s.Status = "cancelled"
-	database.DB.Save(&s)
+	database.DB.Unscoped().Delete(&s)
 
 	database.DB.Create(&models.Notification{
 		UserID:  s.UserID,
@@ -130,8 +130,7 @@ func AdminCancelConsultation(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Consultation not found"})
 		return
 	}
-	con.Status = "cancelled"
-	database.DB.Save(&con)
+	database.DB.Unscoped().Delete(&con)
 
 	database.DB.Create(&models.Notification{
 		UserID:  con.UserID,

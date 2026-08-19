@@ -100,135 +100,128 @@ export default function Admin() {
   }
 
   return (
-    <div>
-      <h2 className="mb-12">Admin Panel</h2>
-      <p className="muted">Manage products and orders across the shop.</p>
+    <div className="admin-layout">
+      <aside className="admin-sidebar">
+        <nav className="admin-nav">
+          <button
+            className={`admin-nav-item ${tab === "dashboard" ? "active" : ""}`}
+            onClick={() => setTab("dashboard")}
+          >
+            📊 Dashboard
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "products" ? "active" : ""}`}
+            onClick={() => setTab("products")}
+          >
+            📦 Products
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "orders" ? "active" : ""}`}
+            onClick={() => setTab("orders")}
+          >
+            🛒 Orders
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "corporate" ? "active" : ""}`}
+            onClick={() => setTab("corporate")}
+          >
+            🏢 Corporate
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "subscriptions" ? "active" : ""}`}
+            onClick={() => setTab("subscriptions")}
+          >
+            📅 Subs
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "consultations" ? "active" : ""}`}
+            onClick={() => setTab("consultations")}
+          >
+            🩺 Consults
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "reminders" ? "active" : ""}`}
+            onClick={() => setTab("reminders")}
+          >
+            ⏰ Reminders
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "coupons" ? "active" : ""}`}
+            onClick={() => setTab("coupons")}
+          >
+            🏷️ Coupons
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "blog" ? "active" : ""}`}
+            onClick={() => setTab("blog")}
+          >
+            📚 Blog
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "csv" ? "active" : ""}`}
+            onClick={() => setTab("csv")}
+          >
+            ⇋ CSV
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "backup" ? "active" : ""}`}
+            onClick={() => setTab("backup")}
+          >
+            💾 Backup
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "roles" ? "active" : ""}`}
+            onClick={() => setTab("roles")}
+          >
+            👥 Roles
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "returns" ? "active" : ""}`}
+            onClick={() => setTab("returns")}
+          >
+            ↩ Returns
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "reviews" ? "active" : ""}`}
+            onClick={() => setTab("reviews")}
+          >
+            ★ Reviews
+          </button>
+          <button
+            className={`admin-nav-item ${tab === "categories" ? "active" : ""}`}
+            onClick={() => setTab("categories")}
+          >
+            🗂 Categories
+          </button>
+        </nav>
+      </aside>
 
-      <div className="tabs" role="tablist">
-        <button
-          role="tab"
-          className={"tab" + (tab === "dashboard" ? " is-active" : "")}
-          onClick={() => setTab("dashboard")}
-        >
-          Dashboard
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "products" ? " is-active" : "")}
-          onClick={() => setTab("products")}
-        >
-          Products
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "orders" ? " is-active" : "")}
-          onClick={() => setTab("orders")}
-        >
-          Orders
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "corporate" ? " is-active" : "")}
-          onClick={() => setTab("corporate")}
-        >
-          Corporate
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "subscriptions" ? " is-active" : "")}
-          onClick={() => setTab("subscriptions")}
-        >
-          Subs
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "consultations" ? " is-active" : "")}
-          onClick={() => setTab("consultations")}
-        >
-          Consults
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "reminders" ? " is-active" : "")}
-          onClick={() => setTab("reminders")}
-        >
-          Reminders
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "coupons" ? " is-active" : "")}
-          onClick={() => setTab("coupons")}
-        >
-          Coupons
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "blog" ? " is-active" : "")}
-          onClick={() => setTab("blog")}
-        >
-          📚 Blog
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "csv" ? " is-active" : "")}
-          onClick={() => setTab("csv")}
-        >
-          ⇋ CSV
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "backup" ? " is-active" : "")}
-          onClick={() => setTab("backup")}
-        >
-          💾 Backup
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "roles" ? " is-active" : "")}
-          onClick={() => setTab("roles")}
-        >
-          👥 Roles
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "returns" ? " is-active" : "")}
-          onClick={() => setTab("returns")}
-        >
-          ↩ Returns
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "reviews" ? " is-active" : "")}
-          onClick={() => setTab("reviews")}
-        >
-          ★ Reviews
-        </button>
-        <button
-          role="tab"
-          className={"tab" + (tab === "categories" ? " is-active" : "")}
-          onClick={() => setTab("categories")}
-        >
-          🗂 Categories
-        </button>
-      </div>
+      <main className="admin-main">
+        <header className="admin-header">
+          <h2>{tab}</h2>
+          <p className="muted" style={{ marginTop: 4 }}>Manage {tab} records and configurations.</p>
+        </header>
 
-      {authError && <div className="warning">{authError}</div>}
+        {authError && <div className="warning mb-16">{authError}</div>}
 
-      {tab === "dashboard" && <DashboardTab />}
-      {tab === "products" && <ProductsTab />}
-      {tab === "orders" && <OrdersTab />}
-      {tab === "corporate" && <AdminCorporateTab />}
-      {tab === "subscriptions" && <AdminSubscriptionsTab />}
-      {tab === "consultations" && <AdminConsultationsTab />}
-      {tab === "reminders" && <AdminRemindersTab />}
-      {tab === "coupons" && <CouponsTab />}
-      {tab === "blog" && <BlogCMS />}
-      {tab === "csv" && <CSVTools />}
-      {tab === "backup" && <BackupTools />}
-      {tab === "roles" && <RolesAdmin />}
-      {tab === "returns" && <ReturnsAdmin />}
-      {tab === "reviews" && <ReviewsAdmin />}
-      {tab === "categories" && <CategoriesAdmin />}
+        <div className="admin-content">
+          {tab === "dashboard" && <DashboardTab />}
+          {tab === "products" && <ProductsTab />}
+          {tab === "orders" && <OrdersTab />}
+          {tab === "corporate" && <AdminCorporateTab />}
+          {tab === "subscriptions" && <AdminSubscriptionsTab />}
+          {tab === "consultations" && <AdminConsultationsTab />}
+          {tab === "reminders" && <AdminRemindersTab />}
+          {tab === "coupons" && <CouponsTab />}
+          {tab === "blog" && <BlogCMS />}
+          {tab === "csv" && <CSVTools />}
+          {tab === "backup" && <BackupTools />}
+          {tab === "roles" && <RolesAdmin />}
+          {tab === "returns" && <ReturnsAdmin />}
+          {tab === "reviews" && <ReviewsAdmin />}
+          {tab === "categories" && <CategoriesAdmin />}
+        </div>
+      </main>
     </div>
   );
 }
@@ -295,7 +288,7 @@ function BlogCMS() {
   };
 
   const onDelete = async (id) => {
-    if (!window.confirm("Delete this post?")) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await deleteBlogPost(id);
       toast.ok("Deleted");
@@ -396,29 +389,43 @@ function BlogCMS() {
       {loading ? (
         <div className="muted">Loading…</div>
       ) : (
-        <div className="table">
-          {posts.length === 0 ? (
-            <div className="muted">No posts yet.</div>
-          ) : (
-            posts.map((p) => (
-              <div
-                key={p.id ?? p.ID}
-                className="row-card"
-                style={{ borderRadius: 0, borderBottom: "1px solid var(--leaf-100)" }}
-              >
-                <span style={{ fontSize: 28 }}>{p.cover_emoji || "🌿"}</span>
-                <div style={{ flex: 1 }}>
-                  <strong>{p.title}</strong>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    {p.category_name || "—"} · {p.status}
-                  </div>
-                </div>
-                <button className="btn btn-danger btn-sm" onClick={() => onDelete(p.id ?? p.ID)}>
-                  Delete
-                </button>
-              </div>
-            ))
-          )}
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {posts.length === 0 ? (
+                <tr>
+                  <td colSpan="5"><div className="muted">No posts yet.</div></td>
+                </tr>
+              ) : (
+                posts.map((p) => (
+                  <tr key={p.id ?? p.ID}>
+                    <td style={{ fontSize: 28 }}>{p.cover_emoji || "🌿"}</td>
+                    <td><strong>{p.title}</strong></td>
+                    <td>{p.category_name || "—"}</td>
+                    <td>
+                      <span className={`pill ${p.status === "published" ? "pill-active" : "pill-pending"}`}>
+                        {p.status}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <button className="btn btn-danger btn-sm" onClick={() => onDelete(p.id ?? p.ID)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -625,53 +632,59 @@ function RolesAdmin() {
       {loading ? (
         <div className="muted">Loading…</div>
       ) : (
-        <div className="table">
-          {filtered.length === 0 ? (
-            <div className="muted">No users.</div>
-          ) : (
-            filtered.map((u) => (
-              <div
-                key={u.id ?? u.ID}
-                className="row-card"
-                style={{
-                  borderRadius: 0,
-                  borderBottom: "1px solid var(--leaf-100)",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 999,
-                    background: "var(--leaf-100)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 700,
-                  }}
-                >
-                  {(u.name || "?").charAt(0).toUpperCase()}
-                </span>
-                <div style={{ flex: 1 }}>
-                  <strong>{u.name}</strong>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    {u.email}
-                  </div>
-                </div>
-                <select
-                  className="input"
-                  value={u.role || "customer"}
-                  onChange={(e) => onRoleChange(u, e.target.value)}
-                  style={{ width: 160 }}
-                >
-                  <option value="customer">customer</option>
-                  <option value="staff">staff</option>
-                  <option value="admin">admin</option>
-                </select>
-              </div>
-            ))
-          )}
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Avatar</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th style={{ textAlign: "right" }}>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="4"><div className="muted">No users.</div></td>
+                </tr>
+              ) : (
+                filtered.map((u) => (
+                  <tr key={u.id ?? u.ID}>
+                    <td style={{ width: 60 }}>
+                      <span
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 999,
+                          background: "var(--leaf-100)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {(u.name || "?").charAt(0).toUpperCase()}
+                      </span>
+                    </td>
+                    <td><strong>{u.name}</strong></td>
+                    <td>{u.email}</td>
+                    <td style={{ textAlign: "right" }}>
+                      <select
+                        className="input"
+                        value={u.role || "customer"}
+                        onChange={(e) => onRoleChange(u, e.target.value)}
+                        style={{ width: 160, display: "inline-block" }}
+                      >
+                        <option value="customer">customer</option>
+                        <option value="staff">staff</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -701,7 +714,7 @@ function ReturnsAdmin() {
   const onUpdate = async (id, status) => {
     const m = await import("../api/orderExt");
     try {
-      await m.updateReturnStatus(id, status);
+      await m.updateReturnStatus(id, { status });
       toast.ok(`${status}`);
       load();
     } catch (e) {
@@ -719,41 +732,54 @@ function ReturnsAdmin() {
       {rows.length === 0 ? (
         <div className="muted">No pending requests.</div>
       ) : (
-        <div className="table">
-          {rows.map((r) => (
-            <div
-              key={r.id ?? r.ID}
-              className="card card-pad mb-8"
-            >
-              <div className="row">
-                <strong>
-                  #{r.order_id ?? r.ID} · {r.type || "return"}
-                </strong>
-                <span className="tag tag-leaf">{r.status}</span>
-              </div>
-              <p style={{ margin: "6px 0" }}>{r.reason || r.details}</p>
-              <div className="row" style={{ gap: 6, marginTop: 6 }}>
-                <button
-                  className="btn btn-primary btn-xs"
-                  onClick={() => onUpdate(r.id ?? r.ID, "approved")}
-                >
-                  Approve
-                </button>
-                <button
-                  className="btn btn-danger btn-xs"
-                  onClick={() => onUpdate(r.id ?? r.ID, "rejected")}
-                >
-                  Reject
-                </button>
-                <button
-                  className="btn btn-secondary btn-xs"
-                  onClick={() => onUpdate(r.id ?? r.ID, "refunded")}
-                >
-                  Mark refunded
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Type</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id ?? r.ID}>
+                  <td><strong>#{r.order_id ?? r.ID}</strong></td>
+                  <td style={{ textTransform: "capitalize" }}>{r.type || "return"}</td>
+                  <td>{r.reason || r.details}</td>
+                  <td>
+                    <span className={`pill ${r.status === "approved" || r.status === "refunded" ? "pill-active" : r.status === "rejected" ? "pill-cancel" : "pill-pending"}`}>
+                      {r.status}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <div className="row gap-4" style={{ justifyContent: "flex-end" }}>
+                      <button
+                        className="btn btn-primary btn-xs"
+                        onClick={() => onUpdate(r.id ?? r.ID, "approved")}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        className="btn btn-danger btn-xs"
+                        onClick={() => onUpdate(r.id ?? r.ID, "rejected")}
+                      >
+                        Reject
+                      </button>
+                      <button
+                        className="btn btn-secondary btn-xs"
+                        onClick={() => onUpdate(r.id ?? r.ID, "refunded")}
+                      >
+                        Refunded
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -797,37 +823,43 @@ function AdminRemindersTab() {
   if (!rows.length) return <div className="muted">No reminders yet.</div>;
 
   return (
-    <div className="table">
-      <div className="thead">
-        <div>User</div>
-        <div>Product</div>
-        <div>Type</div>
-        <div>Next Due</div>
-        <div>Interval</div>
-        <div>Status</div>
-        <div></div>
-      </div>
-      {rows.map((r) => (
-        <div className="trow" key={r.id ?? r.ID}>
-          <div>{r.user_email || `#${r.user_id}`}</div>
-          <div>{r.product_name || `#${r.product_id}`}</div>
-          <div>{r.type}</div>
-          <div>{r.next_due_date}</div>
-          <div>{r.interval_days}d</div>
-          <div>
-            <span className={"pill " + (r.completed ? "pill-done" : "pill-pending")}>
-              {r.completed ? "Done" : "Pending"}
-            </span>
-          </div>
-          <div>
-            {!r.completed && (
-              <button className="btn btn-sm btn-primary" onClick={() => onComplete(r.id ?? r.ID)}>
-                Mark done
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
+    <div className="table-wrap">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Product</th>
+            <th>Type</th>
+            <th>Next Due</th>
+            <th>Interval</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id ?? r.ID}>
+              <td>{r.user_email || `#${r.user_id}`}</td>
+              <td>{r.product_name || `#${r.product_id}`}</td>
+              <td>{r.type}</td>
+              <td>{r.next_due_date}</td>
+              <td>{r.interval_days}d</td>
+              <td>
+                <span className={"pill " + (r.completed ? "pill-done" : "pill-pending")}>
+                  {r.completed ? "Done" : "Pending"}
+                </span>
+              </td>
+              <td style={{ textAlign: "right" }}>
+                {!r.completed && (
+                  <button className="btn btn-sm btn-primary" onClick={() => onComplete(r.id ?? r.ID)}>
+                    Mark done
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -855,13 +887,16 @@ function AdminSubscriptionsTab() {
     load();
   }, []);
 
-  const onCancel = async (id) => {
-    if (!window.confirm("Cancel this subscription?")) return;
+  const onDelete = async (id) => {
+    // Removed window.confirm due to browser dialog suppression
+    const previousRows = [...rows];
+    setRows(rows.filter((s) => (s.id ?? s.ID) !== id));
     try {
       await adminCancelSubscription(id);
       load();
     } catch (e) {
       window.alert(e?.response?.data?.error || "Failed");
+      setRows(previousRows);
     }
   };
 
@@ -870,35 +905,39 @@ function AdminSubscriptionsTab() {
   if (!rows.length) return <div className="muted">No subscriptions yet.</div>;
 
   return (
-    <div className="table">
-      <div className="thead">
-        <div>User</div>
-        <div>Plan</div>
-        <div>Frequency</div>
-        <div>Next Delivery</div>
-        <div>Status</div>
-        <div></div>
-      </div>
-      {rows.map((s) => (
-        <div className="trow" key={s.id ?? s.ID}>
-          <div>{s.user_email || `#${s.user_id}`}</div>
-          <div>{s.plan_name || s.plan || "-"}</div>
-          <div>every {s.interval_days}d</div>
-          <div>{s.next_delivery || "-"}</div>
-          <div>
-            <span className={"pill " + (s.status === "active" ? "pill-active" : "pill-cancel")}>
-              {s.status || "—"}
-            </span>
-          </div>
-          <div>
-            {s.status === "active" && (
-              <button className="btn btn-sm btn-danger" onClick={() => onCancel(s.id ?? s.ID)}>
-                Cancel
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
+    <div className="table-wrap">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Plan</th>
+            <th>Frequency</th>
+            <th>Next Delivery</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((s) => (
+            <tr key={s.id ?? s.ID}>
+              <td>{s.user_email || `#${s.user_id}`}</td>
+              <td>{s.plan_name || s.plan || "-"}</td>
+              <td>every {s.interval_days}d</td>
+              <td>{s.next_delivery || "-"}</td>
+              <td>
+                <span className={"pill " + (s.status === "active" ? "pill-active" : "pill-cancel")}>
+                  {s.status || "—"}
+                </span>
+              </td>
+              <td style={{ textAlign: "right" }}>
+                <button className="btn btn-sm btn-danger" onClick={() => onDelete(s.id ?? s.ID)}>
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -935,13 +974,16 @@ function AdminConsultationsTab() {
     }
   };
 
-  const onCancel = async (id) => {
-    if (!window.confirm("Cancel this consultation?")) return;
+  const onDelete = async (id) => {
+    // Removed window.confirm due to browser dialog suppression
+    const previousRows = [...rows];
+    setRows(rows.filter((c) => (c.id ?? c.ID) !== id));
     try {
       await adminCancelConsultation(id);
       load();
     } catch (e) {
       window.alert(e?.response?.data?.error || "Failed");
+      setRows(previousRows);
     }
   };
 
@@ -949,40 +991,46 @@ function AdminConsultationsTab() {
   if (error) return <div className="warning">{error}</div>;
   if (!rows.length) return <div className="muted">No consultations booked.</div>;
   return (
-    <div className="table">
-      <div className="thead">
-        <div>User</div>
-        <div>Expert</div>
-        <div>Topic</div>
-        <div>Date</div>
-        <div>Status</div>
-        <div></div>
-      </div>
-      {rows.map((c) => (
-        <div className="trow" key={c.id ?? c.ID}>
-          <div>{c.user_email || `#${c.user_id}`}</div>
-          <div>{c.expert_name || "-"}</div>
-          <div>{c.topic || "-"}</div>
-          <div>{c.scheduled_at || c.preferred_date || "-"}</div>
-          <div>
-            <span className={"pill " + (c.status || "pending").toLowerCase().replace(/\s+/g, "-")}>
-              {c.status || "—"}
-            </span>
-          </div>
-          <div className="row gap">
-            {c.status !== "Confirmed" && c.status !== "confirmed" && c.status !== "completed" && (
-              <button className="btn btn-sm btn-primary" onClick={() => onConfirm(c.id ?? c.ID)}>
-                Confirm
-              </button>
-            )}
-            {c.status !== "Cancelled" && c.status !== "cancelled" && (
-              <button className="btn btn-sm btn-danger" onClick={() => onCancel(c.id ?? c.ID)}>
-                Cancel
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
+    <div className="table-wrap">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Expert</th>
+            <th>Topic</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((c) => (
+            <tr key={c.id ?? c.ID}>
+              <td>{c.user_email || `#${c.user_id}`}</td>
+              <td>{c.expert_name || "-"}</td>
+              <td>{c.topic || "-"}</td>
+              <td>{c.scheduled_at || c.preferred_date || "-"}</td>
+              <td>
+                <span className={"pill " + (c.status || "pending").toLowerCase().replace(/\s+/g, "-")}>
+                  {c.status || "—"}
+                </span>
+              </td>
+              <td style={{ textAlign: "right" }}>
+                <div className="row gap" style={{ justifyContent: "flex-end" }}>
+                  {c.status !== "Confirmed" && c.status !== "confirmed" && c.status !== "completed" && (
+                    <button className="btn btn-sm btn-primary" onClick={() => onConfirm(c.id ?? c.ID)}>
+                      Confirm
+                    </button>
+                  )}
+                  <button className="btn btn-sm btn-danger" onClick={() => onDelete(c.id ?? c.ID)}>
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -1025,61 +1073,79 @@ function AdminCorporateTab() {
   if (error) return <div className="warning">{error}</div>;
   if (!rows.length) return <div className="muted">No corporate quotes yet.</div>;
   return (
-    <div className="stack">
-      {rows.map((q) => {
-        const status = (q.status || "pending").toLowerCase();
-        let recipients = [];
-        try { recipients = JSON.parse(q.recipients || "[]"); } catch (_) {}
-        return (
-          <div className="card" key={q.id ?? q.ID}>
-            <div className="row spread">
-              <div>
-                <strong>{q.company_name || "(no company)"}</strong> — {q.contact_name || q.contact_email || q.user_email || `#${q.user_id}`}
-              </div>
-              <div>
-                <span className={"pill " + status}>
-                  {q.status}
-                </span>
-              </div>
-            </div>
-            <div className="muted small">
-              {recipients.length} recipients · ৳{q.budget_per_gift || 0}/gift · total ৳{q.total_estimate || 0}
-            </div>
-            <div className="small">{q.message || <span className="muted">No message</span>}</div>
-            <div className="small">
-              <em>Admin notes:</em> {q.admin_notes || <span className="muted">none</span>}
-            </div>
-            <div className="row gap" style={{ marginTop: 8 }}>
-              <input
-                className="input"
-                placeholder="Notes (optional)"
-                value={notes[q.id ?? q.ID] || ""}
-                onChange={(e) => setNotes((n) => ({ ...n, [q.id ?? q.ID]: e.target.value }))}
-              />
-              {status === "pending" && (
-                <>
-                  <button className="btn btn-sm btn-primary" onClick={() => updateStatus(q.id ?? q.ID, "quoted")}>
-                    Mark Quoted
-                  </button>
-                  <button className="btn btn-sm btn-danger" onClick={() => updateStatus(q.id ?? q.ID, "cancelled")}>
-                    Reject
-                  </button>
-                </>
-              )}
-              {status === "quoted" && (
-                <>
-                  <button className="btn btn-sm btn-primary" onClick={() => updateStatus(q.id ?? q.ID, "accepted")}>
-                    Accept
-                  </button>
-                  <button className="btn btn-sm btn-secondary" onClick={() => updateStatus(q.id ?? q.ID, "delivered")}>
-                    Mark Delivered
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        );
-      })}
+    <div className="table-wrap">
+      <table className="table">
+        <thead>
+          <tr>
+            <th>Company & Contact</th>
+            <th>Details & Message</th>
+            <th>Status & Notes</th>
+            <th style={{ textAlign: "right" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((q) => {
+            const status = (q.status || "pending").toLowerCase();
+            let recipients = [];
+            try { recipients = JSON.parse(q.recipients || "[]"); } catch (_) {}
+            return (
+              <tr key={q.id ?? q.ID}>
+                <td>
+                  <strong>{q.company_name || "(no company)"}</strong><br/>
+                  <span className="muted">{q.contact_name || q.contact_email || q.user_email || `#${q.user_id}`}</span>
+                </td>
+                <td>
+                  <div className="muted" style={{ fontSize: 13, marginBottom: 4 }}>
+                    {recipients.length} recipients · ৳{q.budget_per_gift || 0}/gift · total ৳{q.total_estimate || 0}
+                  </div>
+                  <div style={{ fontSize: 13 }}>{q.message || <span className="muted">No message</span>}</div>
+                </td>
+                <td>
+                  <span className={"pill " + status} style={{ display: "inline-block", marginBottom: 6 }}>
+                    {q.status}
+                  </span><br/>
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    <em>Notes:</em> {q.admin_notes || "none"}
+                  </div>
+                </td>
+                <td style={{ textAlign: "right" }}>
+                  <div className="stack gap-4" style={{ alignItems: "flex-end" }}>
+                    <input
+                      className="input"
+                      style={{ maxWidth: 200, padding: "6px 10px", fontSize: 13 }}
+                      placeholder="Admin notes (optional)"
+                      value={notes[q.id ?? q.ID] || ""}
+                      onChange={(e) => setNotes((n) => ({ ...n, [q.id ?? q.ID]: e.target.value }))}
+                    />
+                    <div className="row gap-4 mt-4">
+                      {status === "pending" && (
+                        <>
+                          <button className="btn btn-xs btn-primary" onClick={() => updateStatus(q.id ?? q.ID, "quoted")}>
+                            Quote
+                          </button>
+                          <button className="btn btn-xs btn-danger" onClick={() => updateStatus(q.id ?? q.ID, "cancelled")}>
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {status === "quoted" && (
+                        <>
+                          <button className="btn btn-xs btn-primary" onClick={() => updateStatus(q.id ?? q.ID, "accepted")}>
+                            Accept
+                          </button>
+                          <button className="btn btn-xs btn-secondary" onClick={() => updateStatus(q.id ?? q.ID, "delivered")}>
+                            Deliver
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -1105,7 +1171,7 @@ function ProductsTab() {
   }, []);
 
   const handleDelete = async (p) => {
-    if (!window.confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await API.delete(`/products/${p.ID}`);
       load();
@@ -1240,6 +1306,18 @@ function ProductForm({ initial, onClose, onSaved }) {
   const isEdit = !!initial;
   const [name, setName] = useState(initial?.name || "");
   const [category, setCategory] = useState(initial?.category || "plant");
+  const [parentCategory, setParentCategory] = useState(initial?.parent_category || "");
+  const [subcategory, setSubcategory] = useState(initial?.subcategory || "");
+  const [indoorOutdoor, setIndoorOutdoor] = useState(initial?.indoor_outdoor || "");
+  const [difficulty, setDifficulty] = useState(initial?.difficulty || "");
+  const [sunlight, setSunlight] = useState(initial?.sunlight || "");
+  const [water, setWater] = useState(initial?.water || "");
+  const [humidity, setHumidity] = useState(initial?.humidity || "");
+  const [petFriendly, setPetFriendly] = useState(initial?.pet_friendly || false);
+  const [specifications, setSpecifications] = useState(initial?.specifications || "");
+  const [compareAtPrice, setCompareAtPrice] = useState(initial?.compare_at_price || 0);
+  const [discountPct, setDiscountPct] = useState(initial?.discount_pct || 0);
+  const [offerLabel, setOfferLabel] = useState(initial?.offer_label || "");
   const [price, setPrice] = useState(initial?.price ?? 0);
   const [stock, setStock] = useState(initial?.stock ?? 0);
   const [description, setDescription] = useState(initial?.description || "");
@@ -1254,8 +1332,20 @@ function ProductForm({ initial, onClose, onSaved }) {
     const body = {
       name,
       category,
-      price: parseFloat(price),
-      stock: parseInt(stock, 10),
+      parent_category: parentCategory,
+      subcategory,
+      indoor_outdoor: indoorOutdoor,
+      difficulty,
+      sunlight,
+      water,
+      humidity,
+      pet_friendly: petFriendly,
+      specifications,
+      compare_at_price: parseFloat(compareAtPrice) || 0,
+      discount_pct: parseFloat(discountPct) || 0,
+      offer_label: offerLabel,
+      price: parseFloat(price) || 0,
+      stock: parseInt(stock, 10) || 0,
       description,
       image_url: imageUrl,
     };
@@ -1311,6 +1401,78 @@ function ProductForm({ initial, onClose, onSaved }) {
           </div>
           <div className="row gap-12">
             <div style={{ flex: 1 }}>
+              <label className="field-label">Parent Category</label>
+              <input
+                className="input"
+                value={parentCategory}
+                onChange={(e) => setParentCategory(e.target.value)}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Subcategory</label>
+              <input
+                className="input"
+                value={subcategory}
+                onChange={(e) => setSubcategory(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="row gap-12">
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Indoor / Outdoor</label>
+              <select className="select" value={indoorOutdoor} onChange={(e) => setIndoorOutdoor(e.target.value)}>
+                <option value="">-</option>
+                <option value="indoor">indoor</option>
+                <option value="outdoor">outdoor</option>
+                <option value="both">both</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Difficulty</label>
+              <select className="select" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                <option value="">-</option>
+                <option value="easy">easy</option>
+                <option value="medium">medium</option>
+                <option value="hard">hard</option>
+              </select>
+            </div>
+          </div>
+          <div className="row gap-12">
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Sunlight</label>
+              <select className="select" value={sunlight} onChange={(e) => setSunlight(e.target.value)}>
+                <option value="">-</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="bright">bright</option>
+                <option value="direct">direct</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Water</label>
+              <select className="select" value={water} onChange={(e) => setWater(e.target.value)}>
+                <option value="">-</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Humidity</label>
+              <select className="select" value={humidity} onChange={(e) => setHumidity(e.target.value)}>
+                <option value="">-</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </div>
+          </div>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input type="checkbox" checked={petFriendly} onChange={(e) => setPetFriendly(e.target.checked)} />
+            <span>Pet Friendly</span>
+          </label>
+          <div className="row gap-12">
+            <div style={{ flex: 1 }}>
               <label className="field-label">Price (৳)</label>
               <input
                 className="input"
@@ -1320,6 +1482,31 @@ function ProductForm({ initial, onClose, onSaved }) {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 required
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Compare At Price (৳)</label>
+              <input
+                className="input"
+                type="number"
+                step="0.01"
+                min="0"
+                value={compareAtPrice}
+                onChange={(e) => setCompareAtPrice(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="row gap-12">
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Discount %</label>
+              <input
+                className="input"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                value={discountPct}
+                onChange={(e) => setDiscountPct(e.target.value)}
               />
             </div>
             <div style={{ flex: 1 }}>
@@ -1334,12 +1521,31 @@ function ProductForm({ initial, onClose, onSaved }) {
               />
             </div>
           </div>
+          <div className="row gap-12">
+            <div style={{ flex: 1 }}>
+              <label className="field-label">Offer Label</label>
+              <input
+                className="input"
+                value={offerLabel}
+                onChange={(e) => setOfferLabel(e.target.value)}
+                placeholder="e.g. Hot, New"
+              />
+            </div>
+          </div>
           <div>
             <label className="field-label">Description</label>
             <textarea
               className="textarea"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="field-label">Specifications (Free text)</label>
+            <textarea
+              className="textarea"
+              value={specifications}
+              onChange={(e) => setSpecifications(e.target.value)}
             />
           </div>
           <div>
@@ -1419,7 +1625,7 @@ function OrdersTab() {
   };
 
   const remove = async (order) => {
-    if (!window.confirm(`Delete order #${order.ID}? Stock will be restored.`)) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await deleteOrder(order.ID);
       load();
@@ -2130,7 +2336,7 @@ function CouponsTab() {
   };
 
   const remove = async (id) => {
-    if (!window.confirm("Delete this coupon?")) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await deleteCoupon(id);
       load();
@@ -2142,7 +2348,7 @@ function CouponsTab() {
   return (
     <div className="row gap-24 mt-16" style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
       <div className="card" style={{ flex: 1, minWidth: 320, padding: 16 }}>
-        <h3 style={{ marginTop: 0 }}>Active Coupons ({coupons.length})</h3>
+        <h3 style={{ marginTop: 0 }}>All Coupons ({coupons.length})</h3>
         {loading ? (
           <div className="muted">Loading coupons…</div>
         ) : coupons.length === 0 ? (
@@ -2156,19 +2362,31 @@ function CouponsTab() {
               <div>Expires</div>
               <div></div>
             </div>
-            {coupons.map((c) => (
-              <div className="trow" key={c.id ?? c.ID}>
-                <div style={{ fontWeight: 700, fontFamily: "var(--mono)" }}>{c.code}</div>
-                <div>{c.discount_percent}%</div>
-                <div>৳{c.min_order_total || 0}</div>
-                <div className="muted" style={{ fontSize: 12 }}>{c.expires_at || "Never"}</div>
-                <div>
-                  <button className="btn btn-sm btn-danger" onClick={() => remove(c.id ?? c.ID)}>
-                    Delete
-                  </button>
+            {coupons.map((c) => {
+              const isExpired = c.expires_at ? new Date(c.expires_at).getTime() < Date.now() : false;
+              return (
+                <div className="trow" key={c.id ?? c.ID} style={{ opacity: isExpired ? 0.6 : 1 }}>
+                  <div style={{ fontWeight: 700, fontFamily: "var(--mono)" }}>
+                    {c.code}
+                    {isExpired && (
+                      <span className="pill status-cancelled" style={{ marginLeft: 8, fontSize: 10, padding: "2px 6px" }}>
+                        Expired
+                      </span>
+                    )}
+                  </div>
+                  <div>{c.discount_percent}%</div>
+                  <div>৳{c.min_order_total || 0}</div>
+                  <div className="muted" style={{ fontSize: 12 }}>
+                    {c.expires_at || "Never"}
+                  </div>
+                  <div>
+                    <button className="btn btn-sm btn-danger" onClick={() => remove(c.id ?? c.ID)}>
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -2246,7 +2464,7 @@ function ReviewsAdmin() {
   }, [productId]);
 
   const onDelete = async (id) => {
-    if (!window.confirm("Delete this review?")) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await adminDeleteReview(id);
       toast.ok("Deleted");
@@ -2379,7 +2597,7 @@ function CategoriesAdmin() {
   };
 
   const onDelete = async (c) => {
-    if (!window.confirm(`Delete category "${c.name}"?`)) return;
+    // Removed window.confirm due to browser dialog suppression
     try {
       await adminDeleteCategory(c.id ?? c.ID);
       toast.ok("Deleted");

@@ -30,7 +30,7 @@ services:
     container_name: katherbox-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8082:80"
     depends_on:
       backend:
         condition: service_healthy

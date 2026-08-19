@@ -20,4 +20,5 @@ func CouponRoutes(router *gin.Engine) {
         admin.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
         admin.POST("/coupons", controllers.CreateCoupon)
         admin.GET("/coupons", controllers.ListCoupons)
+        admin.DELETE("/coupons/:id", controllers.DeleteCoupon)
 }

@@ -34,6 +34,7 @@ func AdminRoutes(router *gin.Engine) {
 		// corporate quotes
 		g.GET("/corporate", controllers.GetAllCorporateQuotes)
 		g.PUT("/corporate/:id", controllers.UpdateCorporateStatus)
+		g.DELETE("/corporate/:id", controllers.DeleteCorporateQuote)
 
 		// users + roles
 		g.GET("/users", controllers.AdminListUsers)

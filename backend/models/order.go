@@ -9,8 +9,10 @@ type Order struct {
 	Status        string      `json:"status"` // Pending, Processing, Packed, On the Way, Delivered
 	PaymentMethod string      `json:"payment_method" gorm:"default:'cod'"`
 	PaymentStatus string      `json:"payment_status" gorm:"default:'Pending'"`
-	TransactionID string      `json:"transaction_id"`
+	TransactionID  string      `json:"transaction_id"`
 	GiftWrap      bool        `json:"gift_wrap" gorm:"default:false"`
+	CouponCode    string      `json:"coupon_code"`
+	DiscountAmount float64    `json:"discount_amount"`
 	Items         []OrderItem `json:"items" gorm:"foreignKey:OrderID"`
 }
 

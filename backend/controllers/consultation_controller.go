@@ -43,6 +43,19 @@ func BookConsultation(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	validExpert := false
+	for _, e := range EXPERTS {
+		if e.Name == input.ExpertName {
+			validExpert = true
+			break
+		}
+	}
+	if !validExpert {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid expert name selected"})
+		return
+	}
+
 	con := models.Consultation{
 		UserID:      userID,
 		ExpertName:  input.ExpertName,
