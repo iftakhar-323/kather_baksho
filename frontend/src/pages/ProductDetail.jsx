@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { getProduct, getRelatedProducts, getFrequentlyBoughtTogether } from "../api/products";
 import { addToCart } from "../api/cart";
 import { CompareStore, SaveForLaterStore, RecentStore } from "../utils/kb";
+import { notifyCartChanged } from "../context/CartContext";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import ReviewsSection from "../components/ReviewsSection";
@@ -10,6 +11,7 @@ import ProductImage from "../components/ProductImage";
 import Lightbox from "../components/Lightbox";
 import Breadcrumbs from "../components/Breadcrumbs";
 import ProductCard from "../components/ProductCard";
+import { SkeletonDetail } from "../components/Skeleton";
 import { useConfirm } from "../components/Confirm";
 
 function capitalize(s) {
@@ -30,6 +32,7 @@ export default function ProductDetail({ productId, onBack }) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("idle");
+  const [qty, setQty] = useState(1);
   const [inCompare, setInCompare] = useState(CompareStore.has(productId));
   const [inSaved, setInSaved] = useState(SaveForLaterStore.has(productId));
   const [zoomOpen, setZoomOpen] = useState(false);
@@ -64,12 +67,7 @@ export default function ProductDetail({ productId, onBack }) {
   }, [productId]);
 
   if (loading) {
-    return (
-      <div className="empty">
-        <div className="emoji">🪴</div>
-        <h3>{t("productDetail.loading")}</h3>
-      </div>
-    );
+    return <SkeletonDetail />;
   }
   if (!product) {
     return (
@@ -95,8 +93,13 @@ export default function ProductDetail({ productId, onBack }) {
     }
     try {
       setStatus("loading");
-      await addToCart(product.ID, 1);
+      await addToCart(product.ID, qty);
       setStatus("added");
+      notifyCartChanged();
+      toast.show("ok", t("productDetail.btnAdded"), 3800, {
+        label: t("nav.cart"),
+        onClick: () => window.__katherboxSetView?.("cart"),
+      });
       setTimeout(() => setStatus("idle"), 1500);
     } catch (err) {
       console.error(err);
@@ -124,6 +127,7 @@ export default function ProductDetail({ productId, onBack }) {
       await Promise.all(
         [product, ...fbtSelected].map((p) => addToCart(p.ID, 1))
       );
+      notifyCartChanged();
       toast.ok(t("productDetail.fbtAdded", { count: 1 + fbtSelected.length }));
     } catch (err) {
       toast.err(err?.response?.data?.error || t("productDetail.fbtAddFailed"));
@@ -177,7 +181,7 @@ export default function ProductDetail({ productId, onBack }) {
             alignItems: "center",
             justifyContent: "center",
             background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 60%), linear-gradient(160deg, var(--leaf-50), var(--leaf-100))",
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 60%), linear-gradient(160deg, var(--brand-50), var(--brand-100))",
             borderRadius: "var(--radius-lg)",
             fontSize: 120,
             aspectRatio: "1 / 1",
@@ -220,7 +224,7 @@ export default function ProductDetail({ productId, onBack }) {
               fontFamily: "var(--heading)",
               fontWeight: 700,
               fontSize: 30,
-              color: "var(--leaf-700)",
+              color: "var(--brand-700)",
               marginTop: 16,
             }}
           >
@@ -230,7 +234,7 @@ export default function ProductDetail({ productId, onBack }) {
           <div
             className="mt-8 mb-16"
             style={{
-              color: stockOk ? "var(--leaf-700)" : "var(--rose)",
+              color: stockOk ? "var(--brand-700)" : "var(--danger-strong)",
               fontWeight: 600,
             }}
           >
@@ -251,16 +255,39 @@ export default function ProductDetail({ productId, onBack }) {
             {product.description || t("productDetail.noDescription")}
           </p>
 
-          <button
-            onClick={handleAdd}
-            disabled={!stockOk || status === "loading"}
-            className="btn btn-primary btn-lg"
-            style={{
-              background: status === "added" ? "var(--success)" : undefined,
-            }}
-          >
-            {btnLabel}
-          </button>
+          <div className="row gap-12" style={{ flexWrap: "wrap" }}>
+            {stockOk && (
+              <div className="qty" aria-label={t("productDetail.quantity") || "Quantity"}>
+                <button
+                  type="button"
+                  aria-label="decrease quantity"
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  disabled={qty <= 1}
+                >
+                  −
+                </button>
+                <span>{qty}</span>
+                <button
+                  type="button"
+                  aria-label="increase quantity"
+                  onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+                  disabled={qty >= product.stock}
+                >
+                  +
+                </button>
+              </div>
+            )}
+            <button
+              onClick={handleAdd}
+              disabled={!stockOk || status === "loading"}
+              className="btn btn-primary btn-lg"
+              style={{
+                background: status === "added" ? "var(--success)" : undefined,
+              }}
+            >
+              {btnLabel}
+            </button>
+          </div>
 
           <div className="row gap-8 mt-12" style={{ flexWrap: "wrap" }}>
             <button

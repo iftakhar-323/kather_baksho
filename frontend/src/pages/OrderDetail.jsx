@@ -267,7 +267,7 @@ export default function OrderDetail({ order, onBack }) {
       {est && (
         <div
           className="card card-pad-lg mb-16"
-          style={{ background: "var(--leaf-50)" }}
+          style={{ background: "var(--brand-50)" }}
         >
           <h3 style={{ marginTop: 0 }}>{t("orderDetail.estTitle")}</h3>
           {est.status === "delivered" ? (
@@ -317,7 +317,7 @@ export default function OrderDetail({ order, onBack }) {
       ) : (
         <div
           style={{
-            borderLeft: "2px solid var(--leaf-200)",
+            borderLeft: "2px solid var(--brand-200)",
             marginLeft: 12,
             paddingLeft: 16,
           }}

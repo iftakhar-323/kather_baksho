@@ -155,7 +155,7 @@ export default function ReviewsSection({ productId }) {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 48, fontWeight: 700, color: "var(--leaf-700)" }}>
+          <div style={{ fontSize: 48, fontWeight: 700, color: "var(--brand-700)" }}>
             {meta.avg ? meta.avg.toFixed(1) : "—"}
           </div>
           <Stars value={Math.round(meta.avg)} readOnly size={22} />
@@ -175,7 +175,7 @@ export default function ReviewsSection({ productId }) {
                   style={{
                     flex: 1,
                     height: 8,
-                    background: "var(--leaf-50)",
+                    background: "var(--brand-50)",
                     borderRadius: 999,
                     overflow: "hidden",
                   }}
@@ -199,7 +199,7 @@ export default function ReviewsSection({ productId }) {
 
       {/* Write / edit form */}
       {user && (!myReview || editing) && (
-        <form onSubmit={onSubmit} className="mt-16" style={{ borderTop: "1px solid var(--leaf-100)", paddingTop: 16 }}>
+        <form onSubmit={onSubmit} className="mt-16" style={{ borderTop: "1px solid var(--brand-100)", paddingTop: 16 }}>
           <div className="row" style={{ alignItems: "center", gap: 12 }}>
             <span style={{ fontWeight: 600 }}>Your rating:</span>
             <Stars value={rating} onPick={setRating} />
@@ -231,7 +231,7 @@ export default function ReviewsSection({ productId }) {
           style={{
             alignItems: "center",
             gap: 12,
-            borderTop: "1px solid var(--leaf-100)",
+            borderTop: "1px solid var(--brand-100)",
             paddingTop: 16,
           }}
         >
@@ -251,7 +251,7 @@ export default function ReviewsSection({ productId }) {
           <button
             type="button"
             className="btn btn-link"
-            style={{ background: "none", border: "none", color: "var(--leaf-700)", cursor: "pointer", padding: 0 }}
+            style={{ background: "none", border: "none", color: "var(--brand-700)", cursor: "pointer", padding: 0 }}
             onClick={() => window.__katherboxSetView?.("login")}
           >
             Log in
@@ -261,7 +261,7 @@ export default function ReviewsSection({ productId }) {
       )}
 
       {/* Reviews list */}
-      <div className="mt-16" style={{ borderTop: "1px solid var(--leaf-100)", paddingTop: 16 }}>
+      <div className="mt-16" style={{ borderTop: "1px solid var(--brand-100)", paddingTop: 16 }}>
         {loading ? (
           <div className="muted">Loading reviews…</div>
         ) : reviews.length === 0 ? (
@@ -270,7 +270,7 @@ export default function ReviewsSection({ productId }) {
           reviews.map((r) => (
             <div
               key={r.id}
-              style={{ padding: "12px 0", borderBottom: "1px solid var(--leaf-100)" }}
+              style={{ padding: "12px 0", borderBottom: "1px solid var(--brand-100)" }}
             >
               <div className="row" style={{ alignItems: "center", gap: 10 }}>
                 <span style={{ fontWeight: 600 }}>{r.user_name || "Customer"}</span>

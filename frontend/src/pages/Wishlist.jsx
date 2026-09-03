@@ -7,6 +7,8 @@ import {
 import { addToCart } from "../api/cart";
 import { useTranslation } from "../i18n/I18nProvider";
 import ProductImage from "../components/ProductImage";
+import { SkeletonCartList } from "../components/Skeleton";
+import { notifyCartChanged } from "../context/CartContext";
 
 function emojiFor(category, subcategory) {
   if (category === "plant") return "🌿";
@@ -82,9 +84,11 @@ export default function Wishlist() {
 
   if (loading) {
     return (
-      <div className="empty">
-        <div className="emoji">❤️</div>
-        <h3>{t("wishlist.loading")}</h3>
+      <div className="cart-page" style={{ maxWidth: 920 }}>
+        <div className="cart-header">
+          <div><h2>{t("wishlist.headerTitle")}</h2></div>
+        </div>
+        <SkeletonCartList count={3} />
       </div>
     );
   }
@@ -122,6 +126,7 @@ export default function Wishlist() {
       setBusyId(it.ID);
       await addToCart(it.Product.ID, 1);
       await removeFromWishlist(it.ID);
+      notifyCartChanged();
       showToast("ok", t("wishlist.movedToCart", { name: it.Product.name }));
       load();
     } catch (err) {
@@ -159,7 +164,7 @@ export default function Wishlist() {
               failCount++;
             }
           }
-          if (okCount > 0) showToast("ok", t("wishlist.movedCountOk", { count: okCount }));
+          if (okCount > 0) { notifyCartChanged(); showToast("ok", t("wishlist.movedCountOk", { count: okCount })); }
           if (failCount > 0) showToast("err", t("wishlist.movedCountFail", { count: failCount }));
           load();
         } finally {

@@ -100,8 +100,8 @@ export default function Dashboard() {
   }
 
   const statusColor = (s) => {
-    if (s === "delivered") return "var(--leaf-600)";
-    if (s === "cancelled") return "var(--rose)";
+    if (s === "delivered") return "var(--brand-600)";
+    if (s === "cancelled") return "var(--danger-strong)";
     if (s === "processing" || s === "packed") return "#e67e22";
     return "var(--ink-400)";
   };

@@ -139,7 +139,7 @@ export default function Subscriptions() {
           className="card"
           style={{
             padding: 12,
-            color: "var(--leaf-700)",
+            color: "var(--brand-700)",
             marginBottom: 12,
           }}
         >
@@ -209,7 +209,7 @@ export default function Subscriptions() {
                 className="row-card"
                 style={{
                   borderRadius: 0,
-                  borderBottom: "1px solid var(--leaf-100)",
+                  borderBottom: "1px solid var(--brand-100)",
                   alignItems: "center",
                   flexWrap: "wrap",
                   gap: 8,
@@ -375,7 +375,7 @@ function DeliveryHistory({ id, onClose }) {
                 key={d.id}
                 className="row"
                 style={{
-                  borderBottom: "1px solid var(--leaf-100)",
+                  borderBottom: "1px solid var(--brand-100)",
                   padding: "8px 0",
                   alignItems: "center",
                 }}

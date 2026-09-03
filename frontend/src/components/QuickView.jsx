@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProduct } from "../api/products";
 import { addToCart } from "../api/cart";
+import { notifyCartChanged } from "../context/CartContext";
 import { addToWishlist } from "../api/wishlist";
 import { useAuth } from "../context/AuthContext";
 import { fmtBDT, emojiFor } from "../utils/kb";
@@ -41,6 +42,7 @@ export default function QuickView({ productId, onClose }) {
     try {
       setAdding(true);
       await addToCart(product.ID, 1);
+      notifyCartChanged();
       toast.ok(`Added ${product.name} to cart`);
       onClose();
     } catch {

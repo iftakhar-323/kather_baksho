@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { addToCart } from "../api/cart";
 import { addToWishlist } from "../api/wishlist";
 import { CompareStore, SaveForLaterStore } from "../utils/kb";
+import { notifyCartChanged } from "../context/CartContext";
 import ProductImage from "./ProductImage";
 import { useConfirm } from "./Confirm";
 import { useToast } from "./Toast";
@@ -50,6 +51,11 @@ export default function ProductCard({ product, onQuickView }) {
       setStatus("loading");
       await addToCart(product.ID, 1);
       setStatus("added");
+      notifyCartChanged();
+      toast.show("ok", `${product.name} added to cart`, 3800, {
+        label: "View cart",
+        onClick: () => window.__katherboxSetView?.("cart"),
+      });
       setTimeout(() => setStatus("idle"), 1500);
     } catch (err) {
       console.error(err);
@@ -200,8 +206,8 @@ export default function ProductCard({ product, onQuickView }) {
             onClick={handleWishlist}
             className="btn btn-secondary btn-sm btn-block"
             style={{
-              color: heart === "saved" ? "var(--rose)" : undefined,
-              borderColor: heart === "saved" ? "var(--rose-lt)" : undefined,
+              color: heart === "saved" ? "var(--danger-strong)" : undefined,
+              borderColor: heart === "saved" ? "var(--danger-weak)" : undefined,
             }}
           >
             {heart === "saved" ? "Saved ♥" : "♡ Save"}

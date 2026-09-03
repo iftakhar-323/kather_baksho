@@ -21,7 +21,7 @@ export default class ErrorBoundary extends Component {
             maxWidth: 560,
             margin: "64px auto",
             textAlign: "center",
-            background: "var(--rose-50, #fff5f5)",
+            background: "var(--danger-50, #fff5f5)",
           }}
         >
           <div style={{ fontSize: 56 }}>😵</div>

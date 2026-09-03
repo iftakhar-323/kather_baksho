@@ -80,7 +80,7 @@ export default function Reminders({ embedded = false }) {
                 className="row-card"
                 style={{
                   borderRadius: 0,
-                  borderBottom: "1px solid var(--leaf-100)",
+                  borderBottom: "1px solid var(--brand-100)",
                   alignItems: "center",
                 }}
               >

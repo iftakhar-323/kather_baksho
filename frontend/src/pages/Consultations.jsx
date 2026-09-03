@@ -77,7 +77,7 @@ export default function Consultations() {
         <p className="muted">{t("consultations.subhead")}</p>
       </div>
 
-      {msg && <div className="card" style={{ padding: 12, color: "var(--leaf-700)" }}>{msg}</div>}
+      {msg && <div className="card" style={{ padding: 12, color: "var(--brand-700)" }}>{msg}</div>}
       {error && <div className="warning">{error}</div>}
 
       <h2>{t("consultations.expertsHeading")}</h2>
@@ -163,7 +163,7 @@ export default function Consultations() {
               className="row-card"
               style={{
                 borderRadius: 0,
-                borderBottom: "1px solid var(--leaf-100)",
+                borderBottom: "1px solid var(--brand-100)",
                 alignItems: "center",
               }}
             >

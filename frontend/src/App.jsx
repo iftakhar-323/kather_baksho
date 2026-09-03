@@ -10,6 +10,7 @@ import {
   Link,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { CartProvider, useCart } from "./context/CartContext";
 // Home is imported eagerly — it's the landing page almost every visit starts
 // on, so there's no benefit to paying a second network round trip for it.
 // Everything else below is route-specific and only needed once a user
@@ -225,6 +226,17 @@ function Footer() {
   );
 }
 
+// Small live badge for the Cart nav item.
+function NavCartBadge({ itemKey }) {
+  const { count } = useCart();
+  if (itemKey !== "cart" || count <= 0) return null;
+  return (
+    <span className="nav-cart-badge" aria-label={`${count} items in cart`}>
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
 function Navbar() {
   const { user, logout } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -314,6 +326,7 @@ function Navbar() {
         >
           {it.emoji && <span className="nav-emoji" aria-hidden="true">{it.emoji}</span>}
           <span>{t(it.tKey)}</span>
+          <NavCartBadge itemKey={it.key} />
         </button>
       ))}
       <div className="nav-drawer-section-title">{t("nav.more") || "More"}</div>
@@ -356,6 +369,7 @@ function Navbar() {
               >
                 {it.emoji && <span className="nav-emoji" aria-hidden="true">{it.emoji}</span>}
                 <span>{t(it.tKey)}</span>
+                <NavCartBadge itemKey={it.key} />
               </button>
             ))}
 
@@ -705,7 +719,9 @@ export default function App() {
     <BrowserRouter>
       <I18nProvider>
         <AuthProvider>
-          <AppShell />
+          <CartProvider>
+            <AppShell />
+          </CartProvider>
         </AuthProvider>
       </I18nProvider>
     </BrowserRouter>

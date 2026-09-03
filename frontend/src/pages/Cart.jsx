@@ -11,6 +11,8 @@ import { applyCoupon } from "../api/coupons";
 import { useTranslation } from "../i18n/I18nProvider";
 import PaymentModal from "../components/PaymentModal";
 import ProductImage from "../components/ProductImage";
+import { SkeletonCartList } from "../components/Skeleton";
+import { notifyCartChanged } from "../context/CartContext";
 
 const FREE_SHIPPING_THRESHOLD = 1500; // ৳
 const GIFT_WRAP_FEE = 50;
@@ -76,6 +78,7 @@ export default function Cart({ onOrderPlaced }) {
       .then((res) => {
         setCart(res.data);
         setError(null);
+        notifyCartChanged();
       })
       .catch((err) => {
         console.error(err);
@@ -138,9 +141,14 @@ export default function Cart({ onOrderPlaced }) {
   }
   if (loading) {
     return (
-      <div className="empty">
-        <div className="emoji">🛒</div>
-        <h3>{t("cart.loading")}</h3>
+      <div className="cart-page">
+        <div className="cart-header">
+          <div>
+            <h2>{t("cart.headerTitle")}</h2>
+            <div className="cart-subhead">{t("cart.loading")}</div>
+          </div>
+        </div>
+        <SkeletonCartList count={3} />
       </div>
     );
   }
@@ -148,7 +156,7 @@ export default function Cart({ onOrderPlaced }) {
     return (
       <div className="empty">
         <div className="emoji">⚠️</div>
-        <h3 style={{ color: "var(--rose)" }}>{error}</h3>
+        <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
       </div>
     );
   }
@@ -259,7 +267,7 @@ export default function Cart({ onOrderPlaced }) {
         style={{ maxWidth: 520, margin: "32px auto", textAlign: "center" }}
       >
         <div style={{ fontSize: 64 }}>🎉</div>
-        <h2 style={{ color: "var(--leaf-700)" }}>{t("cart.placed")}</h2>
+        <h2 style={{ color: "var(--brand-700)" }}>{t("cart.placed")}</h2>
         <p className="muted mt-8">
           Order <strong>#{order.order.ID}</strong>
         </p>

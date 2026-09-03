@@ -7,9 +7,9 @@ let _id = 0;
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
-  const show = useCallback((tone, msg, ttl = 2600) => {
+  const show = useCallback((tone, msg, ttl = 2600, action = null) => {
     const id = ++_id;
-    setToasts((t) => [...t, { id, tone, msg }]);
+    setToasts((t) => [...t, { id, tone, msg, action }]);
     setTimeout(() => {
       setToasts((t) => t.filter((x) => x.id !== id));
     }, ttl);
@@ -31,7 +31,19 @@ export function ToastProvider({ children }) {
             <span className="ic" aria-hidden="true">
               {t.tone === "ok" ? "✓" : t.tone === "err" ? "✕" : "ℹ"}
             </span>
-            <span>{t.msg}</span>
+            <span className="kb-toast-msg">{t.msg}</span>
+            {t.action && (
+              <button
+                type="button"
+                className="kb-toast-action"
+                onClick={() => {
+                  t.action.onClick?.();
+                  setToasts((list) => list.filter((x) => x.id !== t.id));
+                }}
+              >
+                {t.action.label}
+              </button>
+            )}
           </div>
         ))}
       </div>

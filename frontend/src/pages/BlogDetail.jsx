@@ -108,7 +108,7 @@ export default function BlogDetail({ slug, onBack }) {
             fontSize: 96,
             textAlign: "center",
             background:
-              "linear-gradient(135deg, var(--leaf-100), var(--leaf-50))",
+              "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
             borderRadius: "var(--radius-lg)",
             padding: 24,
             marginBottom: 24,

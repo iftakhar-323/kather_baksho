@@ -151,7 +151,7 @@ export function CompareBar() {
         onClick={() => setOpen(true)}
         title="Open compare drawer"
         style={{
-          background: "linear-gradient(160deg, var(--leaf-700), var(--leaf-800))",
+          background: "linear-gradient(160deg, var(--brand-700), var(--brand-800))",
         }}
       >
         <span>⚖️ Compare</span>

@@ -127,7 +127,7 @@ export default function Blog() {
                 style={{
                   height: 140,
                   background:
-                    "linear-gradient(135deg, var(--leaf-100), var(--leaf-200))",
+                    "linear-gradient(135deg, var(--brand-100), var(--brand-200))",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

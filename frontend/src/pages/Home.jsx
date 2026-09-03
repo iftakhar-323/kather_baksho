@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getProducts, getGiftRecommendations } from "../api/products";
 import ProductCard from "../components/ProductCard";
 import ProductImage from "../components/ProductImage";
+import { SkeletonGrid } from "../components/Skeleton";
+import { useDebounce } from "../hooks/useDebounce";
 import { useTranslation } from "../i18n/I18nProvider";
 
 const emptyFilters = {
@@ -58,13 +60,26 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Live search — re-query 400ms after the shopper stops typing, no button.
+  const debouncedSearch = useDebounce(filters.search, 400);
+  const lastSearched = useRef(emptyFilters.search);
+  useEffect(() => {
+    if (debouncedSearch === lastSearched.current) return;
+    lastSearched.current = debouncedSearch;
+    setPage(1);
+    load({ ...filters, search: debouncedSearch }, 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
+
   const apply = (e) => {
     e?.preventDefault?.();
+    lastSearched.current = filters.search;
     setPage(1);
     load(filters, 1);
   };
 
   const reset = () => {
+    lastSearched.current = "";
     setFilters(emptyFilters);
     setPage(1);
     load(emptyFilters, 1);
@@ -72,6 +87,33 @@ export default function Home() {
 
   const update = (key) => (e) =>
     setFilters({ ...filters, [key]: e.target.value });
+
+  // Facet selects apply immediately — standard e-commerce filtering UX.
+  const updateApply = (key) => (e) => {
+    const next = { ...filters, [key]: e.target.value };
+    setFilters(next);
+    setPage(1);
+    load(next, 1);
+  };
+
+  const removeFilter = (key) => {
+    const next = { ...filters, [key]: "" };
+    if (key === "search") lastSearched.current = "";
+    setFilters(next);
+    setPage(1);
+    load(next, 1);
+  };
+
+  // Human-readable labels for the active-filter chip row
+  const catLabel = { plant: "categoryPlants", decor: "categoryDecor", care: "categoryCare" };
+  const activeChips = [
+    filters.search && { key: "search", label: `“${filters.search}”` },
+    filters.category && { key: "category", label: t("home." + (catLabel[filters.category] || "allCategories")) },
+    filters.subcategory && { key: "subcategory", label: filters.subcategory.replace(/_/g, " ") },
+    filters.indoor_outdoor && { key: "indoor_outdoor", label: filters.indoor_outdoor },
+    filters.min_price && { key: "min_price", label: `≥ ৳${Number(filters.min_price).toLocaleString()}` },
+    filters.max_price && { key: "max_price", label: `≤ ৳${Number(filters.max_price).toLocaleString()}` },
+  ].filter(Boolean);
 
   return (
     <div>
@@ -242,7 +284,7 @@ export default function Home() {
         <select
           className="select"
           value={filters.category}
-          onChange={update("category")}
+          onChange={updateApply("category")}
         >
           <option value="">{t("home.allCategories")}</option>
           <option value="plant">{t("home.categoryPlants")}</option>
@@ -252,7 +294,7 @@ export default function Home() {
         <select
           className="select"
           value={filters.subcategory}
-          onChange={update("subcategory")}
+          onChange={updateApply("subcategory")}
         >
           <option value="">{t("home.allSubcategories")}</option>
           <option value="indoor_plant">{t("home.subIndoorPlant")}</option>
@@ -266,7 +308,7 @@ export default function Home() {
         <select
           className="select"
           value={filters.indoor_outdoor}
-          onChange={update("indoor_outdoor")}
+          onChange={updateApply("indoor_outdoor")}
         >
           <option value="">{t("home.indoorOutdoorAny")}</option>
           <option value="indoor">{t("home.giftIndoor")}</option>
@@ -296,6 +338,27 @@ export default function Home() {
           {t("home.reset")}
         </button>
       </form>
+
+      {activeChips.length > 0 && (
+        <div className="kb-filter-chips">
+          <span className="lbl">{t("home.activeFilters")}:</span>
+          {activeChips.map((c) => (
+            <span key={c.key} className="kb-chip">
+              {c.label}
+              <button
+                type="button"
+                onClick={() => removeFilter(c.key)}
+                aria-label={`Remove ${c.label} filter`}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+          <button type="button" className="kb-chip-clear" onClick={reset}>
+            {t("home.clearAll")}
+          </button>
+        </div>
+      )}
 
       <div className="row mt-24 mb-12">
         <h2 style={{ fontSize: "1.25rem" }}>
@@ -352,14 +415,11 @@ export default function Home() {
       )}
 
       {loading ? (
-        <div className="empty">
-          <div className="emoji">🪴</div>
-          <h3>{t("home.loadingProducts")}</h3>
-        </div>
+        <SkeletonGrid count={12} />
       ) : error ? (
         <div className="empty">
           <div className="emoji">⚠️</div>
-          <h3 style={{ color: "var(--rose)" }}>{error}</h3>
+          <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
         </div>
       ) : products.length === 0 ? (
         <div className="empty">

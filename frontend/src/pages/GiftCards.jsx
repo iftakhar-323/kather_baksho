@@ -172,13 +172,13 @@ export default function GiftCards() {
               style={{
                 marginTop: 16,
                 padding: 16,
-                background: "linear-gradient(135deg, var(--leaf-100), var(--leaf-50))",
+                background: "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
                 borderRadius: 12,
               }}
             >
               <div className="row">
                 <strong style={{ flex: 1, fontSize: 18 }}>{balance.code || code}</strong>
-                <span style={{ fontSize: 24, fontWeight: 700, color: "var(--leaf-700)" }}>
+                <span style={{ fontSize: 24, fontWeight: 700, color: "var(--brand-700)" }}>
                   {fmtBDT(balance.value_remaining)}
                 </span>
               </div>
@@ -266,13 +266,13 @@ export default function GiftCards() {
                 className="card card-pad mb-8"
                 style={{
                   background:
-                    "linear-gradient(135deg, var(--leaf-100), var(--leaf-50))",
+                    "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
                 }}
               >
                 <div className="row">
                   <strong style={{ fontSize: 16 }}>{c.code}</strong>
                   <span className="spacer" />
-                  <span style={{ fontSize: 22, fontWeight: 700, color: "var(--leaf-700)" }}>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: "var(--brand-700)" }}>
                     {fmtBDT(c.value_remaining)}
                   </span>
                 </div>

@@ -53,6 +53,25 @@ const STATUS_OPTIONS = [
   "Delivered",
 ];
 
+// Human-readable title + one-line description for each workspace tab.
+const TAB_META = {
+  dashboard:     { title: "Dashboard",         desc: "Revenue, traffic and top performers at a glance." },
+  products:      { title: "Products",          desc: "Add, edit and manage the product catalogue." },
+  orders:        { title: "Orders",            desc: "Track, fulfil and update customer orders." },
+  corporate:    { title: "Corporate Orders",  desc: "Review and progress bulk corporate enquiries." },
+  subscriptions: { title: "Subscriptions",     desc: "Manage recurring plant-box subscriptions." },
+  consultations: { title: "Consultations",     desc: "Confirm or cancel booked expert sessions." },
+  reminders:     { title: "Care Reminders",    desc: "Monitor customer plant-care reminders." },
+  coupons:       { title: "Coupons",           desc: "Create and retire discount codes." },
+  blog:          { title: "Blog CMS",          desc: "Write, publish and remove blog posts." },
+  csv:           { title: "CSV Tools",         desc: "Bulk import and export the product catalogue." },
+  backup:        { title: "Backup & Restore",  desc: "Download or restore a full database snapshot." },
+  roles:         { title: "User Roles",        desc: "Grant or revoke admin access for users." },
+  returns:       { title: "Returns & Refunds", desc: "Approve, reject and process return requests." },
+  reviews:       { title: "Reviews",           desc: "Moderate and remove product reviews." },
+  categories:    { title: "Categories",        desc: "Organise the catalogue's category tree." },
+};
+
 export default function Admin() {
   const { user } = useAuth();
   const [tab, setTab] = useState("products");
@@ -91,7 +110,7 @@ export default function Admin() {
     return (
       <div className="empty" style={{ marginTop: 64 }}>
         <div className="emoji">🚫</div>
-        <h3 style={{ color: "var(--rose)" }}>Admin access required</h3>
+        <h3 style={{ color: "var(--danger-strong)" }}>Admin access required</h3>
         <p>
           {authError ||
             "Your account does not have admin privileges. If you were just promoted, please log out and log back in."}
@@ -199,8 +218,10 @@ export default function Admin() {
 
       <main className="admin-main">
         <header className="admin-header">
-          <h2>{tab}</h2>
-          <p className="muted" style={{ marginTop: 4 }}>Manage {tab} records and configurations.</p>
+          <h2>{(TAB_META[tab] || { title: tab }).title}</h2>
+          <p className="muted" style={{ marginTop: 4 }}>
+            {(TAB_META[tab] || { desc: `Manage ${tab} records and configurations.` }).desc}
+          </p>
         </header>
 
         {authError && <div className="warning mb-16">{authError}</div>}
@@ -671,7 +692,7 @@ function RolesAdmin() {
                           width: 36,
                           height: 36,
                           borderRadius: 999,
-                          background: "var(--leaf-100)",
+                          background: "var(--brand-100)",
                           display: "inline-flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -1293,10 +1314,10 @@ function ProductsTab() {
                       style={{
                         color:
                           p.stock === 0
-                            ? "var(--rose)"
+                            ? "var(--danger-strong)"
                             : p.stock < 5
                             ? "var(--warning)"
-                            : "var(--leaf-700)",
+                            : "var(--brand-700)",
                         fontWeight: 700,
                       }}
                     >
@@ -2195,10 +2216,10 @@ function DashboardTab() {
         }}
       >
         {tiles.map((t) => (
-          <div key={t.label} className="card" style={{ padding: 16, textAlign: "center" }}>
-            <div style={{ fontSize: 28 }}>{t.emoji}</div>
-            <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>{t.label}</div>
-            <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4 }}>{t.value}</div>
+          <div key={t.label} className="card admin-kpi">
+            <span className="k-emoji" aria-hidden="true">{t.emoji}</span>
+            <span className="k-label">{t.label}</span>
+            <span className="k-value">{t.value}</span>
           </div>
         ))}
       </div>
@@ -2217,7 +2238,7 @@ function DashboardTab() {
                 <polyline
                   points={sparkPts}
                   fill="none"
-                  stroke="var(--leaf-600, #5e8b56)"
+                  stroke="var(--brand-600, #5e8b56)"
                   strokeWidth="2"
                   vectorEffect="non-scaling-stroke"
                 />
@@ -2278,8 +2299,8 @@ function DashboardTab() {
           <h3 style={{ marginTop: 0 }}>🏆 Top-selling products</h3>
           {(stats.top_products || []).length === 0 && <p className="muted">No sales yet.</p>}
           {(stats.top_products || []).map((p, i) => (
-            <div key={p.product_id} className="row" style={{ padding: "6px 0", borderBottom: "1px solid var(--leaf-100)" }}>
-              <span style={{ width: 24, color: "var(--leaf-700)", fontWeight: 700 }}>#{i + 1}</span>
+            <div key={p.product_id} className="row" style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}>
+              <span style={{ width: 24, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
               <span style={{ flex: 1 }}>{p.name}</span>
               <span className="muted">{p.sold} sold</span>
               <span style={{ minWidth: 80, textAlign: "right", fontWeight: 600 }}>
@@ -2298,9 +2319,9 @@ function DashboardTab() {
               <div
                 key={u.user_id || u.email}
                 className="row"
-                style={{ padding: "6px 0", borderBottom: "1px solid var(--leaf-100)" }}
+                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}
               >
-                <span style={{ width: 24, color: "var(--leaf-700)", fontWeight: 700 }}>#{i + 1}</span>
+                <span style={{ width: 24, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
                 <span style={{ flex: 1 }}>{u.name || u.email}</span>
                 <span className="muted">{u.orders ?? u.order_count ?? 0} orders</span>
                 <span style={{ minWidth: 80, textAlign: "right", fontWeight: 600 }}>
@@ -2320,12 +2341,12 @@ function DashboardTab() {
               <div
                 key={p.ID || p.id}
                 className="row"
-                style={{ padding: "6px 0", borderBottom: "1px solid var(--leaf-100)" }}
+                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}
               >
                 <span style={{ flex: 1 }}>{p.name}</span>
                 <span
                   style={{
-                    color: p.stock === 0 ? "var(--rose)" : "var(--warning)",
+                    color: p.stock === 0 ? "var(--danger-strong)" : "var(--warning)",
                     fontWeight: 700,
                   }}
                 >
@@ -2489,7 +2510,7 @@ function CouponsTab() {
           <button type="submit" disabled={busy} className="btn btn-primary">
             {busy ? "Saving…" : "Create coupon"}
           </button>
-          {msg && <p style={{ color: msg.startsWith("✓") ? "var(--leaf-700)" : "var(--rose)" }}>{msg}</p>}
+          {msg && <p style={{ color: msg.startsWith("✓") ? "var(--brand-700)" : "var(--danger-strong)" }}>{msg}</p>}
         </form>
       </div>
     </div>

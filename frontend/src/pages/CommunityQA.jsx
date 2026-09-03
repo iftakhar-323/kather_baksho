@@ -377,7 +377,7 @@ export default function CommunityQA({ embedded = false }) {
                 <tr key={u.user_id || i}>
                   <td>
                     <strong
-                      style={{ color: i < 3 ? "var(--leaf-700)" : undefined }}
+                      style={{ color: i < 3 ? "var(--brand-700)" : undefined }}
                     >
                       #{i + 1}
                     </strong>

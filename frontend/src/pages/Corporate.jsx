@@ -98,7 +98,7 @@ export default function Corporate() {
 
       {mainTab === "quote" && (
       <>
-      {msg && <div className="card" style={{ padding: 12, color: "var(--leaf-700)", marginBottom: 12 }}>{msg}</div>}
+      {msg && <div className="card" style={{ padding: 12, color: "var(--brand-700)", marginBottom: 12 }}>{msg}</div>}
       {error && <div className="warning">{error}</div>}
 
       <div className="card" style={{ padding: 16 }}>
@@ -188,7 +188,7 @@ export default function Corporate() {
       {quotes.length > 0 && (
         <div className="card" style={{ padding: 0 }}>
           {quotes.map((q) => (
-            <div key={q.ID} className="row-card" style={{ borderRadius: 0, borderBottom: "1px solid var(--leaf-100)" }}>
+            <div key={q.ID} className="row-card" style={{ borderRadius: 0, borderBottom: "1px solid var(--brand-100)" }}>
               <div className="row-icon" style={{ background: "linear-gradient(135deg,#e8f1e6,#cfe1cb)" }}>
                 <span style={{ fontSize: 24 }}>🏢</span>
               </div>

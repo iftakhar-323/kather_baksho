@@ -5,6 +5,8 @@ import { addToCart } from "../api/cart";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import DeliveryTrack from "../components/DeliveryTrack";
+import { SkeletonCartList } from "../components/Skeleton";
+import { notifyCartChanged } from "../context/CartContext";
 
 const STATUS_KEYS = {
   "Pending": "orders.placed",
@@ -53,6 +55,7 @@ export default function Orders() {
       for (const item of order.items) {
         await addToCart(item.product_id, item.quantity);
       }
+      notifyCartChanged();
       toast.ok("Items added to cart");
       window.__katherboxSetView?.("cart");
     } catch {
@@ -73,9 +76,9 @@ export default function Orders() {
   }
   if (loading) {
     return (
-      <div className="empty">
-        <div className="emoji">📦</div>
-        <h3>{t("orders.loading")}</h3>
+      <div style={{ maxWidth: 820, margin: "0 auto" }}>
+        <h2 className="mb-16">{t("orders.headerTitle")}</h2>
+        <SkeletonCartList count={4} />
       </div>
     );
   }
@@ -83,7 +86,7 @@ export default function Orders() {
     return (
       <div className="empty">
         <div className="emoji">⚠️</div>
-        <h3 style={{ color: "var(--rose)" }}>{error}</h3>
+        <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
       </div>
     );
   }
@@ -179,7 +182,7 @@ export default function Orders() {
                           justifyContent: "space-between",
                           fontSize: 14,
                           padding: "8px 0",
-                          borderTop: "1px solid var(--moss-100)",
+                          borderTop: "1px solid var(--neutral-100)",
                         }}
                       >
                         <span>

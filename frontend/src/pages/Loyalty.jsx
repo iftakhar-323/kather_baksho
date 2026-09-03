@@ -108,12 +108,12 @@ export default function Loyalty() {
           gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))",
           gap: 16,
           background:
-            "linear-gradient(135deg, var(--leaf-100), var(--leaf-50))",
+            "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
         }}
       >
         <div>
           <div className="muted">{t("loyalty.pointsLabel")}</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--leaf-700)" }}>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--brand-700)" }}>
             {fmt(me.points)}
           </div>
         </div>
@@ -221,8 +221,8 @@ export default function Loyalty() {
             <code
               style={{
                 padding: "8px 12px",
-                background: "var(--leaf-50)",
-                border: "1px solid var(--leaf-100)",
+                background: "var(--brand-50)",
+                border: "1px solid var(--brand-100)",
                 borderRadius: 8,
                 fontSize: 18,
                 fontWeight: 700,

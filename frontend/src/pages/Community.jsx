@@ -305,7 +305,7 @@ export default function Community() {
               </div>
 
               {p.like_count > 0 && p.liked_by_names?.length > 0 && (
-                <div style={{ fontSize: 13, color: "var(--leaf-600)", marginBottom: 12 }}>
+                <div style={{ fontSize: 13, color: "var(--brand-600)", marginBottom: 12 }}>
                   <strong>Liked by:</strong> {p.liked_by_names.join(", ")}
                 </div>
               )}
@@ -337,7 +337,7 @@ export default function Community() {
               <div
                 style={{
                   padding: "0 16px 16px",
-                  borderTop: "1px solid var(--leaf-100)",
+                  borderTop: "1px solid var(--brand-100)",
                 }}
               >
                 {comments.length === 0 && (
