@@ -4,7 +4,7 @@ import { addToCart } from "../api/cart";
 import { notifyCartChanged } from "../context/CartContext";
 import { addToWishlist } from "../api/wishlist";
 import { useAuth } from "../context/AuthContext";
-import { fmtBDT, emojiFor } from "../utils/kb";
+import { fmtBDT } from "../utils/kb";
 import { useToast } from "./Toast";
 import ProductImage from "./ProductImage";
 
@@ -80,7 +80,8 @@ export default function QuickView({ productId, onClose }) {
             <div className="qv-thumb">
               <ProductImage
                 src={product.image_url}
-                emoji={emojiFor(product)}
+                category={product.category}
+                seed={product.name}
                 alt={product.name}
               />
             </div>

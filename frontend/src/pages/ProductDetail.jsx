@@ -8,7 +8,7 @@ import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import ReviewsSection from "../components/ReviewsSection";
 import ProductImage from "../components/ProductImage";
-import Lightbox from "../components/Lightbox";
+import ProductGallery from "../components/ProductGallery";
 import Breadcrumbs from "../components/Breadcrumbs";
 import ProductCard from "../components/ProductCard";
 import { SkeletonDetail } from "../components/Skeleton";
@@ -16,12 +16,6 @@ import { useConfirm } from "../components/Confirm";
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-}
-
-function emojiFor(category) {
-  if (category === "plant") return "🌿";
-  if (category === "care") return "🧴";
-  return "🪵";
 }
 
 export default function ProductDetail({ productId, onBack }) {
@@ -35,7 +29,6 @@ export default function ProductDetail({ productId, onBack }) {
   const [qty, setQty] = useState(1);
   const [inCompare, setInCompare] = useState(CompareStore.has(productId));
   const [inSaved, setInSaved] = useState(SaveForLaterStore.has(productId));
-  const [zoomOpen, setZoomOpen] = useState(false);
   const [related, setRelated] = useState([]);
   const [fbt, setFbt] = useState([]);
   const [fbtUnchecked, setFbtUnchecked] = useState({});
@@ -173,36 +166,10 @@ export default function ProductDetail({ productId, onBack }) {
           gap: 32,
         }}
       >
-        <div
-          onClick={() => product.image_url && setZoomOpen(true)}
-          title={product.image_url ? t("productDetail.clickToZoom") : undefined}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 60%), linear-gradient(160deg, var(--brand-50), var(--brand-100))",
-            borderRadius: "var(--radius-lg)",
-            fontSize: 120,
-            aspectRatio: "1 / 1",
-            overflow: "hidden",
-            cursor: product.image_url ? "zoom-in" : "default",
-          }}
-        >
-          <ProductImage
-            src={product.image_url}
-            emoji={emojiFor(product.category)}
-            alt={product.name}
-          />
-        </div>
-
-        {zoomOpen && (
-          <Lightbox
-            src={product.image_url}
-            alt={product.name}
-            onClose={() => setZoomOpen(false)}
-          />
-        )}
+        <ProductGallery
+          product={product}
+          zoomHint={t("productDetail.clickToZoom")}
+        />
 
         <div>
           <h1 style={{ marginBottom: 8 }}>{product.name}</h1>
@@ -353,7 +320,7 @@ export default function ProductDetail({ productId, onBack }) {
           <div className="fbt-row">
             <div className="fbt-tile fbt-tile-main">
               <div className="fbt-thumb">
-                <ProductImage src={product.image_url} emoji={emojiFor(product.category)} alt={product.name} />
+                <ProductImage src={product.image_url} category={product.category} seed={product.name} alt={product.name} />
               </div>
               <div className="fbt-name">{product.name}</div>
               <div className="fbt-price">৳{Number(product.price).toLocaleString()}</div>
@@ -371,7 +338,7 @@ export default function ProductDetail({ productId, onBack }) {
                     }
                   />
                   <div className="fbt-thumb">
-                    <ProductImage src={p.image_url} emoji={emojiFor(p.category)} alt={p.name} />
+                    <ProductImage src={p.image_url} category={p.category} seed={p.name} alt={p.name} />
                   </div>
                   <div className="fbt-name">{p.name}</div>
                   <div className="fbt-price">৳{Number(p.price).toLocaleString()}</div>

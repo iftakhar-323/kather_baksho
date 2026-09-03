@@ -194,6 +194,24 @@ export default function OrderDetail({ order, onBack }) {
         )}
       </div>
 
+      {(order.shipping_address || order.shipping_name) && (
+        <div className="card card-pad mb-16">
+          <span className="field-label">{t("orderDetail.shipTo")}</span>
+          <div style={{ marginTop: 4, lineHeight: 1.5 }}>
+            {order.shipping_name && <strong>{order.shipping_name}</strong>}
+            {order.shipping_phone && (
+              <span className="muted"> · {order.shipping_phone}</span>
+            )}
+            {order.shipping_address && <div>{order.shipping_address}</div>}
+            {order.delivery_note && (
+              <div className="muted" style={{ fontSize: 13 }}>
+                {t("orderDetail.deliveryNote")}: {order.delivery_note}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="row gap-8 mb-16" style={{ flexWrap: "wrap" }}>
         <button className="btn btn-secondary btn-sm" onClick={onViewInvoice}>
           {t("orderDetail.viewInvoice")}

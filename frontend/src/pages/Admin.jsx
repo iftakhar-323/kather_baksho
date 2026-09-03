@@ -44,6 +44,7 @@ import {
 } from "../api/categories";
 import { useToast } from "../components/Toast";
 import { useConfirm } from "../components/Confirm";
+import MiniBarChart from "../components/MiniBarChart";
 
 const STATUS_OPTIONS = [
   "Pending",
@@ -1611,31 +1612,33 @@ function ProductForm({ initial, onClose, onSaved }) {
             />
           </div>
           <div>
-            <label className="field-label">Image URL</label>
-            <div className="row gap-12" style={{ alignItems: "center" }}>
-              <input
-                className="input"
-                style={{ flex: 1 }}
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://... (leave blank to use the category icon)"
-              />
-              {imageUrl && (
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
-                  onLoad={(e) => { e.currentTarget.style.visibility = "visible"; }}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    objectFit: "cover",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--border)",
-                    flexShrink: 0,
-                  }}
-                />
-              )}
+            <label className="field-label">Image URL(s)</label>
+            <input
+              className="input"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://... — separate multiple photos with commas (blank = generated placeholder)"
+            />
+            <div className="row gap-8" style={{ marginTop: 8, flexWrap: "wrap" }}>
+              {imageUrl
+                .split(/[\s,]+/)
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .map((src, i) => (
+                  <img
+                    key={src + i}
+                    src={src}
+                    alt={`Preview ${i + 1}`}
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      objectFit: "cover",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid var(--border)",
+                    }}
+                  />
+                ))}
             </div>
           </div>
 
@@ -2143,6 +2146,8 @@ function DashboardTab() {
   if (error) return <div className="warning">{error}</div>;
   if (!stats) return <div className="empty"><div className="emoji">📊</div><h3>No analytics yet</h3><p>Sales and traffic data will appear once you have orders.</p></div>;
 
+  const daily = (summary && summary.daily) || [];
+
   const tiles = [
     { label: "Total revenue", value: `৳${Number(stats.revenue || 0).toFixed(2)}`, emoji: "💰" },
     { label: "Total orders", value: stats.total_orders, emoji: "📦" },
@@ -2223,6 +2228,57 @@ function DashboardTab() {
           </div>
         ))}
       </div>
+
+      {summary && (
+        <div className="card mt-16" style={{ padding: 16 }}>
+          <div className="row" style={{ alignItems: "center", marginBottom: 4 }}>
+            <h3 style={{ margin: 0, flex: 1 }}>📊 Revenue — last {days} days</h3>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={!daily.length}
+              onClick={() => {
+                const rows = [
+                  ["date", "revenue", "orders"],
+                  ...daily.map((d) => [d.date, d.total, d.count]),
+                ];
+                const csv = rows.map((r) => r.join(",")).join("\n");
+                const url = URL.createObjectURL(
+                  new Blob([csv], { type: "text/csv" })
+                );
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `katherbox-revenue-${days}d.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              ⬇ Export CSV
+            </button>
+          </div>
+          <div className="row" style={{ gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+            {[
+              { label: `Revenue (${days}d)`, value: `৳${Number(summary.total_revenue || 0).toLocaleString()}` },
+              { label: `Orders (${days}d)`, value: Number(summary.total_orders || 0).toLocaleString() },
+              { label: `New customers (${days}d)`, value: Number(summary.total_customers || 0).toLocaleString() },
+              { label: "Avg. order value", value: `৳${Number(summary.avg_order || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}` },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="muted" style={{ fontSize: 12 }}>{s.label}</div>
+                <div style={{ fontSize: 20, fontWeight: 700 }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+          <MiniBarChart
+            data={daily.map((d) => ({
+              label: (d.date || "").slice(5),
+              value: d.total,
+              sub: `${d.count} order${d.count === 1 ? "" : "s"}`,
+            }))}
+            format={(v) => `৳${Number(v).toLocaleString()}`}
+          />
+        </div>
+      )}
 
       {summary && (
         <div className="row mt-16" style={{ alignItems: "stretch", gap: 12 }}>

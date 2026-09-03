@@ -257,6 +257,22 @@ func UpdateReturnRequest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"ok": true})
 }
 
+// shipToLine renders an optional "Ship to" paragraph for the invoice.
+func shipToLine(o models.Order) string {
+	if o.ShippingAddress == "" && o.ShippingName == "" {
+		return ""
+	}
+	parts := o.ShippingName
+	if o.ShippingPhone != "" {
+		parts += " · " + o.ShippingPhone
+	}
+	line := fmt.Sprintf("<p><strong>Ship to:</strong> %s<br>%s", parts, o.ShippingAddress)
+	if o.DeliveryNote != "" {
+		line += fmt.Sprintf("<br><em class=\"muted\">Note: %s</em>", o.DeliveryNote)
+	}
+	return line + "</p>"
+}
+
 // ---------- Invoice HTML (browser-printable) ----------
 
 func InvoiceHTML(c *gin.Context) {
@@ -320,9 +336,10 @@ th{background:#f6f6f6}
 <h1>KatherBox — Invoice</h1>
 <p class="muted">Invoice #INV-%05d · %s</p>
 <p><strong>Billed to:</strong> %s</p>
+%s
 <table>
 <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
-`, oid, oid, o.CreatedAt.Format("02 Jan 2006"), buyer)
+`, oid, oid, o.CreatedAt.Format("02 Jan 2006"), buyer, shipToLine(o))
 	for _, r := range rows {
 		html += fmt.Sprintf("<tr><td>%s</td><td>%d</td><td>৳%.2f</td><td>৳%.2f</td></tr>",
 			r.Name, r.Quantity, r.Price, r.Subtotal)

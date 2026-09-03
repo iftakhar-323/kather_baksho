@@ -188,6 +188,8 @@
     "placedOn": "Placed {{date}} · Total ৳{{total}}",
     "viewInvoice": "🧾 View / print invoice",
     "viewReceipt": "🧾 View receipt",
+    "shipTo": "Ship to",
+    "deliveryNote": "Note",
     "return": "↩️ Return",
     "refund": "💸 Refund",
     "exchange": "🔄 Exchange",

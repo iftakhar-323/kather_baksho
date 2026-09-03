@@ -20,6 +20,10 @@ type CheckoutInput struct {
 	PaymentMethod  string `json:"payment_method"`
 	PaymentStatus  string `json:"payment_status"`
 	TransactionID  string `json:"transaction_id"`
+	ShippingName    string `json:"shipping_name"`
+	ShippingPhone   string `json:"shipping_phone"`
+	ShippingAddress string `json:"shipping_address"`
+	DeliveryNote    string `json:"delivery_note"`
 }
 
 // POST /api/orders/checkout - cart theke order banabe
@@ -98,6 +102,26 @@ func Checkout(c *gin.Context) {
 		finalTotal = 0
 	}
 
+	// Shipping details: prefer what the checkout form sent, fall back to the
+	// user's saved profile so an order always has a deliverable address.
+	shipName := input.ShippingName
+	shipPhone := input.ShippingPhone
+	shipAddr := input.ShippingAddress
+	if shipName == "" || shipPhone == "" || shipAddr == "" {
+		var profile models.User
+		if err := database.DB.First(&profile, userID).Error; err == nil {
+			if shipName == "" {
+				shipName = profile.Name
+			}
+			if shipPhone == "" {
+				shipPhone = profile.Phone
+			}
+			if shipAddr == "" {
+				shipAddr = profile.Address
+			}
+		}
+	}
+
 	payMethod := input.PaymentMethod
 	if payMethod == "" {
 		payMethod = "cod"
@@ -118,6 +142,10 @@ func Checkout(c *gin.Context) {
 		PaymentMethod: payMethod,
 		PaymentStatus: payStatus,
 		TransactionID: input.TransactionID,
+		ShippingName:    shipName,
+		ShippingPhone:   shipPhone,
+		ShippingAddress: shipAddr,
+		DeliveryNote:    input.DeliveryNote,
 		GiftWrap:      input.GiftWrap,
 		CouponCode:    appliedCouponCode,
 		DiscountAmount: couponDiscount,

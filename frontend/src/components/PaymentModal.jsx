@@ -252,7 +252,10 @@ export default function PaymentModal({ total, items, user, onClose, onComplete }
         paymentMethod: method,
         paymentStatus: method === "cod" ? "Pending COD" : "Paid",
         transactionId: txnId,
-        shippingAddress: `${name}, ${phone}, ${address}${deliveryNote ? ` (${deliveryNote})` : ""}`,
+        shippingName: name,
+        shippingPhone: phone,
+        shippingAddress: address,
+        deliveryNote,
       });
       setStep(4);
     }, 2800);

@@ -10,16 +10,6 @@ import ProductImage from "../components/ProductImage";
 import { SkeletonCartList } from "../components/Skeleton";
 import { notifyCartChanged } from "../context/CartContext";
 
-function emojiFor(category, subcategory) {
-  if (category === "plant") return "🌿";
-  if (category === "care") return "🧴";
-  if (category === "decor") {
-    if (subcategory === "decor") return "🏺";
-    return "🪵";
-  }
-  return "🪴";
-}
-
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
     minimumFractionDigits: 0,
@@ -230,7 +220,8 @@ export default function Wishlist() {
               <div className="cart-item-icon">
                 <ProductImage
                   src={p.image_url}
-                  emoji={emojiFor(p.category, p.subcategory)}
+                  category={p.category}
+                  seed={p.name}
                   alt={p.name}
                 />
               </div>
