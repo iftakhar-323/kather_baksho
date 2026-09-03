@@ -8,16 +8,6 @@ import { addToCart } from "../api/cart";
 import { useTranslation } from "../i18n/I18nProvider";
 import ProductImage from "../components/ProductImage";
 
-function emojiFor(category, subcategory) {
-  if (category === "plant") return "🌿";
-  if (category === "care") return "🧴";
-  if (category === "decor") {
-    if (subcategory === "decor") return "🏺";
-    return "🪵";
-  }
-  return "🪴";
-}
-
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
     minimumFractionDigits: 0,
@@ -225,7 +215,8 @@ export default function Wishlist() {
               <div className="cart-item-icon">
                 <ProductImage
                   src={p.image_url}
-                  emoji={emojiFor(p.category, p.subcategory)}
+                  category={p.category}
+                  seed={p.name}
                   alt={p.name}
                 />
               </div>

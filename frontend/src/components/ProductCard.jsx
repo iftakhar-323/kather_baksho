@@ -7,12 +7,6 @@ import ProductImage from "./ProductImage";
 import { useConfirm } from "./Confirm";
 import { useToast } from "./Toast";
 
-function emojiFor(category) {
-  if (category === "plant") return "🌿";
-  if (category === "care") return "🧴";
-  return "🪵";
-}
-
 export default function ProductCard({ product, onQuickView }) {
   const { user } = useAuth();
   const confirm = useConfirm();
@@ -123,7 +117,8 @@ export default function ProductCard({ product, onQuickView }) {
       >
         <ProductImage
           src={product.image_url}
-          emoji={emojiFor(product.category)}
+          category={product.category}
+          seed={product.name}
           alt={product.name}
         />
       </div>

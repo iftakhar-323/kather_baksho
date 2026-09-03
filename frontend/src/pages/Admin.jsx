@@ -1590,31 +1590,33 @@ function ProductForm({ initial, onClose, onSaved }) {
             />
           </div>
           <div>
-            <label className="field-label">Image URL</label>
-            <div className="row gap-12" style={{ alignItems: "center" }}>
-              <input
-                className="input"
-                style={{ flex: 1 }}
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://... (leave blank to use the category icon)"
-              />
-              {imageUrl && (
-                <img
-                  src={imageUrl}
-                  alt="Preview"
-                  onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
-                  onLoad={(e) => { e.currentTarget.style.visibility = "visible"; }}
-                  style={{
-                    width: 48,
-                    height: 48,
-                    objectFit: "cover",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--border)",
-                    flexShrink: 0,
-                  }}
-                />
-              )}
+            <label className="field-label">Image URL(s)</label>
+            <input
+              className="input"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://... — separate multiple photos with commas (blank = generated placeholder)"
+            />
+            <div className="row gap-8" style={{ marginTop: 8, flexWrap: "wrap" }}>
+              {imageUrl
+                .split(/[\s,]+/)
+                .map((s) => s.trim())
+                .filter(Boolean)
+                .map((src, i) => (
+                  <img
+                    key={src + i}
+                    src={src}
+                    alt={`Preview ${i + 1}`}
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      objectFit: "cover",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid var(--border)",
+                    }}
+                  />
+                ))}
             </div>
           </div>
 

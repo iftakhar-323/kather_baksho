@@ -17,16 +17,6 @@ const GIFT_WRAP_FEE = 50;
 const _TAX_RATE = 0;          // single BDT-wide inclusive-pricing model
 const SHIPPING_FEE = 60;
 
-function emojiFor(category, subcategory) {
-  if (category === "plant") return "🌿";
-  if (category === "care") return "🧴";
-  if (category === "decor") {
-    if (subcategory === "decor") return "🏺";
-    return "🪵";
-  }
-  return "🪴";
-}
-
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
     minimumFractionDigits: 0,
@@ -381,7 +371,8 @@ export default function Cart({ onOrderPlaced }) {
               <div className="cart-item-icon">
                 <ProductImage
                   src={item.product.image_url}
-                  emoji={emojiFor(item.product.category, item.product.subcategory)}
+                  category={item.product.category}
+                  seed={item.product.name}
                   alt={item.product.name}
                 />
               </div>

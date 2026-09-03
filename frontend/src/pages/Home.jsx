@@ -209,7 +209,8 @@ export default function Home() {
                 <div className="image">
                   <ProductImage
                     src={r.product.image_url}
-                    emoji={emojiFor(r.product.category)}
+                    category={r.product.category}
+                    seed={r.product.name}
                     alt={r.product.name}
                   />
                 </div>
@@ -376,9 +377,4 @@ export default function Home() {
       )}
     </div>
   );
-}
-
-function emojiFor(category) {
-  const m = { plant: "🪴", decor: "🏺", care: "🧴" };
-  return m[category] || "🌿";
 }
