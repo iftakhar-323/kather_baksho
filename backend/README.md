@@ -196,6 +196,19 @@ cd backend
 
 Runs makeadmin → seedproducts → seedusers → seeddummy → seedorders in order.
 
+### No Go toolchain? Seed straight into the SQLite file
+
+```bash
+cd backend
+node scripts/seed-demo.mjs            # needs Node >= 22
+node scripts/seed-demo.mjs --users 120 --orders 300
+```
+
+Tops up `katherbox.db` with ~90 users, ~220 dated orders (+ items),
+~180 reviews, address book, reminders and notifications — no build step.
+Seeded customers log in with `<name>@katherbox.demo` / `Customer@12345`.
+A `katherbox.db.bak-preseed` copy is left next to it the first time.
+
 ---
 
 ## 7. Demo accounts
