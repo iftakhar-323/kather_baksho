@@ -31,53 +31,27 @@ export const getReturns = (params = {}) =>
 export const updateReturnStatus = (id, payload) =>
   API.patch(`/returns/${id}`, payload);
 
-// Invoice HTML (browser-printable, opens in new tab)
-// GET /api/orders/:id/invoice
-export const openInvoice = (id) => {
-  const token = localStorage.getItem("kb_token");
-  // open with the same auth header (can't easily pass headers; user clicks print)
-  const url = `/api/orders/${id}/invoice`;
-  // Use a fetch to download and open in a new window with the HTML
-  return fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-    .then((r) => r.text())
-    .then((html) => {
-      const w = window.open("", "_blank");
-      if (w) {
-        w.document.write(html);
-        w.document.close();
-      }
-      return true;
-    });
+// Fetch a server-rendered HTML document (invoice / receipt) through the same
+// axios instance the rest of the app uses, so the auth header + baseURL are
+// handled centrally (the previous version read the wrong localStorage key).
+const openHtml = async (path) => {
+  const res = await API.get(path, { responseType: "text" });
+  const w = window.open("", "_blank");
+  if (w) {
+    w.document.write(res.data);
+    w.document.close();
+  }
+  return true;
 };
+
+// GET /api/orders/:id/invoice  — server-rendered printable invoice
+export const openInvoice = (id) => openHtml(`/orders/${id}/invoice`);
 
 // GET /api/orders/:id/receipt
-export const openReceipt = (id) => {
-  const token = localStorage.getItem("kb_token");
-  const url = `/api/orders/${id}/receipt`;
-  return fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-    .then((r) => r.text())
-    .then((html) => {
-      const w = window.open("", "_blank");
-      if (w) {
-        w.document.write(html);
-        w.document.close();
-      }
-      return true;
-    });
-};
+export const openReceipt = (id) => openHtml(`/orders/${id}/receipt`);
 
-// Stub the legacy PDF-named exports so old imports keep working (returns HTML text)
-export const getInvoicePDF = async (id) => {
-  const token = localStorage.getItem("kb_token");
-  const r = await fetch(`/api/orders/${id}/invoice`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return r.text();
-};
-export const getReceiptPDF = async (id) => {
-  const token = localStorage.getItem("kb_token");
-  const r = await fetch(`/api/orders/${id}/receipt`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return r.text();
-};
+// Legacy PDF-named exports kept for old imports (return HTML text).
+export const getInvoicePDF = async (id) =>
+  (await API.get(`/orders/${id}/invoice`, { responseType: "text" })).data;
+export const getReceiptPDF = async (id) =>
+  (await API.get(`/orders/${id}/receipt`, { responseType: "text" })).data;
