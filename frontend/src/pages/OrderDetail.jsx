@@ -4,14 +4,15 @@ import {
   requestReturn,
   requestRefund,
   requestExchange,
-  openInvoice,
   openReceipt,
   getEstimatedDelivery,
 } from "../api/orderExt";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import { useAuth } from "../context/AuthContext";
 import DeliveryTrack from "../components/DeliveryTrack";
 import Breadcrumbs from "../components/Breadcrumbs";
+import Invoice from "../components/Invoice";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -49,6 +50,8 @@ const TIMELINE_ICONS = {
 export default function OrderDetail({ order, onBack }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { user } = useAuth();
+  const [showInvoice, setShowInvoice] = useState(false);
   const [events, setEvents] = useState([]);
   const [est, setEst] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -77,11 +80,6 @@ export default function OrderDetail({ order, onBack }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [order.id || order.ID]);
 
-  const onViewInvoice = () => {
-    openInvoice(order.id || order.ID)
-      .then(() => toast.ok(t("orderDetail.invoiceOpen")))
-      .catch(() => toast.err(t("orderDetail.invoiceFail")));
-  };
   const onViewReceipt = () => {
     openReceipt(order.id || order.ID)
       .then(() => toast.ok(t("orderDetail.receiptOpen")))
@@ -141,6 +139,20 @@ export default function OrderDetail({ order, onBack }) {
   const actionLabel = action
     ? action[0].toUpperCase() + action.slice(1)
     : "";
+
+  if (showInvoice) {
+    return (
+      <div style={{ maxWidth: 880, margin: "0 auto" }}>
+        <button
+          onClick={() => setShowInvoice(false)}
+          className="btn btn-ghost mb-16 no-print"
+        >
+          {t("orderDetail.backToOrder") || "← Back to order"}
+        </button>
+        <Invoice order={order} user={user} onClose={() => setShowInvoice(false)} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -213,8 +225,8 @@ export default function OrderDetail({ order, onBack }) {
       )}
 
       <div className="row gap-8 mb-16" style={{ flexWrap: "wrap" }}>
-        <button className="btn btn-secondary btn-sm" onClick={onViewInvoice}>
-          {t("orderDetail.viewInvoice")}
+        <button className="btn btn-primary btn-sm" onClick={() => setShowInvoice(true)}>
+          🧾 {t("orderDetail.viewInvoice")}
         </button>
         <button className="btn btn-secondary btn-sm" onClick={onViewReceipt}>
           {t("orderDetail.viewReceipt")}

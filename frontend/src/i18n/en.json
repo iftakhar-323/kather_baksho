@@ -180,10 +180,13 @@
     "detailsLabel": "📍 Details",
     "detailsTitle": "View timeline, request return/refund, download invoice",
     "productFallback": "Product #{{id}}",
-    "qtyPrice": "{{qty}} × {{price}}"
+    "qtyPrice": "{{qty}} × {{price}}",
+    "invoiceLabel": "Invoice",
+    "invoiceTitle": "View & print invoice (save as PDF)"
   },
   "orderDetail": {
     "backToOrders": "← Back to orders",
+    "backToOrder": "← Back to order",
     "orderId": "Order #{{id}}",
     "placedOn": "Placed {{date}} · Total ৳{{total}}",
     "viewInvoice": "🧾 View / print invoice",

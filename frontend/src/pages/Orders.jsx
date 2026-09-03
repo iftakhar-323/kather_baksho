@@ -7,6 +7,7 @@ import { useTranslation } from "../i18n/I18nProvider";
 import DeliveryTrack from "../components/DeliveryTrack";
 import { SkeletonCartList } from "../components/Skeleton";
 import { notifyCartChanged } from "../context/CartContext";
+import Invoice from "../components/Invoice";
 
 const STATUS_KEYS = {
   "Pending": "orders.placed",
@@ -33,6 +34,7 @@ export default function Orders() {
   const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(null);
   const [reordering, setReordering] = useState(null);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -107,6 +109,20 @@ export default function Orders() {
     );
   }
 
+  if (invoiceOrder) {
+    return (
+      <div style={{ maxWidth: 880, margin: "0 auto" }}>
+        <button
+          className="btn btn-ghost mb-16 no-print"
+          onClick={() => setInvoiceOrder(null)}
+        >
+          {t("orderDetail.backToOrders")}
+        </button>
+        <Invoice order={invoiceOrder} user={user} onClose={() => setInvoiceOrder(null)} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 820, margin: "0 auto" }}>
       <h2 className="mb-16">{t("orders.headerTitle")}</h2>
@@ -167,6 +183,13 @@ export default function Orders() {
                   title="Add these items to cart again"
                 >
                   {reordering === o.ID ? "Adding..." : "Buy Again 🔄"}
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setInvoiceOrder(o)}
+                  title={t("orders.invoiceTitle") || "View & print invoice"}
+                >
+                  🧾 {t("orders.invoiceLabel") || "Invoice"}
                 </button>
               </div>
 

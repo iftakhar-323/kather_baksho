@@ -179,10 +179,13 @@
     "detailsLabel": "📍 বিস্তারিত",
     "detailsTitle": "টাইমলাইন দেখুন, রিটার্ন/রিফান্ড অনুরোধ করুন, চালান ডাউনলোড করুন",
     "productFallback": "পণ্য #{{id}}",
-    "qtyPrice": "{{qty}} × {{price}}"
+    "qtyPrice": "{{qty}} × {{price}}",
+    "invoiceLabel": "চালান",
+    "invoiceTitle": "চালান দেখুন ও প্রিন্ট করুন (PDF হিসেবে সেভ করুন)"
   },
   "orderDetail": {
     "backToOrders": "← অর্ডারে ফিরে যান",
+    "backToOrder": "← অর্ডারে ফিরে যান",
     "orderId": "অর্ডার #{{id}}",
     "placedOn": "গৃহীত {{date}} · মোট ৳{{total}}",
     "viewInvoice": "🧾 চালান দেখুন / প্রিন্ট",
