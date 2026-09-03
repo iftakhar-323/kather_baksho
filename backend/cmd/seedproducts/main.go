@@ -11,11 +11,34 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"katherbox/database"
 	"katherbox/models"
 )
+
+// Small attribute pools so every product carries believable metadata
+// (brand, care level, light/water needs) instead of blank fields.
+var (
+	brands       = []string{"KatherBox", "GreenLeaf", "Urban Jungle", "Verdant", "PlantPeople", "BloomWorks", "EcoScape", "Habitat"}
+	difficulties = []string{"easy", "easy", "medium", "medium", "hard"}
+	sunlights    = []string{"low", "medium", "bright", "direct"}
+	waterNeeds   = []string{"low", "medium", "high"}
+	offerLabels  = []string{"", "", "", "New", "Hot", "Limited", "Sale", "Staff pick"}
+)
+
+var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
+
+// slugify: "Snake Plant Indoor #0001" -> "snake-plant-indoor-0001".
+func slugify(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	s = slugRe.ReplaceAllString(s, "-")
+	return strings.Trim(s, "-")
+}
+
+func pick(xs []string, i int) string { return xs[i%len(xs)] }
 
 // Pool of descriptive fragments composed into product names so we get
 // believable variation without repeating the same string 100 times.
@@ -176,12 +199,12 @@ func main() {
 	database.ConnectDatabase()
 	database.DB.AutoMigrate(&models.Product{})
 
-	total := 100
+	total := 120
 	if len(os.Args) >= 2 {
 		if n, err := strconv.Atoi(os.Args[1]); err == nil && n > 0 {
 			total = n
 		} else {
-			log.Printf("invalid count %q, falling back to 100", os.Args[1])
+			log.Printf("invalid count %q, falling back to 120", os.Args[1])
 		}
 	}
 
@@ -226,15 +249,35 @@ func main() {
 			stock := t.stockMin + uint((n*53+ti*17)%int(t.stockMax-t.stockMin+1))
 			desc := fmt.Sprintf("%s Edition %d.", descriptionFor(t.descStyle, base), n+1)
 
+			// A minority of items carry a strike-through "compare at" price so
+			// the storefront's discount badges have something to show.
+			var compareAt float64
+			if (n+ti)%4 == 0 {
+				compareAt = roundPrice(price * 1.25)
+			}
+
+			serial := ti*10000 + n + 1
 			p := models.Product{
 				Name:          name,
+				Slug:          fmt.Sprintf("%s-%d", slugify(name), serial),
+				SKU:           fmt.Sprintf("%s-%05d", strings.ToUpper(t.category[:min(4, len(t.category))]), serial),
+				Brand:         pick(brands, n*3+ti),
 				Category:      t.category,
 				Subcategory:   t.subcategory,
 				IndoorOutdoor: t.indoorOutdoor,
+				Difficulty:    pick(difficulties, n+ti),
+				Sunlight:      pick(sunlights, n*2+ti),
+				Water:         pick(waterNeeds, n+ti*2),
+				Humidity:      pick(waterNeeds, n*3+ti),
+				PetFriendly:   (n+ti)%3 == 0,
 				Price:         price,
+				CompareAtPrice: compareAt,
+				OfferLabel:    pick(offerLabels, n*5+ti*7),
 				Stock:         stock,
 				Description:   desc,
-				ImageURL:      fmt.Sprintf("/images/products/seed_%02d.jpg", (n%60)+1),
+				// Left blank on purpose — the frontend draws a unique
+				// illustration per product from the name + subcategory.
+				ImageURL: "",
 			}
 			if err := database.DB.Create(&p).Error; err != nil {
 				log.Printf("insert %s failed: %v", name, err)

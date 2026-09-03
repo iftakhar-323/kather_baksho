@@ -166,17 +166,35 @@ go run ./cmd/makeadmin/        # → admin@katherbox.com / Admin@12345
 # Reset every demo account's password + role
 go run ./cmd/resetusers/       # idempotent; safe to re-run
 
-# Seed product catalog
-go run ./cmd/seedproducts/
+# Seed product catalog (~120 products, each with generated art, brand,
+# care level, light/water needs, some on sale)
+go run ./cmd/seedproducts/            # or: go run ./cmd/seedproducts/ 300
 
-# Seed 50 each of orders, subscriptions, consultations, corporate, reminders
-go run ./cmd/seeddummy/        # random user_id between 1 and 50
+# Seed ~65 realistic user accounts (customers + staff + an extra admin).
+# Every seeded account's password is  Test@12345
+go run ./cmd/seedusers/               # or: go run ./cmd/seedusers/ 150
+
+# Seed ~80 each of orders (dated across the last 120 days, real prices,
+# shipping details, coupons), subscriptions, consultations, corporate,
+# reminders, reviews, returns, blog posts, addresses, gift cards …
+go run ./cmd/seeddummy/
 
 # Seed a single user's orders (older utility)
 go run ./cmd/seedorders/
 ```
 
-All scripts connect to the same SQLite file and are idempotent enough to re-run.
+All scripts connect to the same SQLite file and are idempotent — re-running
+only tops up to the target and never duplicates.
+
+### One-shot: full demo dataset
+
+```bash
+cd backend
+./seed.sh          # macOS / Linux / Git Bash
+./seed.ps1         # Windows PowerShell
+```
+
+Runs makeadmin → seedproducts → seedusers → seeddummy → seedorders in order.
 
 ---
 
@@ -214,11 +232,17 @@ CORS is permissive in dev (any origin, all common methods). Adjust `main.go` for
 **Reset everything from scratch**
 ```bash
 cd backend
-rm -f katherbox.db          # wipe DB
-go run main.go              # re-creates schema via auto-migrate
-go run ./cmd/resetusers/    # demo accounts
-go run ./cmd/seedproducts/  # catalog
-go run ./cmd/seeddummy/     # orders/subs/etc.
+rm -f katherbox.db katherbox.db-wal katherbox.db-shm   # wipe DB
+go run main.go &            # re-creates schema via auto-migrate, then Ctrl-C
+./seed.sh                   # makeadmin + products + users + dummy + orders
+```
+
+or step by step:
+```bash
+go run ./cmd/makeadmin/     # admin@katherbox.com / Admin@12345
+go run ./cmd/seedproducts/  # ~120 products
+go run ./cmd/seedusers/     # ~65 accounts (password: Test@12345)
+go run ./cmd/seeddummy/     # orders/reviews/returns/subs/addresses/…
 ```
 
 **Check server health**

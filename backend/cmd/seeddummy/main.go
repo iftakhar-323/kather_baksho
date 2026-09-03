@@ -14,7 +14,7 @@ import (
 	"katherbox/models"
 )
 
-const targetPerTable = 50
+const targetPerTable = 80
 
 var (
 	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -428,52 +428,155 @@ func seedRoles() (created int) {
 	return len(users)
 }
 
+// pickProducts returns up to n distinct real products (with prices).
+func pickProducts(n int) []models.Product {
+	var ps []models.Product
+	database.DB.Where("stock >= 0").Order("RANDOM()").Limit(n).Find(&ps)
+	return ps
+}
+
+var cities = []string{"Dhaka", "Chattogram", "Sylhet", "Rajshahi", "Khulna", "Barishal", "Rangpur", "Mymensingh"}
+
 func seedOrders() (created int) {
 	var have int64
 	database.DB.Model(&models.Order{}).Count(&have)
 	payMethods := []string{"bkash", "nagad", "rocket", "card", "cod"}
-	orderStatuses := []string{"Pending", "Processing", "Packed", "On the Way", "Delivered"}
+	// Older orders are more likely to be Delivered; recent ones still moving.
+	stageByAge := func(daysAgo int) string {
+		switch {
+		case daysAgo > 25:
+			return pickStr([]string{"Delivered", "Delivered", "Delivered", "Returned"})
+		case daysAgo > 12:
+			return pickStr([]string{"Delivered", "On the Way", "Packed"})
+		case daysAgo > 4:
+			return pickStr([]string{"On the Way", "Packed", "Processing"})
+		default:
+			return pickStr([]string{"Processing", "Pending", "Pending"})
+		}
+	}
 
 	for i := have; i < targetPerTable; i++ {
-		uid := pickUserID()
-		method := pickStr(payMethods)
-		status := pickStr(orderStatuses)
-		payStatus := "Paid"
-		if method == "cod" {
-			payStatus = "Pending COD"
+		var u models.User
+		if err := database.DB.Order("RANDOM()").First(&u).Error; err != nil {
+			continue
 		}
-
-		pid1 := pickProductID()
-		pid2 := pickProductID()
-		if pid1 == 0 {
+		prods := pickProducts(rng.Intn(3) + 1)
+		if len(prods) == 0 {
 			continue
 		}
 
-		items := []models.OrderItem{
-			{ProductID: pid1, Quantity: uint(rng.Intn(3) + 1), Price: 450.0},
-		}
-		if pid2 != 0 && pid2 != pid1 {
-			items = append(items, models.OrderItem{ProductID: pid2, Quantity: uint(rng.Intn(2) + 1), Price: 850.0})
+		var items []models.OrderItem
+		subtotal := 0.0
+		for _, p := range prods {
+			qty := uint(rng.Intn(3) + 1)
+			price := p.Price
+			if price <= 0 {
+				price = 350
+			}
+			items = append(items, models.OrderItem{ProductID: p.ID, Quantity: qty, Price: price})
+			subtotal += price * float64(qty)
 		}
 
-		tot := 0.0
-		for _, it := range items {
-			tot += it.Price * float64(it.Quantity)
+		daysAgo := rng.Intn(120)
+		when := time.Now().AddDate(0, 0, -daysAgo).Add(-time.Duration(rng.Intn(24)) * time.Hour)
+		status := stageByAge(daysAgo)
+
+		method := pickStr(payMethods)
+		payStatus := "Paid"
+		if method == "cod" {
+			payStatus = "Pending COD"
+			if status == "Delivered" {
+				payStatus = "Paid"
+			}
 		}
 
-		txnID := fmt.Sprintf("TRX%06d%d", rng.Intn(999999), i)
+		// ~30% of orders used a coupon.
+		discount := 0.0
+		coupon := ""
+		if rng.Float64() < 0.3 {
+			pct := pickFloat([]float64{5, 10, 15, 20})
+			discount = subtotal * pct / 100
+			coupon = fmt.Sprintf("KB-SAVE-%02d", int(pct))
+		}
+		gift := rng.Float64() < 0.35
+		giftFee := 0.0
+		if gift {
+			giftFee = 50
+		}
+		shipping := 0.0
+		if subtotal-discount < 1500 {
+			shipping = 60
+		}
+		total := subtotal - discount + giftFee + shipping
+
+		name := u.Name
+		if name == "" {
+			name = "Customer"
+		}
+		phone := u.Phone
+		if phone == "" {
+			phone = fmt.Sprintf("+8801%d%07d", 3+rng.Intn(7), rng.Intn(10000000))
+		}
+		addr := u.Address
+		if addr == "" {
+			addr = fmt.Sprintf("House %d, Road %d, %s", rng.Intn(90)+1, rng.Intn(30)+1, pickStr(cities))
+		}
+
 		ord := models.Order{
-			UserID:        uid,
-			TotalPrice:    tot,
-			Status:        status,
-			PaymentMethod: method,
-			PaymentStatus: payStatus,
-			TransactionID: txnID,
-			GiftWrap:      rng.Float64() > 0.5,
-			Items:         items,
+			UserID:          u.ID,
+			TotalPrice:      total,
+			Status:          status,
+			PaymentMethod:   method,
+			PaymentStatus:   payStatus,
+			TransactionID:   fmt.Sprintf("TRX%08d", rng.Intn(99999999)),
+			ShippingName:    name,
+			ShippingPhone:   phone,
+			ShippingAddress: addr,
+			DeliveryNote:    pickStr([]string{"", "", "Leave with the guard", "Call on arrival", "Handle with care"}),
+			GiftWrap:        gift,
+			CouponCode:      coupon,
+			DiscountAmount:  discount,
+			Items:           items,
 		}
-		database.DB.Create(&ord)
+		if err := database.DB.Create(&ord).Error; err != nil {
+			continue
+		}
+		// Stamp the historical date (GORM sets CreatedAt on insert, so patch it).
+		database.DB.Model(&models.Order{}).Where("id = ?", ord.ID).
+			Updates(map[string]interface{}{"created_at": when, "updated_at": when})
 		created++
+	}
+	return
+}
+
+func seedAddresses() (created int) {
+	var users []models.User
+	database.DB.Where("role = ?", "customer").Order("RANDOM()").Limit(40).Find(&users)
+	for _, u := range users {
+		var have int64
+		database.DB.Model(&models.Address{}).Where("user_id = ?", u.ID).Count(&have)
+		if have > 0 {
+			continue
+		}
+		n := rng.Intn(2) + 1
+		for k := 0; k < n; k++ {
+			city := pickStr(cities)
+			a := models.Address{
+				UserID:     u.ID,
+				Label:      pickStr([]string{"Home", "Office", "Parents'"}),
+				Recipient:  u.Name,
+				Phone:      fmt.Sprintf("+8801%d%07d", 3+rng.Intn(7), rng.Intn(10000000)),
+				Line1:      fmt.Sprintf("House %d, Road %d", rng.Intn(90)+1, rng.Intn(30)+1),
+				Line2:      pickStr([]string{"", "Flat 3B", "2nd floor", "Apt 5"}),
+				City:       city,
+				Region:     city + " Division",
+				PostalCode: fmt.Sprintf("%04d", rng.Intn(9000)+1000),
+				Country:    "Bangladesh",
+				IsDefault:  k == 0,
+			}
+			database.DB.Create(&a)
+			created++
+		}
 	}
 	return
 }
@@ -545,6 +648,7 @@ func main() {
 		{"returns", seedReturns()},
 		{"reviews", seedReviews()},
 		{"blog", seedBlog()},
+		{"addresses", seedAddresses()},
 		{"orders", seedOrders()},
 		{"gift_cards", seedGiftCards()},
 		{"community", seedCommunity()},
@@ -557,7 +661,7 @@ func main() {
 
 	// final snapshot
 	fmt.Println("\n--- row counts after seed ---")
-	for _, t := range []string{"users", "products", "orders", "categories", "reviews", "coupons", "subscriptions", "consultations", "care_reminders", "corporate_quotes", "return_requests", "blog_posts", "gift_cards", "community_questions"} {
+	for _, t := range []string{"users", "products", "orders", "order_items", "addresses", "categories", "reviews", "coupons", "subscriptions", "consultations", "care_reminders", "corporate_quotes", "return_requests", "blog_posts", "gift_cards", "community_questions"} {
 		var n int64
 		database.DB.Table(t).Count(&n)
 		fmt.Printf("  %-18s %d\n", t, n)
