@@ -81,6 +81,7 @@ export default function QuickView({ productId, onClose }) {
               <ProductImage
                 src={product.image_url}
                 category={product.category}
+                subcategory={product.subcategory}
                 seed={product.name}
                 alt={product.name}
               />

@@ -124,6 +124,7 @@ export default function ProductCard({ product, onQuickView }) {
         <ProductImage
           src={product.image_url}
           category={product.category}
+          subcategory={product.subcategory}
           seed={product.name}
           alt={product.name}
         />

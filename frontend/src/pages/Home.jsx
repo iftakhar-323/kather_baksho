@@ -252,6 +252,7 @@ export default function Home() {
                   <ProductImage
                     src={r.product.image_url}
                     category={r.product.category}
+                    subcategory={r.product.subcategory}
                     seed={r.product.name}
                     alt={r.product.name}
                   />

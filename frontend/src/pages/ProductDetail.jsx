@@ -320,7 +320,7 @@ export default function ProductDetail({ productId, onBack }) {
           <div className="fbt-row">
             <div className="fbt-tile fbt-tile-main">
               <div className="fbt-thumb">
-                <ProductImage src={product.image_url} category={product.category} seed={product.name} alt={product.name} />
+                <ProductImage src={product.image_url} category={product.category} subcategory={product.subcategory} seed={product.name} alt={product.name} />
               </div>
               <div className="fbt-name">{product.name}</div>
               <div className="fbt-price">৳{Number(product.price).toLocaleString()}</div>
@@ -338,7 +338,7 @@ export default function ProductDetail({ productId, onBack }) {
                     }
                   />
                   <div className="fbt-thumb">
-                    <ProductImage src={p.image_url} category={p.category} seed={p.name} alt={p.name} />
+                    <ProductImage src={p.image_url} category={p.category} subcategory={p.subcategory} seed={p.name} alt={p.name} />
                   </div>
                   <div className="fbt-name">{p.name}</div>
                   <div className="fbt-price">৳{Number(p.price).toLocaleString()}</div>
