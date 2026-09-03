@@ -1,9 +1,6 @@
 # Step 1: Build stage
 FROM golang:alpine AS builder
 
-# Install build dependencies for CGO (SQLite)
-RUN apk add --no-cache gcc musl-dev build-base
-
 WORKDIR /app
 
 # Copy go module files and download dependencies
@@ -13,8 +10,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the Go application binary with CGO enabled
-ENV CGO_ENABLED=1
+# Pure-Go SQLite driver (github.com/glebarez/sqlite) — no C toolchain needed.
+ENV CGO_ENABLED=0
 ENV GOOS=linux
 RUN go build -ldflags="-w -s" -o katherbox main.go
 
@@ -26,7 +23,7 @@ RUN go build -ldflags="-w -s" -o seeddummy ./cmd/seeddummy
 # Step 2: Final runtime stage
 FROM alpine:3.20
 
-RUN apk add --no-cache ca-certificates sqlite-libs tzdata
+RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /app
 

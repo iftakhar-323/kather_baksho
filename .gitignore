@@ -3,6 +3,10 @@ backend/katherbox
 backend/*.exe
 backend/.env
 backend/.env.*.local
+# SQLite WAL sidecar files (transient; the committed katherbox.db is the seed)
+backend/*.db-wal
+backend/*.db-shm
+backend/*.orig
 
 # Frontend
 frontend/node_modules/
@@ -12,5 +16,6 @@ frontend/dist/
 .DS_Store
 *.log
 .puku/
+.claude/
 
 backend/seeddummy

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strings"
 	"time"
@@ -20,7 +21,7 @@ func main() {
 	_ = godotenv.Load()
 
 	database.ConnectDatabase()
-	database.DB.AutoMigrate(
+	if err := database.DB.AutoMigrate(
 		&models.Product{},
 		&models.User{},
 		&models.Cart{},
@@ -67,7 +68,9 @@ func main() {
 		&models.Review{},
 		&models.Category{},
 		&models.EmailVerification{},
-	)
+	); err != nil {
+		log.Fatalf("auto-migrate failed: %v", err)
+	}
 
 	router := gin.Default()
 
