@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider, useCart } from "./context/CartContext";
+import Avatar from "./components/Avatar";
 // Home is imported eagerly — it's the landing page almost every visit starts
 // on, so there's no benefit to paying a second network round trip for it.
 // Everything else below is route-specific and only needed once a user
@@ -440,9 +441,7 @@ function Navbar() {
                 onClick={() => go("profile")}
                 title="Edit profile, password, addresses"
               >
-                <span className="avatar">
-                  {(user.name || "?").trim().charAt(0).toUpperCase()}
-                </span>
+                <Avatar user={user} size={26} className="nav-profile-avatar" />
                 <span className="nav-profile-name">{user.name?.split(" ")[0]}</span>
               </button>
               <button onClick={logout} className="btn btn-secondary btn-sm nav-logout">

@@ -16,6 +16,10 @@ type User struct {
 	// ===== Profile extras (Sprint A) =====
 	Phone   string `json:"phone" gorm:"default:''"`  // user-facing profile phone
 	Address string `json:"address" gorm:"default:''"` // legacy single-address string (kept for back-compat)
+
+	// AvatarURL is an optional profile-picture link. When empty the frontend
+	// renders a deterministic generated avatar from the name/email.
+	AvatarURL string `json:"avatar_url" gorm:"default:''"`
 }
 
 // Address is a saved delivery address for a user.

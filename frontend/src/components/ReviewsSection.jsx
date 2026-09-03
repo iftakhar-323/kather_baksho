@@ -8,6 +8,7 @@ import {
 } from "../api/reviews";
 import { useToast } from "./Toast";
 import { useConfirm } from "./Confirm";
+import Avatar from "./Avatar";
 
 function Stars({ value, onPick, size = 28, readOnly = false }) {
   return (
@@ -273,6 +274,7 @@ export default function ReviewsSection({ productId }) {
               style={{ padding: "12px 0", borderBottom: "1px solid var(--brand-100)" }}
             >
               <div className="row" style={{ alignItems: "center", gap: 10 }}>
+                <Avatar name={r.user_name} email={r.user_email} size={26} />
                 <span style={{ fontWeight: 600 }}>{r.user_name || "Customer"}</span>
                 <Stars value={r.rating} readOnly size={16} />
                 <span className="muted" style={{ fontSize: 12 }}>

@@ -122,6 +122,7 @@ func Me(c *gin.Context) {
 		"email":          user.Email,
 		"phone":          user.Phone,
 		"address":        user.Address,
+		"avatar_url":     user.AvatarURL,
 		"role":           user.Role,
 		"points":         user.Points,
 		"email_verified": user.EmailVerified,
@@ -133,9 +134,10 @@ func Me(c *gin.Context) {
 // =====================================================================
 
 type UpdateProfileInput struct {
-	Name    string `json:"name"`
-	Phone   string `json:"phone"`
-	Address string `json:"address"`
+	Name      string `json:"name"`
+	Phone     string `json:"phone"`
+	Address   string `json:"address"`
+	AvatarURL string `json:"avatar_url"`
 }
 
 // PUT /api/auth/profile
@@ -157,6 +159,8 @@ func UpdateProfile(c *gin.Context) {
 	}
 	// Address may legitimately be empty (clearing it), so always set it
 	updates["address"] = input.Address
+	// Avatar URL may also be cleared back to "" to fall back to the generated one
+	updates["avatar_url"] = input.AvatarURL
 
 	if len(updates) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No fields to update"})
@@ -173,11 +177,12 @@ func UpdateProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Profile updated",
 		"user": gin.H{
-			"id":      user.ID,
-			"name":    user.Name,
-			"email":   user.Email,
-			"phone":   user.Phone,
-			"address": user.Address,
+			"id":         user.ID,
+			"name":       user.Name,
+			"email":      user.Email,
+			"phone":      user.Phone,
+			"address":    user.Address,
+			"avatar_url": user.AvatarURL,
 		},
 	})
 }

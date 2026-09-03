@@ -45,6 +45,7 @@ import {
 import { useToast } from "../components/Toast";
 import { useConfirm } from "../components/Confirm";
 import MiniBarChart from "../components/MiniBarChart";
+import Avatar from "../components/Avatar";
 
 const STATUS_OPTIONS = [
   "Pending",
@@ -688,20 +689,7 @@ function RolesAdmin() {
                 filtered.map((u) => (
                   <tr key={u.id ?? u.ID}>
                     <td style={{ width: 60 }}>
-                      <span
-                        style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 999,
-                          background: "var(--brand-100)",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontWeight: 700,
-                        }}
-                      >
-                        {(u.name || "?").charAt(0).toUpperCase()}
-                      </span>
+                      <Avatar user={u} size={36} />
                     </td>
                     <td><strong>{u.name}</strong></td>
                     <td>{u.email}</td>

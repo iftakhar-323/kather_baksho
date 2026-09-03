@@ -1055,6 +1055,8 @@
     "name": "Name",
     "phone": "Phone",
     "phonePlaceholder": "+880 1XXX XXX XXX",
+    "avatarUrl": "Profile picture URL",
+    "avatarUrlHint": "Paste an image link, or leave blank for a generated avatar",
     "addressLegacy": "Address (legacy / quick)",
     "addressLegacyHint": "Optional — for the full address book, see the Addresses tab.",
     "saveChanges": "Save changes",

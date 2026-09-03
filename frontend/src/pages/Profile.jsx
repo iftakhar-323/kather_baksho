@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "../i18n/I18nProvider";
 import { useConfirm } from "../components/Confirm";
 import { useToast } from "../components/Toast";
+import Avatar from "../components/Avatar";
 
 // =====================================================================
 // Profile.jsx — Sprint A
@@ -44,11 +45,14 @@ export default function Profile({ onExit }) {
   return (
     <section className="profile-page">
       <header className="profile-head">
-        <div>
-          <h1 className="profile-title">{t("profile.title")}</h1>
-          <p className="profile-sub">
-            {t("profile.signedInAs", { email: user?.email })}
-          </p>
+        <div className="kb-user-cell">
+          <Avatar user={user} size={56} ring />
+          <div>
+            <h1 className="profile-title">{t("profile.title")}</h1>
+            <p className="profile-sub">
+              {t("profile.signedInAs", { email: user?.email })}
+            </p>
+          </div>
         </div>
         {onExit && (
           <button className="btn btn-secondary btn-sm" onClick={onExit}>
@@ -103,6 +107,7 @@ function EditProfileTab({ onSaved }) {
     name: user?.name || "",
     phone: user?.phone || "",
     address: user?.address || "",
+    avatar_url: user?.avatar_url || "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -128,6 +133,25 @@ function EditProfileTab({ onSaved }) {
     <form className="profile-card" onSubmit={submit}>
       <h3>{t("profile.editProfile")}</h3>
       <p className="profile-hint">{t("profile.editHint")}</p>
+
+      <div className="kb-user-cell" style={{ marginBottom: 16 }}>
+        <Avatar
+          name={form.name}
+          email={user?.email}
+          src={form.avatar_url}
+          size={64}
+          ring
+        />
+        <label className="profile-field" style={{ flex: 1, margin: 0 }}>
+          <span>{t("profile.avatarUrl")}</span>
+          <input
+            type="url"
+            value={form.avatar_url}
+            onChange={(e) => setForm({ ...form, avatar_url: e.target.value })}
+            placeholder={t("profile.avatarUrlHint")}
+          />
+        </label>
+      </div>
 
       <label className="profile-field">
         <span>{t("profile.name")}</span>
