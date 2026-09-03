@@ -253,4 +253,89 @@ func main() {
 	database.DB.Model(&models.Product{}).Count(&inDB)
 	fmt.Printf("\nseedproducts: requested=%d created=%d skipped=%d (existing) total_in_db=%d\n",
 		total, created, skipped, inDB)
+
+	fbtAssigned := assignFBT()
+	fmt.Printf("seedproducts: assigned fbt_ids to %d products\n", fbtAssigned)
+}
+
+// assignFBT backfills FbtIDs ("frequently bought together") for every
+// in-stock product that doesn't have one yet: plants pair with a couple of
+// care items + a planter, while care/decor items pair back with plants.
+// Deterministic (id-driven), so it's idempotent and safe to re-run.
+func assignFBT() int {
+	var rows []models.Product
+	database.DB.Where("stock > 0").Find(&rows)
+
+	var plantIDs, careIDs, decorIDs []uint
+	for _, p := range rows {
+		switch p.Category {
+		case "plant":
+			plantIDs = append(plantIDs, p.ID)
+		case "care":
+			careIDs = append(careIDs, p.ID)
+		case "decor":
+			decorIDs = append(decorIDs, p.ID)
+		}
+	}
+
+	pick := func(pool []uint, id uint, n int) []uint {
+		if len(pool) == 0 {
+			return nil
+		}
+		out := make([]uint, 0, n)
+		start := int(id) % len(pool)
+		step := len(pool) / (n + 1)
+		if step < 1 {
+			step = 1
+		}
+		for tries := 0; len(out) < n && tries < len(pool); tries++ {
+			cand := pool[(start+tries*step)%len(pool)]
+			if cand == id {
+				continue
+			}
+			dup := false
+			for _, x := range out {
+				if x == cand {
+					dup = true
+					break
+				}
+			}
+			if !dup {
+				out = append(out, cand)
+			}
+		}
+		return out
+	}
+
+	joinIDs := func(ids []uint) string {
+		s := ""
+		for i, id := range ids {
+			if i > 0 {
+				s += ","
+			}
+			s += strconv.FormatUint(uint64(id), 10)
+		}
+		return s
+	}
+
+	updated := 0
+	for _, p := range rows {
+		if p.FbtIDs != "" {
+			continue
+		}
+		var fbt []uint
+		switch p.Category {
+		case "plant":
+			fbt = append(pick(careIDs, p.ID, 2), pick(decorIDs, p.ID, 1)...)
+		case "decor", "care":
+			fbt = pick(plantIDs, p.ID, 2)
+		}
+		if len(fbt) == 0 {
+			continue
+		}
+		database.DB.Model(&models.Product{}).Where("id = ?", p.ID).
+			Update("fbt_ids", joinIDs(fbt))
+		updated++
+	}
+	return updated
 }
