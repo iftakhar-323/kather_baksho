@@ -2185,20 +2185,47 @@ function DashboardTab() {
     };
   });
 
+  const printReport = () => {
+    document.body.classList.add("kb-printing");
+    const done = () => {
+      document.body.classList.remove("kb-printing");
+      window.removeEventListener("afterprint", done);
+    };
+    window.addEventListener("afterprint", done);
+    setTimeout(done, 1500);
+    window.print();
+  };
+
   return (
-    <div>
-      <div className="row mb-16" style={{ gap: 8, alignItems: "center" }}>
+    <div className="kb-print-area" id="admin-dashboard">
+      <div
+        className="kb-print-only"
+        style={{ display: "none", marginBottom: 12 }}
+      >
+        <h1 style={{ margin: 0 }}>🪴 KatherBox — Analytics report</h1>
+        <div className="muted">
+          Last {days} days · generated {new Date().toLocaleString("en-GB")}
+        </div>
+      </div>
+
+      <div className="row mb-16 no-print" style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}>
         <label className="muted">Window:</label>
-        <select
-          className="input"
-          value={days}
-          onChange={(e) => setDays(Number(e.target.value))}
-          style={{ width: 140 }}
-        >
-          <option value={7}>Last 7 days</option>
-          <option value={30}>Last 30 days</option>
-          <option value={90}>Last 90 days</option>
-        </select>
+        <div className="kb-analytics-range">
+          {[7, 30, 90, 365].map((d) => (
+            <button
+              key={d}
+              type="button"
+              className={days === d ? "is-active" : ""}
+              onClick={() => setDays(d)}
+            >
+              {d === 365 ? "1 year" : `${d} days`}
+            </button>
+          ))}
+        </div>
+        <span style={{ flex: 1 }} />
+        <button type="button" className="btn btn-secondary btn-sm" onClick={printReport}>
+          🖨 Print / Save as PDF
+        </button>
       </div>
 
       <div
@@ -2363,9 +2390,10 @@ function DashboardTab() {
               <div
                 key={u.user_id || u.email}
                 className="row"
-                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}
+                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)", alignItems: "center", gap: 8 }}
               >
-                <span style={{ width: 24, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
+                <span style={{ width: 20, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
+                <Avatar name={u.name} email={u.email} size={26} />
                 <span style={{ flex: 1 }}>{u.name || u.email}</span>
                 <span className="muted">{u.orders ?? u.order_count ?? 0} orders</span>
                 <span style={{ minWidth: 80, textAlign: "right", fontWeight: 600 }}>
