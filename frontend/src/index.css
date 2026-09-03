@@ -927,6 +927,16 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
   letter-spacing: 1px;
 }
 
+/* Mini bar chart (admin analytics) */
+.kb-barchart svg { display: block; overflow: visible; }
+.kb-barchart-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ink-500, #6b7280);
+  margin-top: 4px;
+}
+
 /* Product detail gallery */
 .kb-gallery { align-self: start; }
 .kb-gallery-main {
