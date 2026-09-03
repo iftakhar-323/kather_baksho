@@ -14,6 +14,9 @@ services:
       - DB_PATH=/app/data/katherbox.db
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
+      # Change this for any real deployment — this default only exists so
+      # `docker compose up` works out of the box for local/demo use.
+      - JWT_SECRET=${JWT_SECRET:-katherbox_docker_default_change_me}
     volumes:
       - sqlite_data:/app/data
     healthcheck:
