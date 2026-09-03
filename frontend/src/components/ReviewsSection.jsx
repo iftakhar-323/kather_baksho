@@ -7,6 +7,7 @@ import {
   deleteReview,
 } from "../api/reviews";
 import { useToast } from "./Toast";
+import { useConfirm } from "./Confirm";
 
 function Stars({ value, onPick, size = 28, readOnly = false }) {
   return (
@@ -47,6 +48,7 @@ function fmtDate(s) {
 export default function ReviewsSection({ productId }) {
   const { user } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
   const [meta, setMeta] = useState({ avg: 0, count: 0, histogram: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } });
@@ -90,7 +92,11 @@ export default function ReviewsSection({ productId }) {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      const ok = window.confirm("Please log in to write a review. Go to login?");
+      const ok = await confirm({
+        title: "Log in required",
+        body: "Please log in to write a review. Go to login?",
+        confirmText: "Log in",
+      });
       if (ok) window.__katherboxSetView?.("login");
       return;
     }
@@ -114,7 +120,13 @@ export default function ReviewsSection({ productId }) {
 
   const onDelete = async () => {
     if (!myReview) return;
-    if (!window.confirm("Delete your review?")) return;
+    const ok = await confirm({
+      title: "Delete review",
+      body: "Delete your review? This can't be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteReview(myReview.id);
       toast.ok("Review deleted");

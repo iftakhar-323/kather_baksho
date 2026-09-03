@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getProduct } from "../api/products";
+import { getProduct, getRelatedProducts, getFrequentlyBoughtTogether } from "../api/products";
 import { addToCart } from "../api/cart";
 import { CompareStore, SaveForLaterStore, RecentStore } from "../utils/kb";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import ReviewsSection from "../components/ReviewsSection";
+import ProductImage from "../components/ProductImage";
+import Lightbox from "../components/Lightbox";
+import Breadcrumbs from "../components/Breadcrumbs";
+import ProductCard from "../components/ProductCard";
+import { useConfirm } from "../components/Confirm";
+
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
 
 function emojiFor(category) {
   if (category === "plant") return "🌿";
@@ -17,11 +26,17 @@ export default function ProductDetail({ productId, onBack }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const toast = useToast();
+  const confirm = useConfirm();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("idle");
   const [inCompare, setInCompare] = useState(CompareStore.has(productId));
   const [inSaved, setInSaved] = useState(SaveForLaterStore.has(productId));
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [related, setRelated] = useState([]);
+  const [fbt, setFbt] = useState([]);
+  const [fbtUnchecked, setFbtUnchecked] = useState({});
+  const [fbtAdding, setFbtAdding] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -37,6 +52,15 @@ export default function ProductDetail({ productId, onBack }) {
         console.error(err);
         setLoading(false);
       });
+    getRelatedProducts(productId)
+      .then((res) => setRelated((res.data || []).filter((p) => p.ID !== Number(productId))))
+      .catch(() => setRelated([]));
+    getFrequentlyBoughtTogether(productId)
+      .then((res) => {
+        setFbt((res.data || []).filter((p) => p.ID !== Number(productId)));
+        setFbtUnchecked({});
+      })
+      .catch(() => setFbt([]));
   }, [productId]);
 
   if (loading) {
@@ -61,7 +85,11 @@ export default function ProductDetail({ productId, onBack }) {
 
   const handleAdd = async () => {
     if (!user) {
-      const goLogin = window.confirm(t("productDetail.loginPrompt"));
+      const goLogin = await confirm({
+        title: "Log in required",
+        body: t("productDetail.loginPrompt"),
+        confirmText: "Log in",
+      });
       if (goLogin) window.__katherboxSetView?.("login");
       return;
     }
@@ -74,6 +102,33 @@ export default function ProductDetail({ productId, onBack }) {
       console.error(err);
       setStatus("error");
       setTimeout(() => setStatus("idle"), 2000);
+    }
+  };
+
+  const fbtSelected = fbt.filter((p) => !fbtUnchecked[p.ID]);
+  const fbtTotal =
+    Number(product.price) + fbtSelected.reduce((sum, p) => sum + Number(p.price), 0);
+
+  const addAllFbt = async () => {
+    if (!user) {
+      const goLogin = await confirm({
+        title: "Log in required",
+        body: t("productDetail.loginPrompt"),
+        confirmText: "Log in",
+      });
+      if (goLogin) window.__katherboxSetView?.("login");
+      return;
+    }
+    setFbtAdding(true);
+    try {
+      await Promise.all(
+        [product, ...fbtSelected].map((p) => addToCart(p.ID, 1))
+      );
+      toast.ok(t("productDetail.fbtAdded", { count: 1 + fbtSelected.length }));
+    } catch (err) {
+      toast.err(err?.response?.data?.error || t("productDetail.fbtAddFailed"));
+    } finally {
+      setFbtAdding(false);
     }
   };
 
@@ -90,6 +145,18 @@ export default function ProductDetail({ productId, onBack }) {
 
   return (
     <div style={{ maxWidth: 960, margin: "0 auto" }}>
+      <Breadcrumbs
+        items={[
+          { label: t("nav.shop"), to: "/" },
+          {
+            label: capitalize(
+              (product.subcategory || product.category || "").replace(/_/g, " ")
+            ),
+            to: "/",
+          },
+          { label: product.name },
+        ]}
+      />
       <button onClick={onBack} className="btn btn-ghost mb-16">
         {t("productDetail.backToShop")}
       </button>
@@ -103,6 +170,8 @@ export default function ProductDetail({ productId, onBack }) {
         }}
       >
         <div
+          onClick={() => product.image_url && setZoomOpen(true)}
+          title={product.image_url ? t("productDetail.clickToZoom") : undefined}
           style={{
             display: "flex",
             alignItems: "center",
@@ -112,10 +181,24 @@ export default function ProductDetail({ productId, onBack }) {
             borderRadius: "var(--radius-lg)",
             fontSize: 120,
             aspectRatio: "1 / 1",
+            overflow: "hidden",
+            cursor: product.image_url ? "zoom-in" : "default",
           }}
         >
-          {emojiFor(product.category)}
+          <ProductImage
+            src={product.image_url}
+            emoji={emojiFor(product.category)}
+            alt={product.name}
+          />
         </div>
+
+        {zoomOpen && (
+          <Lightbox
+            src={product.image_url}
+            alt={product.name}
+            onClose={() => setZoomOpen(false)}
+          />
+        )}
 
         <div>
           <h1 style={{ marginBottom: 8 }}>{product.name}</h1>
@@ -234,7 +317,72 @@ export default function ProductDetail({ productId, onBack }) {
           </div>
         </div>
       </div>
+
+      {fbt.length > 0 && (
+        <section className="card card-pad-lg fbt-section" style={{ marginTop: 24 }}>
+          <h2 style={{ marginBottom: 4 }}>{t("productDetail.fbtHeading")}</h2>
+          <p className="muted" style={{ marginBottom: 16 }}>{t("productDetail.fbtSubhead")}</p>
+
+          <div className="fbt-row">
+            <div className="fbt-tile fbt-tile-main">
+              <div className="fbt-thumb">
+                <ProductImage src={product.image_url} emoji={emojiFor(product.category)} alt={product.name} />
+              </div>
+              <div className="fbt-name">{product.name}</div>
+              <div className="fbt-price">৳{Number(product.price).toLocaleString()}</div>
+            </div>
+
+            {fbt.map((p) => (
+              <div className="fbt-item" key={p.ID}>
+                <span className="fbt-plus" aria-hidden="true">+</span>
+                <label className={"fbt-tile" + (fbtUnchecked[p.ID] ? " is-off" : "")}>
+                  <input
+                    type="checkbox"
+                    checked={!fbtUnchecked[p.ID]}
+                    onChange={() =>
+                      setFbtUnchecked((u) => ({ ...u, [p.ID]: !u[p.ID] }))
+                    }
+                  />
+                  <div className="fbt-thumb">
+                    <ProductImage src={p.image_url} emoji={emojiFor(p.category)} alt={p.name} />
+                  </div>
+                  <div className="fbt-name">{p.name}</div>
+                  <div className="fbt-price">৳{Number(p.price).toLocaleString()}</div>
+                </label>
+              </div>
+            ))}
+          </div>
+
+          <div className="fbt-footer">
+            <div>
+              <span className="muted">{t("productDetail.fbtTotalLabel")}</span>{" "}
+              <strong className="fbt-total">৳{fbtTotal.toLocaleString()}</strong>
+            </div>
+            <button
+              className="btn btn-primary"
+              disabled={fbtAdding}
+              onClick={addAllFbt}
+            >
+              {fbtAdding
+                ? t("productDetail.fbtAdding")
+                : t("productDetail.fbtAddAll", { count: 1 + fbtSelected.length })}
+            </button>
+          </div>
+        </section>
+      )}
+
       <ReviewsSection productId={product.ID} />
+
+      {related.length > 0 && (
+        <section style={{ marginTop: 32 }}>
+          <h2 style={{ marginBottom: 14 }}>{t("productDetail.relatedHeading")}</h2>
+          <div className="product-grid">
+            {related.slice(0, 4).map((p) => (
+              <ProductCard key={p.ID} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

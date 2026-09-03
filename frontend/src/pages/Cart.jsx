@@ -10,6 +10,7 @@ import { getMe } from "../api/auth";
 import { applyCoupon } from "../api/coupons";
 import { useTranslation } from "../i18n/I18nProvider";
 import PaymentModal from "../components/PaymentModal";
+import ProductImage from "../components/ProductImage";
 
 const FREE_SHIPPING_THRESHOLD = 1500; // ৳
 const GIFT_WRAP_FEE = 50;
@@ -378,7 +379,11 @@ export default function Cart({ onOrderPlaced }) {
               className={`cart-item ${isBusy ? "is-busy" : ""}`}
             >
               <div className="cart-item-icon">
-                {emojiFor(item.product.category, item.product.subcategory)}
+                <ProductImage
+                  src={item.product.image_url}
+                  emoji={emojiFor(item.product.category, item.product.subcategory)}
+                  alt={item.product.name}
+                />
               </div>
 
               <div className="cart-item-body">

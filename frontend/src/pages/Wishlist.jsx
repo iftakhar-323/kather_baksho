@@ -6,6 +6,7 @@ import {
 } from "../api/wishlist";
 import { addToCart } from "../api/cart";
 import { useTranslation } from "../i18n/I18nProvider";
+import ProductImage from "../components/ProductImage";
 
 function emojiFor(category, subcategory) {
   if (category === "plant") return "🌿";
@@ -222,7 +223,11 @@ export default function Wishlist() {
               className={`cart-item ${isBusy ? "is-busy" : ""}`}
             >
               <div className="cart-item-icon">
-                {emojiFor(p.category, p.subcategory)}
+                <ProductImage
+                  src={p.image_url}
+                  emoji={emojiFor(p.category, p.subcategory)}
+                  alt={p.name}
+                />
               </div>
 
               <div className="cart-item-body">

@@ -11,6 +11,8 @@ import {
   setDefaultAddress,
 } from "../api/auth";
 import { useTranslation } from "../i18n/I18nProvider";
+import { useConfirm } from "../components/Confirm";
+import { useToast } from "../components/Toast";
 
 // =====================================================================
 // Profile.jsx — Sprint A
@@ -262,6 +264,7 @@ function blankAddress(t) {
 
 function AddressBookTab({ onSaved }) {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // null | "new" | {id, ...}
@@ -298,7 +301,13 @@ function AddressBookTab({ onSaved }) {
   };
 
   const remove = async (id) => {
-    if (!window.confirm(t("profile.deleteAddressConfirm"))) return;
+    const ok = await confirm({
+      title: "Delete address",
+      body: t("profile.deleteAddressConfirm"),
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteAddress(id);
       onSaved(t("profile.addressDeleted"));
@@ -380,6 +389,7 @@ function AddressBookTab({ onSaved }) {
 
 function AddressForm({ initial, onSubmit, onCancel }) {
   const { t } = useTranslation();
+  const toast = useToast();
   const [form, setForm] = useState({
     ...blankAddress(t),
     ...initial,
@@ -387,7 +397,7 @@ function AddressForm({ initial, onSubmit, onCancel }) {
   const submit = (e) => {
     e.preventDefault();
     if (!form.recipient || !form.phone || !form.line1 || !form.city) {
-      alert(t("profile.requiredFieldsAlert"));
+      toast.err(t("profile.requiredFieldsAlert"));
       return;
     }
     onSubmit(form);

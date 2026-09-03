@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getProducts, getGiftRecommendations } from "../api/products";
 import ProductCard from "../components/ProductCard";
+import ProductImage from "../components/ProductImage";
 import { useTranslation } from "../i18n/I18nProvider";
 
 const emptyFilters = {
@@ -75,10 +76,24 @@ export default function Home() {
   return (
     <div>
       <section className="hero">
-        <h1>{t("home.heroTitleFull")}</h1>
-        <p>
-          {t("home.heroSubtitleFull")}
-        </p>
+        <div className="hero-decor" aria-hidden="true">
+          <span className="hero-blob hero-blob-1" />
+          <span className="hero-blob hero-blob-2" />
+          <span className="hero-leaf hero-leaf-1">🌿</span>
+          <span className="hero-leaf hero-leaf-2">🪴</span>
+          <span className="hero-leaf hero-leaf-3">🌸</span>
+        </div>
+        <div className="hero-content">
+          <span className="hero-kicker">{t("home.heroKicker")}</span>
+          <h1>{t("home.heroTitleFull")}</h1>
+          <p>
+            {t("home.heroSubtitleFull")}
+          </p>
+          <div className="hero-cta">
+            <a href="#shop" className="btn btn-primary btn-lg">{t("home.shopNow")}</a>
+            <a href="#gift-finder" className="btn hero-btn-ghost btn-lg">{t("home.heroCtaGift")}</a>
+          </div>
+        </div>
       </section>
 
       {/* ===== KatherBox trust strip ===== */}
@@ -118,7 +133,7 @@ export default function Home() {
       </section>
 
       {/* ===== Gift recommender widget ===== */}
-      <section className="card" style={{ marginBottom: 24 }}>
+      <section id="gift-finder" className="card" style={{ marginBottom: 24, scrollMarginTop: 88 }}>
         <div className="row" style={{ alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 24 }}>🎁</span>
           <h2 style={{ margin: 0, fontSize: "1.15rem" }}>{t("home.giftTitle")}</h2>
@@ -192,7 +207,11 @@ export default function Home() {
             {giftResults.map((r) => (
               <div key={r.product.ID} className="product-card">
                 <div className="image">
-                  <span className="emoji-img">{emojiFor(r.product.category)}</span>
+                  <ProductImage
+                    src={r.product.image_url}
+                    emoji={emojiFor(r.product.category)}
+                    alt={r.product.name}
+                  />
                 </div>
                 <div className="body">
                   <span className="badge">{r.reason}</span>
@@ -213,7 +232,7 @@ export default function Home() {
       </section>
 
       {/* search + filter bar */}
-      <form onSubmit={apply} className="filter-bar">
+      <form id="shop" onSubmit={apply} className="filter-bar" style={{ scrollMarginTop: 88 }}>
         <input
           className="input"
           placeholder={t("home.searchPlaceholder")}

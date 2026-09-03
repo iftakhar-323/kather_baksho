@@ -23,7 +23,7 @@ function fmtDate(s) {
   }
 }
 
-export default function CommunityQA() {
+export default function CommunityQA({ embedded = false }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const toast = useToast();
@@ -112,10 +112,14 @@ export default function CommunityQA() {
 
   return (
     <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("community.qa.heading")}</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        {t("community.qa.subhead")}
-      </p>
+      {!embedded && (
+        <>
+          <h1 style={{ marginBottom: 8 }}>{t("community.qa.heading")}</h1>
+          <p className="muted" style={{ marginBottom: 16 }}>
+            {t("community.qa.subhead")}
+          </p>
+        </>
+      )}
 
       <div className="row gap-8" style={{ marginBottom: 16 }}>
         <button

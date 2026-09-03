@@ -5,6 +5,7 @@ import { addToWishlist } from "../api/wishlist";
 import { useAuth } from "../context/AuthContext";
 import { fmtBDT, emojiFor } from "../utils/kb";
 import { useToast } from "./Toast";
+import ProductImage from "./ProductImage";
 
 export default function QuickView({ productId, onClose }) {
   const { user } = useAuth();
@@ -74,7 +75,13 @@ export default function QuickView({ productId, onClose }) {
           </>
         ) : (
           <>
-            <div className="qv-thumb" aria-hidden="true">{emojiFor(product)}</div>
+            <div className="qv-thumb">
+              <ProductImage
+                src={product.image_url}
+                emoji={emojiFor(product)}
+                alt={product.name}
+              />
+            </div>
             <div className="qv-body">
               <h3>{product.name}</h3>
               <div className="muted" style={{ fontSize: 12 }}>

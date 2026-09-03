@@ -22,7 +22,7 @@ const STATUS_FLOW = [
   "rejected",
 ];
 
-export default function CorporateOrders() {
+export default function CorporateOrders({ embedded = false }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const toast = useToast();
@@ -121,10 +121,14 @@ export default function CorporateOrders() {
 
   return (
     <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("corporateOrders.head")}</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        {t("corporateOrders.subhead")}
-      </p>
+      {!embedded && (
+        <>
+          <h1 style={{ marginBottom: 8 }}>{t("corporateOrders.head")}</h1>
+          <p className="muted" style={{ marginBottom: 16 }}>
+            {t("corporateOrders.subhead")}
+          </p>
+        </>
+      )}
 
       <div className="row mb-16">
         <button

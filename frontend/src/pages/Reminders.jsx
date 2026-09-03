@@ -8,7 +8,7 @@ const TYPE_ICON = {
   repotting: "🪴",
 };
 
-export default function Reminders() {
+export default function Reminders({ embedded = false }) {
   const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,11 +49,13 @@ export default function Reminders() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="container">
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ marginBottom: 6 }}>{t("reminders.head")}</h1>
-        <p className="muted">{t("reminders.subhead")}</p>
-      </div>
+    <div className={embedded ? "" : "container"}>
+      {!embedded && (
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ marginBottom: 6 }}>{t("reminders.head")}</h1>
+          <p className="muted">{t("reminders.subhead")}</p>
+        </div>
+      )}
 
       {loading && <div className="empty">{t("reminders.loading")}</div>}
       {error && <div className="empty" style={{ color: "#b00020" }}>{error}</div>}

@@ -3,6 +3,9 @@ import { useAuth } from "../context/AuthContext";
 import { addToCart } from "../api/cart";
 import { addToWishlist } from "../api/wishlist";
 import { CompareStore, SaveForLaterStore } from "../utils/kb";
+import ProductImage from "./ProductImage";
+import { useConfirm } from "./Confirm";
+import { useToast } from "./Toast";
 
 function emojiFor(category) {
   if (category === "plant") return "🌿";
@@ -12,6 +15,8 @@ function emojiFor(category) {
 
 export default function ProductCard({ product, onQuickView }) {
   const { user } = useAuth();
+  const confirm = useConfirm();
+  const toast = useToast();
   const [status, setStatus] = useState("idle"); // idle | loading | added | error
   const [heart, setHeart] = useState("idle");   // idle | saved
   const [inCompare, setInCompare] = useState(CompareStore.has(product.ID));
@@ -33,9 +38,11 @@ export default function ProductCard({ product, onQuickView }) {
 
   const handleAdd = async () => {
     if (!user) {
-      const goLogin = window.confirm(
-        "You need to log in to add items to your cart. Go to login?"
-      );
+      const goLogin = await confirm({
+        title: "Log in required",
+        body: "You need to log in to add items to your cart. Go to login?",
+        confirmText: "Log in",
+      });
       if (goLogin) window.__katherboxSetView?.("login");
       return;
     }
@@ -65,7 +72,11 @@ export default function ProductCard({ product, onQuickView }) {
   const handleWishlist = async (e) => {
     e.stopPropagation();
     if (!user) {
-      const goLogin = window.confirm("Log in to save items?");
+      const goLogin = await confirm({
+        title: "Log in required",
+        body: "Log in to save items?",
+        confirmText: "Log in",
+      });
       if (goLogin) window.__katherboxSetView?.("login");
       return;
     }
@@ -74,7 +85,7 @@ export default function ProductCard({ product, onQuickView }) {
       setHeart("saved");
       setTimeout(() => setHeart("idle"), 1500);
     } catch (err) {
-      window.alert(err?.response?.data?.error || "Could not save");
+      toast.err(err?.response?.data?.error || "Could not save");
     }
   };
 
@@ -85,7 +96,7 @@ export default function ProductCard({ product, onQuickView }) {
     e.stopPropagation();
     const r = CompareStore.toggle(product);
     if (r === "full") {
-      window.alert("You can compare up to 4 products. Remove one first.");
+      toast.info("You can compare up to 4 products. Remove one first.");
       return;
     }
     setInCompare(r);
@@ -110,7 +121,11 @@ export default function ProductCard({ product, onQuickView }) {
         onClick={() => window.__katherboxSetView?.(`product-${product.ID}`)}
         title="View details"
       >
-        {emojiFor(product.category)}
+        <ProductImage
+          src={product.image_url}
+          emoji={emojiFor(product.category)}
+          alt={product.name}
+        />
       </div>
 
       {/* hover overlay buttons */}

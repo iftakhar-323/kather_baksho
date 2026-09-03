@@ -9,12 +9,15 @@ import {
   deletePost,
 } from "../api/community";
 import { useTranslation } from "../i18n/I18nProvider";
+import { useConfirm } from "../components/Confirm";
+import CommunityQA from "./CommunityQA";
 
 const CATS = ["show-off", "tip", "question", "story"];
 
 export default function Community() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const confirm = useConfirm();
   const [posts, setPosts] = useState([]);
   const [expanded, setExpanded] = useState(null);
   const [showNew, setShowNew] = useState(false);
@@ -27,6 +30,7 @@ export default function Community() {
   const [commentsByPost, setCommentsByPost] = useState({});
   const [draftComments, setDraftComments] = useState({});
   const [catFilter, setCatFilter] = useState("");
+  const [mainTab, setMainTab] = useState("feed");
 
   const reload = () => {
     listPosts()
@@ -83,13 +87,19 @@ export default function Community() {
     try {
       await toggleLike(postId);
       reload();
-    } catch (e) {
+    } catch {
       /* ignore */
     }
   };
 
   const remove = async (postId) => {
-    if (!window.confirm(t("community.feed.deleteConfirm"))) return;
+    const ok = await confirm({
+      title: "Delete post",
+      body: t("community.feed.deleteConfirm"),
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     await deletePost(postId);
     reload();
   };
@@ -105,6 +115,25 @@ export default function Community() {
 
   return (
     <div>
+      <div className="row gap-8" style={{ marginBottom: 16 }}>
+        <button
+          className={"btn btn-sm " + (mainTab === "feed" ? "btn-primary" : "btn-secondary")}
+          onClick={() => setMainTab("feed")}
+        >
+          {t("community.feed.heading")}
+        </button>
+        <button
+          className={"btn btn-sm " + (mainTab === "qa" ? "btn-primary" : "btn-secondary")}
+          onClick={() => setMainTab("qa")}
+        >
+          {t("community.qa.heading")}
+        </button>
+      </div>
+
+      {mainTab === "qa" && <CommunityQA embedded />}
+
+      {mainTab === "feed" && (
+      <>
       <div
         className="row-between"
         style={{ alignItems: "flex-start", marginBottom: 16 }}
@@ -351,6 +380,8 @@ export default function Community() {
           </div>
         );
       })}
+      </>
+      )}
     </div>
   );
 }

@@ -43,6 +43,7 @@ import {
   adminDeleteCategory,
 } from "../api/categories";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/Confirm";
 
 const STATUS_OPTIONS = [
   "Pending",
@@ -229,6 +230,7 @@ export default function Admin() {
 // ============ Blog CMS Tab ============
 function BlogCMS() {
   const toast = useToast();
+  const confirm = useConfirm();
   const [posts, setPosts] = useState([]);
   const [cats, setCats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -288,7 +290,13 @@ function BlogCMS() {
   };
 
   const onDelete = async (id) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete blog post",
+      body: "Delete this post? This can't be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteBlogPost(id);
       toast.ok("Deleted");
@@ -508,6 +516,7 @@ function CSVTools() {
 // ============ Backup Tools Tab ============
 function BackupTools() {
   const toast = useToast();
+  const confirm = useConfirm();
   const fileRef = useRef(null);
   const [busy, setBusy] = useState(false);
 
@@ -536,7 +545,13 @@ function BackupTools() {
   const onRestore = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!window.confirm("Restore from this backup? Existing data may be overwritten.")) {
+    const ok = await confirm({
+      title: "Restore backup",
+      body: "Restore from this backup? Existing data may be overwritten.",
+      confirmText: "Restore",
+      danger: true,
+    });
+    if (!ok) {
       e.target.value = "";
       return;
     }
@@ -695,7 +710,6 @@ function RolesAdmin() {
 function ReturnsAdmin() {
   const toast = useToast();
   const [rows, setRows] = useState([]);
-  const [tab, setTab] = useState("returns");
   const [loading, setLoading] = useState(true);
 
   const load = () => {
@@ -787,6 +801,7 @@ function ReturnsAdmin() {
 }
 
 function AdminRemindersTab() {
+  const toast = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -814,7 +829,7 @@ function AdminRemindersTab() {
       await adminCompleteReminder(id);
       load();
     } catch (e) {
-      window.alert(e?.response?.data?.error || "Failed");
+      toast.err(e?.response?.data?.error || "Failed");
     }
   };
 
@@ -865,6 +880,8 @@ function AdminRemindersTab() {
 }
 
 function AdminSubscriptionsTab() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -888,14 +905,20 @@ function AdminSubscriptionsTab() {
   }, []);
 
   const onDelete = async (id) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Cancel subscription",
+      body: "Cancel this subscription?",
+      confirmText: "Cancel subscription",
+      danger: true,
+    });
+    if (!ok) return;
     const previousRows = [...rows];
     setRows(rows.filter((s) => (s.id ?? s.ID) !== id));
     try {
       await adminCancelSubscription(id);
       load();
     } catch (e) {
-      window.alert(e?.response?.data?.error || "Failed");
+      toast.err(e?.response?.data?.error || "Failed");
       setRows(previousRows);
     }
   };
@@ -943,6 +966,8 @@ function AdminSubscriptionsTab() {
 }
 
 function AdminConsultationsTab() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -970,19 +995,25 @@ function AdminConsultationsTab() {
       await adminConfirmConsultation(id);
       load();
     } catch (e) {
-      window.alert(e?.response?.data?.error || "Failed");
+      toast.err(e?.response?.data?.error || "Failed");
     }
   };
 
   const onDelete = async (id) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Cancel consultation",
+      body: "Cancel this consultation booking?",
+      confirmText: "Cancel booking",
+      danger: true,
+    });
+    if (!ok) return;
     const previousRows = [...rows];
     setRows(rows.filter((c) => (c.id ?? c.ID) !== id));
     try {
       await adminCancelConsultation(id);
       load();
     } catch (e) {
-      window.alert(e?.response?.data?.error || "Failed");
+      toast.err(e?.response?.data?.error || "Failed");
       setRows(previousRows);
     }
   };
@@ -1036,6 +1067,7 @@ function AdminConsultationsTab() {
 }
 
 function AdminCorporateTab() {
+  const toast = useToast();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -1065,7 +1097,7 @@ function AdminCorporateTab() {
       setNotes((n) => ({ ...n, [id]: "" }));
       load();
     } catch (e) {
-      window.alert(e?.response?.data?.error || "Failed");
+      toast.err(e?.response?.data?.error || "Failed");
     }
   };
 
@@ -1087,7 +1119,7 @@ function AdminCorporateTab() {
           {rows.map((q) => {
             const status = (q.status || "pending").toLowerCase();
             let recipients = [];
-            try { recipients = JSON.parse(q.recipients || "[]"); } catch (_) {}
+            try { recipients = JSON.parse(q.recipients || "[]"); } catch { /* malformed JSON, ignore */ }
             return (
               <tr key={q.id ?? q.ID}>
                 <td>
@@ -1152,6 +1184,8 @@ function AdminCorporateTab() {
 
 // ============ Products Tab ============
 function ProductsTab() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -1171,12 +1205,19 @@ function ProductsTab() {
   }, []);
 
   const handleDelete = async (p) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete product",
+      body: `Delete "${p.name}"? This can't be undone.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await API.delete(`/products/${p.ID}`);
+      toast.ok("Product deleted");
       load();
     } catch (err) {
-      alert(err.response?.data?.error || "Delete failed");
+      toast.err(err.response?.data?.error || "Delete failed");
     }
   };
 
@@ -1550,12 +1591,31 @@ function ProductForm({ initial, onClose, onSaved }) {
           </div>
           <div>
             <label className="field-label">Image URL</label>
-            <input
-              className="input"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
+            <div className="row gap-12" style={{ alignItems: "center" }}>
+              <input
+                className="input"
+                style={{ flex: 1 }}
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://... (leave blank to use the category icon)"
+              />
+              {imageUrl && (
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
+                  onLoad={(e) => { e.currentTarget.style.visibility = "visible"; }}
+                  style={{
+                    width: 48,
+                    height: 48,
+                    objectFit: "cover",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border)",
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+            </div>
           </div>
 
           {error && <p className="form-error">{error}</p>}
@@ -1581,6 +1641,8 @@ function ProductForm({ initial, onClose, onSaved }) {
 
 // ============ Orders Tab ============
 function OrdersTab() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1620,17 +1682,23 @@ function OrdersTab() {
       await updateOrderStatus(order.ID, newStatus);
       load();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to update status");
+      toast.err(err.response?.data?.error || "Failed to update status");
     }
   };
 
   const remove = async (order) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete order",
+      body: `Delete order #${order.ID}? This can't be undone.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteOrder(order.ID);
       load();
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to delete order");
+      toast.err(err.response?.data?.error || "Failed to delete order");
     }
   };
 
@@ -2286,6 +2354,8 @@ function DashboardTab() {
 
 // ============ Coupons Tab ============
 function CouponsTab() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [code, setCode] = useState("");
@@ -2336,12 +2406,18 @@ function CouponsTab() {
   };
 
   const remove = async (id) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete coupon",
+      body: "Delete this coupon? This can't be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await deleteCoupon(id);
       load();
     } catch (err) {
-      alert(err?.response?.data?.error || "Failed to delete");
+      toast.err(err?.response?.data?.error || "Failed to delete");
     }
   };
 
@@ -2423,11 +2499,11 @@ function CouponsTab() {
 // ============ Reviews Admin Tab ============
 function ReviewsAdmin() {
   const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productId, setProductId] = useState("");
   const [hint, setHint] = useState("");
-  const [autoFilled, setAutoFilled] = useState(false);
 
   const load = () => {
     setLoading(true);
@@ -2464,7 +2540,13 @@ function ReviewsAdmin() {
   }, [productId]);
 
   const onDelete = async (id) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete review",
+      body: "Delete this review? This can't be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await adminDeleteReview(id);
       toast.ok("Deleted");
@@ -2530,6 +2612,7 @@ function ReviewsAdmin() {
 // ============ Categories Admin Tab ============
 function CategoriesAdmin() {
   const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
@@ -2597,7 +2680,13 @@ function CategoriesAdmin() {
   };
 
   const onDelete = async (c) => {
-    // Removed window.confirm due to browser dialog suppression
+    const ok = await confirm({
+      title: "Delete category",
+      body: `Delete "${c.name}"? This can't be undone.`,
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await adminDeleteCategory(c.id ?? c.ID);
       toast.ok("Deleted");

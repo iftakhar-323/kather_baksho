@@ -10,6 +10,7 @@ import {
   listSubscriptionDeliveries,
 } from "../api/subscriptions";
 import { useToast } from "../components/Toast";
+import { useConfirm } from "../components/Confirm";
 import { useTranslation } from "../i18n/I18nProvider";
 
 const PLAN_KEYS = [
@@ -33,6 +34,7 @@ function fmtDate(s) {
 
 export default function Subscriptions() {
   const toast = useToast();
+  const confirm = useConfirm();
   const { t } = useTranslation();
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +69,13 @@ export default function Subscriptions() {
   };
 
   const cancel = async (sub) => {
-    if (!window.confirm(t("subscriptions.cancelConfirm", { name: sub.plan_name }))) return;
+    const ok = await confirm({
+      title: "Cancel subscription",
+      body: t("subscriptions.cancelConfirm", { name: sub.plan_name }),
+      confirmText: "Cancel subscription",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await cancelSubscription(sub.ID);
       toast.ok(t("subscriptions.cancelledMsg"));

@@ -6,9 +6,11 @@ import {
   cancelConsultation,
 } from "../api/consultations";
 import { useTranslation } from "../i18n/I18nProvider";
+import { useConfirm } from "../components/Confirm";
 
 export default function Consultations() {
   const { t } = useTranslation();
+  const confirm = useConfirm();
   const [experts, setExperts] = useState([]);
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,13 @@ export default function Consultations() {
   };
 
   const cancel = async (c) => {
-    if (!window.confirm(t("consultations.cancelConfirm"))) return;
+    const ok = await confirm({
+      title: "Cancel consultation",
+      body: t("consultations.cancelConfirm"),
+      confirmText: "Cancel booking",
+      danger: true,
+    });
+    if (!ok) return;
     await cancelConsultation(c.ID);
     loadAll();
   };

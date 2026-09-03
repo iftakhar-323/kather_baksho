@@ -11,6 +11,7 @@ import {
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import DeliveryTrack from "../components/DeliveryTrack";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -143,6 +144,13 @@ export default function OrderDetail({ order, onBack }) {
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
+      <Breadcrumbs
+        items={[
+          { label: t("nav.shop"), to: "/" },
+          { label: t("nav.orders"), to: "/orders" },
+          { label: t("orderDetail.orderId", { id: order.id || order.ID }) },
+        ]}
+      />
       <button onClick={onBack} className="btn btn-ghost mb-16">
         {t("orderDetail.backToOrders")}
       </button>

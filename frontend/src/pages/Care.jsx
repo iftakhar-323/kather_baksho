@@ -10,6 +10,7 @@ import {
 } from "../api/care";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import Reminders from "./Reminders";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -164,7 +165,15 @@ export default function Care() {
         >
           {t("care.dashboard.tabSchedules")}
         </button>
+        <button
+          className={"btn btn-sm " + (tab === "reminders" ? "btn-primary" : "btn-secondary")}
+          onClick={() => setTab("reminders")}
+        >
+          {t("reminders.head")}
+        </button>
       </div>
+
+      {tab === "reminders" && <Reminders embedded />}
 
       {tab === "dashboard" && (
         <div>

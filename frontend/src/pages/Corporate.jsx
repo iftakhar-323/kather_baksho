@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { createCorporateQuote, getMyCorporateQuotes } from "../api/corporate";
 import { useTranslation } from "../i18n/I18nProvider";
+import CorporateOrders from "./CorporateOrders";
 
 export default function Corporate() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [mainTab, setMainTab] = useState("quote");
   const [companyName, setCompanyName] = useState("");
   const [contactName, setContactName] = useState(user?.name || "");
   const [contactEmail, setContactEmail] = useState(user?.email || "");
@@ -77,6 +79,25 @@ export default function Corporate() {
         <p className="muted">{t("corporate.subhead")}</p>
       </div>
 
+      <div className="row gap-8" style={{ marginBottom: 16 }}>
+        <button
+          className={"btn btn-sm " + (mainTab === "quote" ? "btn-primary" : "btn-secondary")}
+          onClick={() => setMainTab("quote")}
+        >
+          {t("corporate.formHeading")}
+        </button>
+        <button
+          className={"btn btn-sm " + (mainTab === "orders" ? "btn-primary" : "btn-secondary")}
+          onClick={() => setMainTab("orders")}
+        >
+          {t("corporateOrders.head")}
+        </button>
+      </div>
+
+      {mainTab === "orders" && <CorporateOrders embedded />}
+
+      {mainTab === "quote" && (
+      <>
       {msg && <div className="card" style={{ padding: 12, color: "var(--leaf-700)", marginBottom: 12 }}>{msg}</div>}
       {error && <div className="warning">{error}</div>}
 
@@ -186,6 +207,8 @@ export default function Corporate() {
             </div>
           ))}
         </div>
+      )}
+      </>
       )}
     </div>
   );

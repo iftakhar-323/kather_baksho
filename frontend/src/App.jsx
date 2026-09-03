@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -10,26 +10,30 @@ import {
   Link,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+// Home is imported eagerly — it's the landing page almost every visit starts
+// on, so there's no benefit to paying a second network round trip for it.
+// Everything else below is route-specific and only needed once a user
+// actually navigates there, so it's lazy-loaded into its own chunk.
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Cart from "./pages/Cart";
-import Orders from "./pages/Orders";
-import Admin from "./pages/Admin";
-import ProductDetail from "./pages/ProductDetail";
-import Wishlist from "./pages/Wishlist";
-import Reminders from "./pages/Reminders";
-import Seasonal from "./pages/Seasonal";
-import Subscriptions from "./pages/Subscriptions";
-import Consultations from "./pages/Consultations";
-import Corporate from "./pages/Corporate";
-import Community from "./pages/Community";
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Admin = lazy(() => import("./pages/Admin"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Seasonal = lazy(() => import("./pages/Seasonal"));
+const Subscriptions = lazy(() => import("./pages/Subscriptions"));
+const Consultations = lazy(() => import("./pages/Consultations"));
+const Corporate = lazy(() => import("./pages/Corporate"));
+const Community = lazy(() => import("./pages/Community"));
 // Sprint A — profile + auth + static pages
-import Profile from "./pages/Profile";
-import StaticPage from "./pages/StaticPage";
+const Profile = lazy(() => import("./pages/Profile"));
+const StaticPage = lazy(() => import("./pages/StaticPage"));
 import Notifications from "./components/Notifications";
 // Sprint C — UI polish + zero-API features
 import { ToastProvider } from "./components/Toast";
+import { ConfirmProvider } from "./components/Confirm";
 import ScrollProgress from "./components/ScrollProgress";
 import ThemeToggle from "./components/ThemeToggle";
 import RecentlyViewed from "./components/RecentlyViewed";
@@ -39,15 +43,13 @@ import StatsCounter from "./components/StatsCounter";
 import FeaturedCollections from "./components/FeaturedCollections";
 import QuickView from "./components/QuickView";
 // Sprint D — no-API feature pages
-import Loyalty from "./pages/Loyalty";
-import Blog from "./pages/Blog";
-import BlogDetail from "./pages/BlogDetail";
-import CommunityQA from "./pages/CommunityQA";
-import Care from "./pages/Care";
-import CorporateOrders from "./pages/CorporateOrders";
-import OrderDetail from "./pages/OrderDetail";
-import GiftCards from "./pages/GiftCards";
-import Dashboard from "./pages/Dashboard";
+const Loyalty = lazy(() => import("./pages/Loyalty"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
+const Care = lazy(() => import("./pages/Care"));
+const OrderDetail = lazy(() => import("./pages/OrderDetail"));
+const GiftCards = lazy(() => import("./pages/GiftCards"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 import GlobalSearch from "./components/GlobalSearch";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LangToggle from "./components/LangToggle";
@@ -69,12 +71,10 @@ const MORE_NAV_ITEMS = [
   { key: "consultations", tKey: "nav.consultations", emoji: "🌱" },
   { key: "care",          tKey: "nav.care",          emoji: "🌿" },
   { key: "blog",          tKey: "nav.blog",          emoji: "" },
-  { key: "communityqa",   tKey: "nav.communityqa",   emoji: "💡" },
   { key: "loyalty",       tKey: "nav.loyalty",       emoji: "🏆" },
   { key: "gift-cards",    tKey: "nav.giftCards",     emoji: "🎁" },
-  { key: "corp-portal",   tKey: "nav.corpPortal",    emoji: "🏢" },
+  { key: "corporate",     tKey: "nav.corpPortal",    emoji: "🏢" },
   { key: "community",     tKey: "nav.community",     emoji: "" },
-  { key: "reminders",     tKey: "nav.reminders",     emoji: "🌿" },
   { key: "seasonal",      tKey: "nav.seasonal",      emoji: "" },
 ];
 
@@ -87,10 +87,10 @@ const STATIC_SLUGS = ["about", "contact", "faq", "privacy", "terms", "shipping",
 // Single source of truth: legacy "view" key  ⇄  URL path.
 // Customer-only views that admins should never see.
 const CUSTOMER_ONLY = new Set([
-  "cart", "orders", "order-detail", "wishlist", "reminders",
+  "cart", "orders", "order-detail", "wishlist",
   "seasonal", "subscriptions", "consultations", "corporate",
-  "community", "loyalty", "blog", "communityqa", "care",
-  "corp-portal", "gift-cards", "dashboard",
+  "community", "loyalty", "blog", "care",
+  "gift-cards", "dashboard",
 ]);
 
 // View → path. Unknown keys fall back to "/".
@@ -123,6 +123,14 @@ function viewFromPath(pathname) {
   if (STATIC_SLUGS.includes(first)) return { view: first };
   // Anything else (cart, wishlist, orders list, etc.) is the key itself.
   return { view: first };
+}
+
+function RouteLoader() {
+  return (
+    <div className="route-loader" aria-busy="true" aria-label="Loading page">
+      <div className="pm-spinner" />
+    </div>
+  );
 }
 
 function Footer() {
@@ -589,6 +597,7 @@ function MainApp() {
 
       <main className="page">
         <ErrorBoundary>
+        <Suspense fallback={<RouteLoader />}>
         <Routes>
           <Route path="/" element={
             <HomePage
@@ -630,22 +639,25 @@ function MainApp() {
           <Route path="/cart"          element={<CustomerOnly isAdmin={isAdmin}><Cart onOrderPlaced={() => navigate("/orders")} /></CustomerOnly>} />
           <Route path="/orders"        element={<CustomerOnly isAdmin={isAdmin}><Orders /></CustomerOnly>} />
           <Route path="/wishlist"      element={<CustomerOnly isAdmin={isAdmin}><Wishlist /></CustomerOnly>} />
-          <Route path="/reminders"     element={<CustomerOnly isAdmin={isAdmin}><Reminders /></CustomerOnly>} />
           <Route path="/seasonal"      element={<CustomerOnly isAdmin={isAdmin}><Seasonal /></CustomerOnly>} />
           <Route path="/subscriptions" element={<CustomerOnly isAdmin={isAdmin}><Subscriptions /></CustomerOnly>} />
           <Route path="/consultations" element={<CustomerOnly isAdmin={isAdmin}><Consultations /></CustomerOnly>} />
           <Route path="/corporate"     element={<CustomerOnly isAdmin={isAdmin}><Corporate /></CustomerOnly>} />
           <Route path="/community"     element={<CustomerOnly isAdmin={isAdmin}><Community /></CustomerOnly>} />
           <Route path="/loyalty"       element={<CustomerOnly isAdmin={isAdmin}><Loyalty /></CustomerOnly>} />
-          <Route path="/communityqa"   element={<CustomerOnly isAdmin={isAdmin}><CommunityQA /></CustomerOnly>} />
           <Route path="/care"          element={<CustomerOnly isAdmin={isAdmin}><Care /></CustomerOnly>} />
-          <Route path="/corp-portal"   element={<CustomerOnly isAdmin={isAdmin}><CorporateOrders /></CustomerOnly>} />
           <Route path="/gift-cards"    element={<CustomerOnly isAdmin={isAdmin}><GiftCards /></CustomerOnly>} />
           <Route path="/dashboard"    element={<CustomerOnly isAdmin={isAdmin}><Dashboard /></CustomerOnly>} />
+
+          {/* Merged pages — old bookmarked URLs redirect into the new tabs */}
+          <Route path="/reminders"   element={<Navigate to="/care" replace />} />
+          <Route path="/communityqa" element={<Navigate to="/community" replace />} />
+          <Route path="/corp-portal" element={<Navigate to="/corporate" replace />} />
 
           {/* 404 fallback → home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
         </ErrorBoundary>
       </main>
 
@@ -678,10 +690,12 @@ function AppShell() {
   const isAdmin = user?.role === "admin";
   return (
     <ToastProvider>
-      <ScrollProgress />
-      <MainApp />
-      {!isAdmin && <CompareBar />}
-      {!isAdmin && <Onboarding />}
+      <ConfirmProvider>
+        <ScrollProgress />
+        <MainApp />
+        {!isAdmin && <CompareBar />}
+        {!isAdmin && <Onboarding />}
+      </ConfirmProvider>
     </ToastProvider>
   );
 }
