@@ -187,6 +187,8 @@
     "placedOn": "গৃহীত {{date}} · মোট ৳{{total}}",
     "viewInvoice": "🧾 চালান দেখুন / প্রিন্ট",
     "viewReceipt": "🧾 রসিদ দেখুন",
+    "shipTo": "পাঠানো হবে",
+    "deliveryNote": "নোট",
     "return": "↩️ ফেরত",
     "refund": "💸 রিফান্ড",
     "exchange": "🔄 বদল",

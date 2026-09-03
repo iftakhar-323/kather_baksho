@@ -10,6 +10,10 @@ type Order struct {
 	PaymentMethod string      `json:"payment_method" gorm:"default:'cod'"`
 	PaymentStatus string      `json:"payment_status" gorm:"default:'Pending'"`
 	TransactionID  string      `json:"transaction_id"`
+	ShippingName    string     `json:"shipping_name"`
+	ShippingPhone   string     `json:"shipping_phone"`
+	ShippingAddress string     `json:"shipping_address"`
+	DeliveryNote    string     `json:"delivery_note"`
 	GiftWrap      bool        `json:"gift_wrap" gorm:"default:false"`
 	CouponCode    string      `json:"coupon_code"`
 	DiscountAmount float64    `json:"discount_amount"`

@@ -213,7 +213,15 @@ export default function Cart({ onOrderPlaced }) {
     setShowPaymentModal(true);
   };
 
-  const handleCompletePayment = async ({ paymentMethod, paymentStatus, transactionId }) => {
+  const handleCompletePayment = async ({
+    paymentMethod,
+    paymentStatus,
+    transactionId,
+    shippingName,
+    shippingPhone,
+    shippingAddress,
+    deliveryNote,
+  }) => {
     setShowPaymentModal(false);
     try {
       setCheckingOut(true);
@@ -224,6 +232,10 @@ export default function Cart({ onOrderPlaced }) {
         payment_method: paymentMethod,
         payment_status: paymentStatus,
         transaction_id: transactionId,
+        shipping_name: shippingName || "",
+        shipping_phone: shippingPhone || "",
+        shipping_address: shippingAddress || "",
+        delivery_note: deliveryNote || "",
       });
       setOrder(res.data);
       getMe().then((r) => setUserPoints(r.data.points || 0)).catch(() => {});
