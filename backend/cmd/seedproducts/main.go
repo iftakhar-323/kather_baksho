@@ -275,9 +275,10 @@ func main() {
 				OfferLabel:    pick(offerLabels, n*5+ti*7),
 				Stock:         stock,
 				Description:   desc,
-				// Left blank on purpose — the frontend draws a unique
-				// illustration per product from the name + subcategory.
-				ImageURL: "",
+				// A curated, license-free catalogue photo chosen from the
+				// product name + subcategory (see models.ProductImageURL and
+				// frontend/public/images/products/catalog/).
+				ImageURL: models.ProductImageURL(name, t.subcategory, t.category, uint(serial)),
 			}
 			if err := database.DB.Create(&p).Error; err != nil {
 				log.Printf("insert %s failed: %v", name, err)
