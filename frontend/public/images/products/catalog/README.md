@@ -7,10 +7,16 @@ product name, falling back to a per-subcategory pool.
 
 ## Source & licence
 
-Fetched from [loremflickr.com](https://loremflickr.com), which serves photos
-from Flickr published under Creative Commons licences. They are placeholders
-for a demo catalogue — replace any of them with your own product photography by
-dropping a file with the same name here (keep it roughly square, ~640px).
+Most files are the lead photo of the matching **Wikipedia / Wikimedia Commons**
+article (e.g. `monstera.jpg` ← *Monstera deliciosa*, `pruning-shears.jpg` ←
+*Pruning shears*) — accurate, correctly identified, and published under free
+licences (CC-BY-SA / public domain). A handful of generic items
+(`plant-stand`, `pebble-tray`, `bamboo-tray`, `moss-pole`, `soil-bag`,
+`moisture-meter`, `plant-food`, `gift-box-plants`, `plant-collection`) come
+from [loremflickr.com](https://loremflickr.com) (Creative Commons Flickr).
+
+All are centre-cropped to 640×640 JPEG. Replace any with your own product
+photography by dropping a file with the same name here.
 
 ## Regenerating assignments
 
