@@ -891,6 +891,31 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 .row-between { justify-content: space-between; }
 .row-wrap { flex-wrap: wrap; }
 
+/* Filter chip row (category filters, tag pickers) */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.chip {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.chip:hover { border-color: var(--primary); color: var(--primary); }
+.chip.is-active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
 /* Loyalty page */
 .loyalty-card-icon { font-size: 28px; }
 .loyalty-card-title { margin: 8px 0 4px; }
@@ -979,19 +1004,64 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 .corp-recipient-name { flex: 1; min-width: 140px; }
 .corp-recipient-addr { flex: 2; min-width: 200px; }
 
+/* Community feed */
+.post-card { padding: 0; margin-bottom: 12px; }
+.post-card-body { padding: 16px; }
+.post-card-head { align-items: flex-start; }
+.post-card-headline { flex: 1; cursor: pointer; min-width: 0; }
+.post-card-meta { font-size: 13px; margin-bottom: 4px; }
+.post-card-title { font-size: 18px; font-weight: 600; color: var(--text-h); }
+.post-card-img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin: 12px 0;
+}
+.post-card-text { white-space: pre-wrap; margin-bottom: 12px; }
+.post-card-likedby { font-size: 13px; color: var(--brand-600); margin-bottom: 12px; }
+.post-card-comments { padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.post-comment { margin-top: 10px; }
+.post-comment-author { font-size: 13px; font-weight: 600; color: var(--text-h); }
+.post-comment-body { font-size: 14px; }
+.post-comment-input { flex: 1; }
+
+/* Clickable card (opens a detail view / modal) */
+.card-clickable { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.card-clickable:hover { border-color: var(--brand-300); box-shadow: var(--shadow); }
+
 /* Corporate orders page */
 .co-field-grow { flex: 1; min-width: 200px; }
 .co-field-qty { width: 120px; }
 .co-field-budget { width: 160px; }
-.co-order-card {
-  display: block;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font: inherit;
-}
-.co-order-card:hover { border-color: var(--brand-300); }
 .co-order-date { font-size: 12px; margin-top: 4px; }
+
+/* Community Q&A */
+.qa-layout { display: flex; align-items: flex-start; gap: 16px; }
+.qa-list-col { flex: 2; min-width: 0; }
+.qa-detail-col { flex: 1; min-width: 280px; }
+.qa-detail { position: sticky; top: 16px; }
+.qa-detail-title { margin: 8px 0; }
+.qa-detail-body { white-space: pre-wrap; }
+.qa-question-title { margin: 0; }
+.qa-question-meta { font-size: 12px; margin-top: 6px; gap: 8px; flex-wrap: wrap; }
+.qa-question-answers { font-size: 13px; margin-top: 8px; }
+.qa-answer { margin-bottom: 8px; }
+.qa-answer-body { margin: 0; white-space: pre-wrap; }
+.qa-answer-meta { font-size: 12px; }
+.qa-product-input { width: 200px; }
+.qa-tags-input { flex: 1; min-width: 160px; }
+.qa-rank-col { width: 60px; }
+.qa-mini-lb-row { padding: 6px 0; }
+.qa-mini-lb-rank { width: 24px; font-weight: 700; }
+.qa-mini-lb-name { flex: 1; }
+.text-accent { color: var(--brand-700); }
+[data-theme="dark"] .text-accent { color: var(--brand-300); }
+@media (max-width: 720px) {
+  .qa-layout { flex-direction: column; }
+  .qa-detail-col { width: 100%; }
+  .qa-detail { position: static; }
+}
 
 /* Seasonal page */
 .tabs.is-wrap { flex-wrap: wrap; }

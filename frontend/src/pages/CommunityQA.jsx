@@ -10,6 +10,8 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import PageHeader from "../components/PageHeader";
+import Segmented from "../components/Segmented";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -111,29 +113,20 @@ export default function CommunityQA({ embedded = false }) {
   };
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+    <div className={embedded ? "" : "page-shell is-wide"}>
       {!embedded && (
-        <>
-          <h1 style={{ marginBottom: 8 }}>{t("community.qa.heading")}</h1>
-          <p className="muted" style={{ marginBottom: 16 }}>
-            {t("community.qa.subhead")}
-          </p>
-        </>
+        <PageHeader title={t("community.qa.heading")} sub={t("community.qa.subhead")} />
       )}
 
-      <div className="row gap-8" style={{ marginBottom: 16 }}>
-        <button
-          className={"btn btn-sm " + (tab === "qa" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("qa")}
-        >
-          {t("community.qa.tabQuestions")}
-        </button>
-        <button
-          className={"btn btn-sm " + (tab === "leaderboard" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("leaderboard")}
-        >
-          {t("community.qa.tabLeaderboard")}
-        </button>
+      <div className="row gap-8 mb-16 row-wrap">
+        <Segmented
+          value={tab}
+          onChange={setTab}
+          options={[
+            { value: "qa", label: t("community.qa.tabQuestions") },
+            { value: "leaderboard", label: t("community.qa.tabLeaderboard") },
+          ]}
+        />
         {user && tab === "qa" && (
           <>
             <span className="spacer" />
@@ -149,7 +142,7 @@ export default function CommunityQA({ embedded = false }) {
 
       {askOpen && (
         <form onSubmit={onAsk} className="card card-pad-lg mb-16">
-          <h3 style={{ marginTop: 0 }}>{t("community.qa.askTitle")}</h3>
+          <h3 className="mt-0">{t("community.qa.askTitle")}</h3>
           <input
             className="input"
             placeholder={t("community.qa.titlePlaceholder")}
@@ -158,28 +151,25 @@ export default function CommunityQA({ embedded = false }) {
             required
           />
           <textarea
-            className="input mt-8"
+            className="textarea mt-8"
             rows={4}
             placeholder={t("community.qa.bodyPlaceholder")}
             value={qBody}
             onChange={(e) => setQBody(e.target.value)}
-            style={{ resize: "vertical" }}
           />
-          <div className="row mt-8" style={{ gap: 8 }}>
+          <div className="row mt-8 gap-8 row-wrap">
             <input
-              className="input"
+              className="input qa-product-input"
               placeholder={t("community.qa.productIdPlaceholder")}
               value={qProductId}
               onChange={(e) => setQProductId(e.target.value)}
-              style={{ width: 200 }}
               type="number"
             />
             <input
-              className="input"
+              className="input qa-tags-input"
               placeholder={t("community.qa.tagsPlaceholder")}
               value={qTags}
               onChange={(e) => setQTags(e.target.value)}
-              style={{ flex: 1 }}
             />
           </div>
           <button className="btn btn-primary mt-8" type="submit">
@@ -189,8 +179,8 @@ export default function CommunityQA({ embedded = false }) {
       )}
 
       {tab === "qa" && (
-        <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-          <div style={{ flex: 2, minWidth: 0 }}>
+        <div className="qa-layout">
+          <div className="qa-list-col">
             {loading ? (
               <div className="empty">
                 <div className="emoji">⏳</div>
@@ -203,19 +193,16 @@ export default function CommunityQA({ embedded = false }) {
                 <p className="muted">{t("community.qa.noQuestionsBody")}</p>
               </div>
             ) : (
-              <div>
+              <div className="stack gap-8">
                 {questions.map((q) => (
                   <div
                     key={q.id}
-                    className="card card-pad"
-                    style={{ marginBottom: 8, cursor: "pointer" }}
+                    className="card card-pad card-clickable qa-question-card"
                     onClick={() => setActiveQ(q)}
                   >
-                    <h4 style={{ margin: 0 }}>{q.title}</h4>
-                    <div
-                      className="row muted"
-                      style={{ fontSize: 12, marginTop: 6, gap: 8 }}
-                    >
+                    <h4 className="qa-question-title">{q.title}</h4>
+                    <div className="row muted qa-question-meta">
+
                       <span>
                         {t("community.qa.by", {
                           name: q.author_name || t("community.qa.anonymous"),
@@ -238,19 +225,13 @@ export default function CommunityQA({ embedded = false }) {
                       )}
                     </div>
                     {(q.tags || []).length > 0 && (
-                      <div
-                        className="row gap-4 mt-8"
-                        style={{ flexWrap: "wrap" }}
-                      >
+                      <div className="row gap-4 mt-8 row-wrap">
                         {q.tags.map((tg) => (
                           <span key={tg} className="tag">#{tg}</span>
                         ))}
                       </div>
                     )}
-                    <div
-                      className="muted"
-                      style={{ fontSize: 13, marginTop: 8 }}
-                    >
+                    <div className="muted qa-question-answers">
                       {(q.answer_count || 0) === 1
                         ? t("community.qa.answerCount", {
                             count: q.answer_count || 0,
@@ -265,23 +246,18 @@ export default function CommunityQA({ embedded = false }) {
             )}
           </div>
 
-          <div style={{ flex: 1, minWidth: 280 }}>
+          <div className="qa-detail-col">
             {activeQ ? (
-              <div
-                className="card card-pad-lg"
-                style={{ position: "sticky", top: 16 }}
-              >
+              <div className="card card-pad-lg qa-detail">
                 <button
                   className="btn btn-ghost btn-xs"
                   onClick={() => setActiveQ(null)}
                 >
                   {t("community.qa.backToList")}
                 </button>
-                <h3 style={{ margin: "8px 0" }}>{activeQ.title}</h3>
-                {activeQ.body && (
-                  <p style={{ whiteSpace: "pre-wrap" }}>{activeQ.body}</p>
-                )}
-                <h4 style={{ marginTop: 16 }}>
+                <h3 className="qa-detail-title">{activeQ.title}</h3>
+                {activeQ.body && <p className="qa-detail-body">{activeQ.body}</p>}
+                <h4 className="mt-16">
                   {t("community.qa.answersHeading", {
                     count: (activeQ.answers || []).length,
                   })}
@@ -290,13 +266,9 @@ export default function CommunityQA({ embedded = false }) {
                   <p className="muted">{t("community.qa.noAnswers")}</p>
                 )}
                 {(activeQ.answers || []).map((a) => (
-                  <div
-                    key={a.id}
-                    className="card card-pad"
-                    style={{ marginBottom: 8, padding: 12 }}
-                  >
-                    <p style={{ margin: 0, whiteSpace: "pre-wrap" }}>{a.body}</p>
-                    <div className="row mt-8" style={{ fontSize: 12 }}>
+                  <div key={a.id} className="card card-pad qa-answer">
+                    <p className="qa-answer-body">{a.body}</p>
+                    <div className="row mt-8 qa-answer-meta">
                       <span className="muted">
                         {t("community.qa.answerAuthor", {
                           name: a.author_name || t("community.qa.anonymous"),
@@ -338,13 +310,9 @@ export default function CommunityQA({ embedded = false }) {
                   {t("community.qa.topHelpersTitle")}
                 </h4>
                 {(leaderboard || []).slice(0, 5).map((u, i) => (
-                  <div
-                    key={u.user_id || i}
-                    className="row"
-                    style={{ padding: "6px 0" }}
-                  >
-                    <span style={{ width: 24, fontWeight: 700 }}>#{i + 1}</span>
-                    <span style={{ flex: 1 }}>
+                  <div key={u.user_id || i} className="row qa-mini-lb-row">
+                    <span className="qa-mini-lb-rank">#{i + 1}</span>
+                    <span className="qa-mini-lb-name">
                       {u.name || t("community.qa.anonymous")}
                     </span>
                     <strong>
@@ -359,14 +327,11 @@ export default function CommunityQA({ embedded = false }) {
       )}
 
       {tab === "leaderboard" && (
-        <div
-          className="card"
-          style={{ padding: 0, overflow: "hidden" }}
-        >
-          <table className="table" style={{ width: "100%" }}>
+        <div className="table-wrap">
+          <table className="table">
             <thead>
               <tr>
-                <th style={{ width: 60 }}>{t("community.qa.rank")}</th>
+                <th className="qa-rank-col">{t("community.qa.rank")}</th>
                 <th>{t("community.qa.helper")}</th>
                 <th>{t("community.qa.points")}</th>
                 <th>{t("community.qa.answers")}</th>
@@ -376,9 +341,7 @@ export default function CommunityQA({ embedded = false }) {
               {(leaderboard || []).map((u, i) => (
                 <tr key={u.user_id || i}>
                   <td>
-                    <strong
-                      style={{ color: i < 3 ? "var(--brand-700)" : undefined }}
-                    >
+                    <strong className={i < 3 ? "text-accent" : undefined}>
                       #{i + 1}
                     </strong>
                   </td>

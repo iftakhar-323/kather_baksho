@@ -10,6 +10,8 @@ import {
 } from "../api/community";
 import { useTranslation } from "../i18n/I18nProvider";
 import { useConfirm } from "../components/Confirm";
+import PageHeader from "../components/PageHeader";
+import Segmented from "../components/Segmented";
 import CommunityQA from "./CommunityQA";
 
 const CATS = ["show-off", "tip", "question", "story"];
@@ -114,49 +116,38 @@ export default function Community() {
   };
 
   return (
-    <div>
-      <div className="row gap-8" style={{ marginBottom: 16 }}>
-        <button
-          className={"btn btn-sm " + (mainTab === "feed" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setMainTab("feed")}
-        >
-          {t("community.feed.heading")}
-        </button>
-        <button
-          className={"btn btn-sm " + (mainTab === "qa" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setMainTab("qa")}
-        >
-          {t("community.qa.heading")}
-        </button>
-      </div>
+    <div className="page-shell is-wide">
+      <Segmented
+        className="mb-16"
+        value={mainTab}
+        onChange={setMainTab}
+        options={[
+          { value: "feed", label: t("community.feed.heading") },
+          { value: "qa", label: t("community.qa.heading") },
+        ]}
+      />
 
       {mainTab === "qa" && <CommunityQA embedded />}
 
       {mainTab === "feed" && (
       <>
-      <div
-        className="row-between"
-        style={{ alignItems: "flex-start", marginBottom: 16 }}
-      >
-        <div>
-          <h1 style={{ marginBottom: 6 }}>{t("community.feed.heading")}</h1>
-          <p className="muted">{t("community.feed.subhead")}</p>
-        </div>
-        {user && (
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowNew((s) => !s)}
-          >
-            {showNew ? t("community.feed.close") : t("community.feed.newPostOpen")}
-          </button>
-        )}
-      </div>
+      <PageHeader
+        title={t("community.feed.heading")}
+        sub={t("community.feed.subhead")}
+        actions={
+          user && (
+            <button className="btn btn-primary" onClick={() => setShowNew((s) => !s)}>
+              {showNew ? t("community.feed.close") : t("community.feed.newPostOpen")}
+            </button>
+          )
+        }
+      />
 
       {error && <div className="warning">{error}</div>}
 
       {showNew && (
-        <div className="card" style={{ padding: 16, marginBottom: 16 }}>
-          <h3 style={{ marginTop: 0 }}>{t("community.feed.newPostTitle")}</h3>
+        <div className="card card-pad mb-16">
+          <h3 className="mt-0">{t("community.feed.newPostTitle")}</h3>
           <form className="auth-form" onSubmit={submitPost}>
             <div>
               <label className="field-label">
@@ -214,9 +205,9 @@ export default function Community() {
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+      <div className="chip-row">
         <button
-          className={"btn btn-sm " + (!catFilter ? "btn-primary" : "btn-secondary")}
+          className={"chip" + (!catFilter ? " is-active" : "")}
           onClick={() => setCatFilter("")}
         >
           {t("community.feed.all")}
@@ -224,9 +215,7 @@ export default function Community() {
         {CATS.map((c) => (
           <button
             key={c}
-            className={
-              "btn btn-sm " + (catFilter === c ? "btn-primary" : "btn-secondary")
-            }
+            className={"chip" + (catFilter === c ? " is-active" : "")}
             onClick={() => setCatFilter(c)}
           >
             {catLabel(c)}
@@ -254,24 +243,18 @@ export default function Community() {
         const isOpen = expanded === p.id;
         const comments = commentsByPost[p.id] || [];
         return (
-          <div key={p.id} className="card" style={{ padding: 0, marginBottom: 12 }}>
-            <div style={{ padding: 16 }}>
-              <div className="row-between" style={{ alignItems: "flex-start" }}>
-                <div
-                  style={{ flex: 1, cursor: "pointer" }}
-                  onClick={() => openPost(p)}
-                >
-                  <div
-                    className="muted"
-                    style={{ fontSize: 13, marginBottom: 4 }}
-                  >
+          <div key={p.id} className="card post-card">
+            <div className="post-card-body">
+              <div className="row-between post-card-head">
+                <div className="post-card-headline" onClick={() => openPost(p)}>
+                  <div className="muted post-card-meta">
                     {catLabel(p.category)} {t("community.feed.by", {
                       name: p.author || t("community.feed.anonymous"),
                     })}{" "}
                     •{" "}
                     {new Date(p.created_at).toLocaleDateString()}
                   </div>
-                  <div style={{ fontSize: 18, fontWeight: 600 }}>{p.title}</div>
+                  <div className="post-card-title">{p.title}</div>
                 </div>
                 {(user?.id === p.user_id || user?.role === "admin") && (
                   <button
@@ -287,25 +270,17 @@ export default function Community() {
                 <img
                   src={p.image_url}
                   alt=""
-                  style={{
-                    width: "100%",
-                    maxHeight: 320,
-                    objectFit: "cover",
-                    borderRadius: 12,
-                    margin: "12px 0",
-                  }}
+                  className="post-card-img"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
                 />
               )}
 
-              <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>
-                {p.body}
-              </div>
+              <div className="post-card-text">{p.body}</div>
 
               {p.like_count > 0 && p.liked_by_names?.length > 0 && (
-                <div style={{ fontSize: 13, color: "var(--brand-600)", marginBottom: 12 }}>
+                <div className="post-card-likedby">
                   <strong>Liked by:</strong> {p.liked_by_names.join(", ")}
                 </div>
               )}
@@ -334,30 +309,22 @@ export default function Community() {
             </div>
 
             {isOpen && (
-              <div
-                style={{
-                  padding: "0 16px 16px",
-                  borderTop: "1px solid var(--brand-100)",
-                }}
-              >
+              <div className="post-card-comments">
                 {comments.length === 0 && (
-                  <p className="muted" style={{ marginTop: 12 }}>
-                    {t("community.feed.noComments")}
-                  </p>
+                  <p className="muted mt-12">{t("community.feed.noComments")}</p>
                 )}
                 {comments.map((c) => (
-                  <div key={c.id} style={{ marginTop: 10 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>
+                  <div key={c.id} className="post-comment">
+                    <div className="post-comment-author">
                       {c.author || t("community.feed.anonymous")}
                     </div>
-                    <div style={{ fontSize: 14 }}>{c.body}</div>
+                    <div className="post-comment-body">{c.body}</div>
                   </div>
                 ))}
                 {user && (
-                  <div className="row gap-8" style={{ marginTop: 12 }}>
+                  <div className="row gap-8 mt-12">
                     <input
-                      className="input"
-                      style={{ flex: 1 }}
+                      className="input post-comment-input"
                       placeholder={t("community.feed.writeCommentPlaceholder")}
                       value={draftComments[p.id] || ""}
                       onChange={(e) =>

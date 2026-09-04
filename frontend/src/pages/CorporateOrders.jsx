@@ -212,10 +212,9 @@ export default function CorporateOrders({ embedded = false }) {
       ) : (
         <div className="stack gap-8">
           {orders.map((o) => (
-            <button
+            <div
               key={o.id}
-              type="button"
-              className="card card-pad co-order-card"
+              className="card card-pad card-clickable"
               onClick={() => setActive(o)}
             >
               <div className="row gap-8">
@@ -231,7 +230,7 @@ export default function CorporateOrders({ embedded = false }) {
                   date: new Date(o.created_at).toLocaleDateString(),
                 })}
               </div>
-            </button>
+            </div>
           ))}
         </div>
       )}
