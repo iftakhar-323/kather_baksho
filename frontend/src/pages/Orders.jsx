@@ -20,6 +20,26 @@ const STATUS_KEYS = {
   "Refunded": "orders.refunded",
 };
 
+// status → colour tone for the pill (all render white text on a solid fill)
+const STATUS_TONE = {
+  "Pending": "warn",
+  "Processing": "info",
+  "Packed": "info",
+  "On the Way": "accent",
+  "Delivered": "ok",
+  "Cancelled": "danger",
+  "Returned": "danger",
+  "Refunded": "muted",
+};
+
+function fmtOrderDate(o) {
+  const raw = o.CreatedAt || o.created_at || o.createdAt;
+  const d = raw ? new Date(raw) : null;
+  return d && !Number.isNaN(d.getTime())
+    ? d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })
+    : "";
+}
+
 function emojiFor(category) {
   if (category === "plant") return "🌿";
   if (category === "care") return "🧴";
@@ -130,7 +150,8 @@ export default function Orders() {
       <div className="stack gap-12">
         {orders.map((o) => {
           const isOpen = expanded === o.ID;
-          const statusClass = `status status-${o.status?.replace(/ /g, "\\ ")}`;
+          const statusTone = STATUS_TONE[o.status] || "muted";
+          const statusLabel = t(STATUS_KEYS[o.status] || "orders.placed") || o.status;
           return (
             <article key={o.ID} className="card card-pad">
               <div
@@ -145,10 +166,10 @@ export default function Orders() {
                     </span>
                   </div>
                   <div style={{ fontSize: 12.5, color: "var(--ink-400)" }}>
-                    {new Date(o.created_at).toLocaleString()}
+                    {fmtOrderDate(o)}
                   </div>
                 </div>
-                <span className={statusClass}>{t(STATUS_KEYS[o.status] || "orders.placed")}</span>
+                <span className={`kb-status kb-status-${statusTone}`}>{statusLabel}</span>
                 <div
                   style={{
                     fontFamily: "var(--heading)",
@@ -195,7 +216,7 @@ export default function Orders() {
 
               {isOpen && (
                 <div className="mt-16">
-                  <DeliveryTrack status={o.status} createdAt={o.created_at} />
+                  <DeliveryTrack status={o.status} createdAt={o.CreatedAt || o.created_at} />
                   <div className="stack gap-8 mt-16">
                     {(o.items || []).map((it) => (
                       <div

@@ -358,6 +358,8 @@
     "loading": "Loading…",
     "totalItems": "{{count}} item",
     "totalItemsPlural": "{{count}} items",
+    "sortFeatured": "Featured",
+    "sortPopular": "Most viewed",
     "sortNewest": "Newest",
     "sortPriceAsc": "Price ↑",
     "sortPriceDesc": "Price ↓",
@@ -919,6 +921,8 @@
   "footer": {
     "support": "Support",
     "shop": "Shop",
+    "shopAll": "Shop all plants",
+    "plantBoxes": "Plant boxes",
     "contact": "Get in touch",
     "rights": "All rights reserved",
     "aboutUs": "About us",

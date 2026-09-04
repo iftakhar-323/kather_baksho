@@ -4444,6 +4444,22 @@ body {
   border-color: var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  /* flex-wrap instead of a fixed 8-col grid so long option labels
+     ("All subcategories") are never clipped */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.filter-bar > .input,
+.filter-bar > .select { flex: 1 1 150px; min-width: 140px; }
+.filter-bar > .input[type="number"] { flex: 1 1 90px; min-width: 90px; max-width: 130px; }
+.filter-bar > .input:first-of-type { flex: 2 1 220px; }
+.filter-bar > .btn { flex: 0 0 auto; }
+@media (max-width: 560px) {
+  .filter-bar > .input,
+  .filter-bar > .select,
+  .filter-bar > .input[type="number"] { flex-basis: 100%; max-width: none; }
+  .filter-bar > .btn { flex: 1 1 auto; }
 }
 .kb-filter-chips {
   display: flex;
@@ -4926,3 +4942,35 @@ body {
 }
 .kb-cat-bar-track { flex: 1; height: 10px; background: var(--brand-50, #eef5ef); border-radius: 999px; overflow: hidden; }
 .kb-cat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--brand-400, #5f9a72), var(--brand-600, #2f6543)); }
+
+/* =====================================================================
+   REFRESH 2026 · status badges — one readable style for every state
+   (Orders used an undefined `.status status-Delivered` combo; several
+   other pages use lowercase `.status-cancelled` etc. that were never
+   defined → white text on a white card. This normalises all of them.)
+   ===================================================================== */
+.kb-status,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  color: #fff;
+  white-space: nowrap;
+  background: var(--ink-500);
+}
+.kb-status-ok,      .status-delivered,   .status-Delivered,
+.status-active,     .status-confirmed,   .status-completed   { background: var(--success); }
+.kb-status-info,    .status-processing,  .status-Processing,
+.status-Packed,     .status-paid,        .status-scheduled   { background: var(--info); }
+.kb-status-warn,    .status-pending,     .status-Pending,
+.status-placed                                               { background: var(--warning); color: #3a2a08; }
+.kb-status-accent,  .status-shipped,     .status-On\ the\ Way,
+.status-out                                                  { background: var(--accent-500); }
+.kb-status-danger,  .status-cancelled,   .status-Cancelled,
+.status-returned,   .status-refunded,    .status-rejected    { background: var(--danger); }
+.kb-status-muted,   .status-draft,       .status-closed      { background: var(--ink-400); }

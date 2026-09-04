@@ -48,6 +48,7 @@ function formFor(product, h) {
   const sub = String(product?.subcategory || "").toLowerCase();
   const cat = String(product?.category || "").toLowerCase();
   const name = String(product?.name || "").toLowerCase();
+  if (sub === "plant_box" || /\bbox\b/.test(name)) return "giftbox";
   if (/cact|succulent/.test(sub) || /cactus|aloe|echeveria|haworthia|jade/.test(name)) {
     return h % 2 ? "cactus" : "succulent";
   }
@@ -56,7 +57,13 @@ function formFor(product, h) {
   if (/snake|sansevieria|zz |bamboo|blade/.test(name)) return "blades";
   if (/palm|areca|fern/.test(name)) return "palm";
   if (/monstera|rubber|fiddle|calathea|maranta|anthurium|aglaonema/.test(name)) return "broadleaf";
-  if (cat === "care") return "care";
+  if (cat === "care" || /soil|fertiliz|compost|perlite|vermiculite|mix|meal|salt|neem|spray|oil|tonic|food|hormone|fungicide|insecticid/.test(sub + name)) {
+    if (/spray|oil|tonic|liquid|food|mist|fungicide|insecticid|transpirant|seal/.test(name)) return "care-bottle";
+    if (/soil|mix|compost|perlite|vermiculite|coir|meal|cake|earth|manure/.test(name)) return "care-bag";
+    if (/kit|box|set|bundle/.test(name)) return "care-box";
+    if (/powder|salt|strip|meter|test|hormone/.test(name)) return "care-tub";
+    return h % 2 ? "care-bottle" : "care-bag";
+  }
   if (cat === "decor") return h % 2 ? "pot-only" : "broadleaf";
   const forms = ["broadleaf", "blades", "bushy", "flowering", "succulent", "palm", "trailing"];
   return pick(forms, h);
@@ -170,11 +177,56 @@ function plantSvg(form, h, foliage) {
       return s;
     }
     case "care":
+    case "care-bottle": {
+      const capW = 40 + (h % 3) * 8;
       return `
-        <rect x="205" y="150" width="90" height="180" rx="14" fill="${foliage}"/>
-        <rect x="223" y="120" width="54" height="40" rx="8" fill="${f2}"/>
-        <rect x="215" y="200" width="70" height="70" rx="6" fill="#fff" fill-opacity="0.85"/>
-        <path d="M228 236 l14 14 l26 -30" stroke="${foliage}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+        <rect x="${250 - capW / 2}" y="118" width="${capW}" height="34" rx="6" fill="${f2}"/>
+        <rect x="234" y="150" width="32" height="26" fill="${f2}"/>
+        <path d="M198 176 Q198 200 210 214 L210 400 Q210 420 230 420 L270 420 Q290 420 290 400 L290 214 Q302 200 302 176 Z" fill="${foliage}"/>
+        <rect x="214" y="250" width="72" height="96" rx="6" fill="#fff" fill-opacity="0.9"/>
+        <line x1="226" y1="272" x2="274" y2="272" stroke="${foliage}" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"/>
+        <line x1="226" y1="292" x2="274" y2="292" stroke="${foliage}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+        <line x1="226" y1="312" x2="258" y2="312" stroke="${foliage}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>`;
+    }
+    case "care-bag": {
+      const lean = (h % 5) - 2;
+      return `
+        <path d="M170 180 L330 180 L316 200 L184 200 Z" fill="${f2}"/>
+        <path d="M182 200 L318 200 Q330 200 330 214 L${322 + lean} 418 Q320 440 296 440 L204 440 Q180 440 178 418 L${170 + lean} 214 Q170 200 182 200 Z" fill="${foliage}"/>
+        <rect x="206" y="252" width="88" height="104" rx="6" fill="#fff" fill-opacity="0.9"/>
+        <circle cx="250" cy="292" r="20" fill="${foliage}" fill-opacity="0.5"/>
+        <path d="M250 300 q-14 -22 0 -40 q14 18 0 40" fill="${foliage}" fill-opacity="0.6"/>`;
+    }
+    case "care-box": {
+      return `
+        <path d="M160 214 L250 180 L340 214 L250 250 Z" fill="${f2}"/>
+        <path d="M160 214 L250 250 L250 430 L160 392 Z" fill="${foliage}"/>
+        <path d="M340 214 L250 250 L250 430 L340 392 Z" fill="${foliage}" fill-opacity="0.82"/>
+        <path d="M250 250 L250 430 M205 232 L205 411" stroke="#000" stroke-opacity="0.08" stroke-width="4"/>
+        <rect x="196" y="300" width="70" height="54" rx="5" fill="#fff" fill-opacity="0.9" transform="skewY(11)"/>`;
+    }
+    case "care-tub": {
+      return `
+        <ellipse cx="250" cy="196" rx="76" ry="18" fill="${f2}"/>
+        <path d="M174 196 L174 388 Q174 410 250 410 Q326 410 326 388 L326 196" fill="${foliage}"/>
+        <ellipse cx="250" cy="196" rx="76" ry="18" fill="#000" fill-opacity="0.12"/>
+        <ellipse cx="250" cy="188" rx="64" ry="14" fill="${f2}"/>
+        <rect x="210" y="258" width="80" height="86" rx="6" fill="#fff" fill-opacity="0.9"/>`;
+    }
+    case "giftbox": {
+      const ribbon = pick(BLOOM_COLORS, h + 1);
+      const lidTilt = (h % 5) - 2;
+      return `
+        <rect x="162" y="230" width="176" height="180" rx="10" fill="${foliage}"/>
+        <rect x="162" y="230" width="176" height="180" rx="10" fill="#000" fill-opacity="0.05"/>
+        <rect x="150" y="${196 + lidTilt}" width="200" height="52" rx="10" fill="${f2}"/>
+        <rect x="234" y="196" width="32" height="214" fill="${ribbon}" fill-opacity="0.92"/>
+        <rect x="150" y="212" width="200" height="26" fill="${ribbon}" fill-opacity="0.92"/>
+        <path d="M250 196 Q218 150 196 176 Q188 200 250 208 Q312 200 304 176 Q282 150 250 196 Z" fill="${ribbon}"/>
+        <path d="M196 300 q-14 -30 4 -48 M214 300 q-6 -34 14 -46 M232 298 q4 -30 22 -34" stroke="#fff" stroke-opacity="0.35" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <circle cx="210" cy="264" r="12" fill="#fff" fill-opacity="0.25"/>
+        <circle cx="292" cy="286" r="10" fill="#fff" fill-opacity="0.22"/>`;
+    }
     case "pot-only":
       return "";
     case "bushy":
@@ -219,8 +271,8 @@ function buildSvg(product, variant = 0) {
 <ellipse cx="250" cy="474" rx="140" ry="20" fill="#000" fill-opacity="0.07"/>
 <g transform="translate(0 ${ty}) rotate(${rot} 250 320) scale(${scale.toFixed(3)}) translate(${(250 - 250 * scale).toFixed(1)} ${(320 - 320 * scale).toFixed(1)})">
 ${plantSvg(form, h, foliage)}
-${form === "care" ? "" : soil()}
-${form === "care" ? "" : potSvg(potColors, potStyle)}
+${form.startsWith("care") || form === "giftbox" ? "" : soil()}
+${form.startsWith("care") || form === "giftbox" ? "" : potSvg(potColors, potStyle)}
 </g>
 <text x="250" y="486" font-size="15" letter-spacing="5" text-anchor="middle"
  fill="#2f6543" fill-opacity="0.45" font-family="system-ui, sans-serif">KATHERBOX</text>

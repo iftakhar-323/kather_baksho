@@ -13,10 +13,10 @@ const emptyFilters = {
   indoor_outdoor: "",
   min_price: "",
   max_price: "",
-  sort: "newest",
+  sort: "featured",
 };
 
-export default function Home() {
+export default function Home({ slot = null }) {
   const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
@@ -173,6 +173,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Featured collections + social proof — injected by HomePage so the
+          hero always leads the page. */}
+      {slot}
 
       {/* ===== Gift recommender widget ===== */}
       <section id="gift-finder" className="card" style={{ marginBottom: 24, scrollMarginTop: 88 }}>
@@ -379,7 +383,9 @@ export default function Home() {
           }}
           style={{ padding: "6px 10px", fontSize: 13 }}
         >
+          <option value="featured">{t("home.sortFeatured")}</option>
           <option value="newest">{t("home.sortNewest")}</option>
+          <option value="popular">{t("home.sortPopular")}</option>
           <option value="price_asc">{t("home.sortPriceAsc")}</option>
           <option value="price_desc">{t("home.sortPriceDesc")}</option>
           <option value="name_asc">{t("home.sortNameAsc")}</option>

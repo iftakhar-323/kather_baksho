@@ -16,8 +16,10 @@ import Invoice from "../components/Invoice";
 
 function fmtDate(s) {
   if (!s) return "";
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
   try {
-    return new Date(s).toLocaleString("en-GB", {
+    return d.toLocaleString("en-GB", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -178,13 +180,13 @@ export default function OrderDetail({ order, onBack }) {
       </div>
       <p className="muted">
         {t("orderDetail.placedOn", {
-          date: fmtDate(order.created_at),
+          date: fmtDate((order.CreatedAt || order.created_at)),
           total: Number(order.total_price || 0).toLocaleString(),
         })}
       </p>
 
       <div className="mb-16 mt-16">
-        <DeliveryTrack status={order.status} createdAt={order.created_at} />
+        <DeliveryTrack status={order.status} createdAt={(order.CreatedAt || order.created_at)} />
       </div>
 
       <div className="card card-pad mb-16" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -378,7 +380,7 @@ export default function OrderDetail({ order, onBack }) {
               </strong>
               {ev.note && <p style={{ margin: "4px 0" }}>{ev.note}</p>}
               <div className="muted" style={{ fontSize: 12 }}>
-                {fmtDate(ev.created_at)}
+                {fmtDate((ev.CreatedAt || ev.created_at))}
               </div>
             </div>
           ))}

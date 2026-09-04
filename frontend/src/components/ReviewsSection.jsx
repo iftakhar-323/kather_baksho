@@ -270,7 +270,7 @@ export default function ReviewsSection({ productId }) {
         ) : (
           reviews.map((r) => (
             <div
-              key={r.id}
+              key={r.ID ?? r.id}
               style={{ padding: "12px 0", borderBottom: "1px solid var(--brand-100)" }}
             >
               <div className="row" style={{ alignItems: "center", gap: 10 }}>
@@ -278,7 +278,7 @@ export default function ReviewsSection({ productId }) {
                 <span style={{ fontWeight: 600 }}>{r.user_name || "Customer"}</span>
                 <Stars value={r.rating} readOnly size={16} />
                 <span className="muted" style={{ fontSize: 12 }}>
-                  {fmtDate(r.created_at)}
+                  {fmtDate(r.created_at || r.CreatedAt)}
                 </span>
               </div>
               {r.comment && (

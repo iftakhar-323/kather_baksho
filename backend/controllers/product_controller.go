@@ -89,11 +89,14 @@ func GetProducts(c *gin.Context) {
 	case "name_asc":
 		q = q.Order("name asc")
 	case "popular":
-		q = q.Order("view_count desc")
+		q = q.Order("view_count desc, id desc")
 	case "newest":
 		q = q.Order("id desc")
 	default:
-		q = q.Order("id desc")
+		// "featured": a stable pseudo-random order so page 1 shows a varied
+		// mix of plants / decor / care instead of whichever category was
+		// seeded last. Deterministic, so pagination stays consistent.
+		q = q.Order("(id * 1103515245 + 12345) % 2147483647")
 	}
 
 	// pagination (defaults: page=1, limit=24, capped at 100)

@@ -357,6 +357,8 @@
     "loading": "লোড হচ্ছে…",
     "totalItems": "{{count}}টি আইটেম",
     "totalItemsPlural": "{{count}}টি আইটেম",
+    "sortFeatured": "ফিচার্ড",
+    "sortPopular": "জনপ্রিয়",
     "sortNewest": "নতুন",
     "sortPriceAsc": "দাম ↑",
     "sortPriceDesc": "দাম ↓",
@@ -918,6 +920,8 @@
   "footer": {
     "support": "সহায়তা",
     "shop": "দোকান",
+    "shopAll": "সব গাছ দেখুন",
+    "plantBoxes": "প্ল্যান্ট বক্স",
     "contact": "যোগাযোগ",
     "rights": "সর্বস্বত্ব সংরক্ষিত",
     "aboutUs": "আমাদের সম্পর্কে",

@@ -184,8 +184,8 @@ function Footer() {
         <div className="footer-col">
           <h4>{t("footer.shop")}</h4>
           <ul>
-            <li><Link to={linkTo("home")}>{t("nav.subscriptions")} — All plants</Link></li>
-            <li><Link to={linkTo("subscriptions")}>{t("nav.subscriptions")}</Link></li>
+            <li><Link to={linkTo("home")}>{t("footer.shopAll") || "Shop all plants"}</Link></li>
+            <li><Link to={linkTo("subscriptions")}>{t("footer.plantBoxes") || "Plant boxes"}</Link></li>
             <li><Link to={linkTo("consultations")}>{t("nav.consultations")}</Link></li>
             <li><Link to={linkTo("corporate")}>{t("nav.corpPortal")}</Link></li>
           </ul>
@@ -509,15 +509,17 @@ function Navbar() {
 // ────────────────────────────────────────────────────────────────────────────
 function HomePage({ onQuickView, isAdmin }) {
   return isAdmin ? (
-    <>
-      <FeaturedCollections onQuickView={onQuickView} />
-      <Home />
-    </>
+    <Home slot={<FeaturedCollections onQuickView={onQuickView} />} />
   ) : (
     <>
-      <FeaturedCollections onQuickView={onQuickView} />
-      <StatsCounter />
-      <Home />
+      <Home
+        slot={
+          <>
+            <FeaturedCollections onQuickView={onQuickView} />
+            <StatsCounter />
+          </>
+        }
+      />
       <RecentlyViewed />
     </>
   );

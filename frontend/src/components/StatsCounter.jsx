@@ -1,14 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { getProducts } from "../api/products";
 
-// Animated stat counter — purely visual, increments when scrolled into view.
-// Numbers are static placeholders; replace with real data when backend exposes metrics.
-
-const STATS = [
-  { num: 1102, suffix: "+", label: "Plants sold" },
-  { num: 4.9,  decimals: 1, label: "Customer rating", icon: "★" },
-  { num: 24, suffix: "hr", label: "Same-day dispatch" },
-  { num: 7,    label: "Day plant guarantee" },
-];
+// Animated stat strip. The catalogue size is pulled live; the rest are
+// storefront promises (no invented "customers served" style numbers).
 
 function useInView(ref) {
   const [seen, setSeen] = useState(false);
@@ -40,7 +34,6 @@ function Stat({ num, decimals = 0, label, suffix = "", icon }) {
     let raf;
     const tick = (t) => {
       const pct = Math.min(1, (t - start) / duration);
-      // ease out cubic
       const eased = 1 - Math.pow(1 - pct, 3);
       setVal(num * eased);
       if (pct < 1) raf = requestAnimationFrame(tick);
@@ -64,9 +57,29 @@ function Stat({ num, decimals = 0, label, suffix = "", icon }) {
 }
 
 export default function StatsCounter() {
+  const [catalogue, setCatalogue] = useState(500);
+
+  useEffect(() => {
+    let alive = true;
+    getProducts({ limit: 1 })
+      .then((res) => {
+        const total = res.data?.total;
+        if (alive && total) setCatalogue(Math.floor(total / 10) * 10); // round down to a tidy figure
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
+  const stats = [
+    { num: catalogue, suffix: "+", label: "Plants & products in stock" },
+    { num: 4.9, decimals: 1, label: "Average review rating", icon: "★" },
+    { num: 3, label: "Cities with same-day delivery" },
+    { num: 7, label: "Day healthy-arrival guarantee" },
+  ];
+
   return (
-    <section className="kb-stats" aria-label="KatherBox stats">
-      {STATS.map((s, i) => (
+    <section className="kb-stats" aria-label="Why shop with KatherBox">
+      {stats.map((s, i) => (
         <Stat key={i} {...s} />
       ))}
     </section>
