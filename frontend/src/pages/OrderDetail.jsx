@@ -144,7 +144,7 @@ export default function OrderDetail({ order, onBack }) {
 
   if (showInvoice) {
     return (
-      <div style={{ maxWidth: 880, margin: "0 auto" }}>
+      <div className="page-shell is-narrow">
         <button
           onClick={() => setShowInvoice(false)}
           className="btn btn-ghost mb-16 no-print"
@@ -157,7 +157,7 @@ export default function OrderDetail({ order, onBack }) {
   }
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div className="page-shell is-narrow">
       <Breadcrumbs
         items={[
           { label: t("nav.shop"), to: "/" },
@@ -169,11 +169,10 @@ export default function OrderDetail({ order, onBack }) {
         {t("orderDetail.backToOrders")}
       </button>
 
-      <div
-        className="row gap-8"
-        style={{ alignItems: "center", flexWrap: "wrap" }}
-      >
-        <h1 style={{ margin: 0 }}>{t("orderDetail.orderId", { id: order.id || order.ID })}</h1>
+      <div className="row gap-8 row-wrap order-detail-title">
+        <h1 className="mt-0" style={{ marginBottom: 0 }}>
+          {t("orderDetail.orderId", { id: order.id || order.ID })}
+        </h1>
         <span className={"tag " + statusColor}>
           {statusLabelKey ? t(statusLabelKey) : order.status}
         </span>
@@ -189,7 +188,7 @@ export default function OrderDetail({ order, onBack }) {
         <DeliveryTrack status={order.status} createdAt={(order.CreatedAt || order.created_at)} />
       </div>
 
-      <div className="card card-pad mb-16" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="card card-pad mb-16 row row-wrap od-payment-row">
         <div>
           <span className="field-label">Payment Method</span>
           <span className={`pay-pill pay-pill-${order.payment_method || 'cod'}`}>
@@ -203,7 +202,7 @@ export default function OrderDetail({ order, onBack }) {
         {order.transaction_id && (
           <div>
             <span className="field-label">Transaction ID</span>
-            <strong style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{order.transaction_id}</strong>
+            <strong className="od-txn-id">{order.transaction_id}</strong>
           </div>
         )}
       </div>
@@ -211,14 +210,14 @@ export default function OrderDetail({ order, onBack }) {
       {(order.shipping_address || order.shipping_name) && (
         <div className="card card-pad mb-16">
           <span className="field-label">{t("orderDetail.shipTo")}</span>
-          <div style={{ marginTop: 4, lineHeight: 1.5 }}>
+          <div className="od-ship-to">
             {order.shipping_name && <strong>{order.shipping_name}</strong>}
             {order.shipping_phone && (
               <span className="muted"> · {order.shipping_phone}</span>
             )}
             {order.shipping_address && <div>{order.shipping_address}</div>}
             {order.delivery_note && (
-              <div className="muted" style={{ fontSize: 13 }}>
+              <div className="muted od-delivery-note">
                 {t("orderDetail.deliveryNote")}: {order.delivery_note}
               </div>
             )}
@@ -226,7 +225,7 @@ export default function OrderDetail({ order, onBack }) {
         </div>
       )}
 
-      <div className="row gap-8 mb-16" style={{ flexWrap: "wrap" }}>
+      <div className="row gap-8 mb-16 row-wrap">
         <button className="btn btn-primary btn-sm" onClick={() => setShowInvoice(true)}>
           🧾 {t("orderDetail.viewInvoice")}
         </button>
@@ -275,13 +274,12 @@ export default function OrderDetail({ order, onBack }) {
             {t("orderDetail.detailsLabel")}
           </label>
           <textarea
-            className="input"
+            className="textarea"
             rows={3}
             value={details}
             onChange={(e) => setDetails(e.target.value)}
-            style={{ resize: "vertical" }}
           />
-          <div className="row mt-8" style={{ gap: 8 }}>
+          <div className="row mt-8 gap-8">
             <button className="btn btn-primary" disabled={busy}>
               {busy ? t("orderDetail.sending") : t("orderDetail.submit")}
             </button>
@@ -297,11 +295,8 @@ export default function OrderDetail({ order, onBack }) {
       )}
 
       {est && (
-        <div
-          className="card card-pad-lg mb-16"
-          style={{ background: "var(--brand-50)" }}
-        >
-          <h3 style={{ marginTop: 0 }}>{t("orderDetail.estTitle")}</h3>
+        <div className="card card-pad-lg mb-16 od-est">
+          <h3 className="mt-0">{t("orderDetail.estTitle")}</h3>
           {est.status === "delivered" ? (
             <p>
               {t("orderDetail.estDelivered", {
@@ -312,13 +307,13 @@ export default function OrderDetail({ order, onBack }) {
             <p>{t("orderDetail.estCancelled")}</p>
           ) : (
             <>
-              <p style={{ margin: "4px 0" }}>
+              <p className="od-est-line">
                 {t("orderDetail.estBetween", {
                   earliest: est.earliest,
                   latest: est.latest,
                 })}
               </p>
-              <p className="muted" style={{ margin: 0, fontSize: 13 }}>
+              <p className="muted od-est-sub">
                 {est.shipped_at
                   ? t("orderDetail.estShipped", {
                       date: est.shipped_at,
@@ -328,14 +323,7 @@ export default function OrderDetail({ order, onBack }) {
                       days: est.business_days,
                     })}
               </p>
-              {est.note && (
-                <p
-                  className="muted"
-                  style={{ margin: "8px 0 0", fontSize: 12 }}
-                >
-                  {est.note}
-                </p>
-              )}
+              {est.note && <p className="muted od-est-note">{est.note}</p>}
             </>
           )}
         </div>
@@ -347,44 +335,22 @@ export default function OrderDetail({ order, onBack }) {
       ) : events.length === 0 ? (
         <p className="muted">{t("orderDetail.noEvents")}</p>
       ) : (
-        <div
-          style={{
-            borderLeft: "2px solid var(--brand-200)",
-            marginLeft: 12,
-            paddingLeft: 16,
-          }}
-        >
+        <ol className="timeline">
           {events.map((ev) => (
-            <div
-              key={ev.id}
-              style={{
-                position: "relative",
-                marginBottom: 16,
-                paddingLeft: 4,
-              }}
-            >
-              <span
-                style={{
-                  position: "absolute",
-                  left: -28,
-                  top: 0,
-                  width: 28,
-                  textAlign: "center",
-                  fontSize: 20,
-                }}
-              >
+            <li key={ev.id} className="timeline-item">
+              <span className="timeline-marker">
                 {TIMELINE_ICONS[ev.event] || "•"}
               </span>
-              <strong style={{ textTransform: "capitalize" }}>
+              <strong className="timeline-title">
                 {ev.event.replace(/_/g, " ")}
               </strong>
-              {ev.note && <p style={{ margin: "4px 0" }}>{ev.note}</p>}
-              <div className="muted" style={{ fontSize: 12 }}>
+              {ev.note && <p className="timeline-note">{ev.note}</p>}
+              <div className="muted timeline-date">
                 {fmtDate((ev.CreatedAt || ev.created_at))}
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </div>
   );

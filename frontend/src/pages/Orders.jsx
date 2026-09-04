@@ -8,6 +8,7 @@ import DeliveryTrack from "../components/DeliveryTrack";
 import { SkeletonCartList } from "../components/Skeleton";
 import { notifyCartChanged } from "../context/CartContext";
 import Invoice from "../components/Invoice";
+import PageHeader from "../components/PageHeader";
 
 const STATUS_KEYS = {
   "Pending": "orders.placed",
@@ -89,7 +90,7 @@ export default function Orders() {
 
   if (!user) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🔒</div>
         <h3>{t("orders.loginTitle")}</h3>
         <p>{t("orders.loginBody")}</p>
@@ -98,8 +99,8 @@ export default function Orders() {
   }
   if (loading) {
     return (
-      <div style={{ maxWidth: 820, margin: "0 auto" }}>
-        <h2 className="mb-16">{t("orders.headerTitle")}</h2>
+      <div className="page-shell is-narrow">
+        <PageHeader title={t("orders.headerTitle")} />
         <SkeletonCartList count={4} />
       </div>
     );
@@ -108,14 +109,14 @@ export default function Orders() {
     return (
       <div className="empty">
         <div className="emoji">⚠️</div>
-        <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
+        <h3 className="text-danger">{error}</h3>
       </div>
     );
   }
 
   if (orders.length === 0) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">📭</div>
         <h3>{t("orders.emptyTitle")}</h3>
         <p>{t("orders.emptyBody")}</p>
@@ -131,7 +132,7 @@ export default function Orders() {
 
   if (invoiceOrder) {
     return (
-      <div style={{ maxWidth: 880, margin: "0 auto" }}>
+      <div className="page-shell is-narrow">
         <button
           className="btn btn-ghost mb-16 no-print"
           onClick={() => setInvoiceOrder(null)}
@@ -144,8 +145,8 @@ export default function Orders() {
   }
 
   return (
-    <div style={{ maxWidth: 820, margin: "0 auto" }}>
-      <h2 className="mb-16">{t("orders.headerTitle")}</h2>
+    <div className="page-shell is-narrow">
+      <PageHeader title={t("orders.headerTitle")} />
 
       <div className="stack gap-12">
         {orders.map((o) => {
@@ -154,34 +155,18 @@ export default function Orders() {
           const statusLabel = t(STATUS_KEYS[o.status] || "orders.placed") || o.status;
           return (
             <article key={o.ID} className="card card-pad">
-              <div
-                className="row"
-                style={{ flexWrap: "wrap", gap: 12, alignItems: "center" }}
-              >
-                <div style={{ flex: 1, minWidth: 180 }}>
-                  <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+              <div className="row row-wrap gap-12 order-row-head">
+                <div className="order-row-id">
+                  <div className="order-row-title">
                     {t("orders.orderId", { id: o.ID })}
                     <span className={`pay-pill pay-pill-${o.payment_method || 'cod'}`}>
                       {o.payment_method || 'cod'}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12.5, color: "var(--ink-400)" }}>
-                    {fmtOrderDate(o)}
-                  </div>
+                  <div className="order-row-date">{fmtOrderDate(o)}</div>
                 </div>
                 <span className={`kb-status kb-status-${statusTone}`}>{statusLabel}</span>
-                <div
-                  style={{
-                    fontFamily: "var(--heading)",
-                    fontWeight: 700,
-                    color: "var(--text-h)",
-                    fontSize: 18,
-                    minWidth: 90,
-                    textAlign: "right",
-                  }}
-                >
-                  ৳{o.total_price.toFixed(2)}
-                </div>
+                <div className="order-row-total">৳{o.total_price.toFixed(2)}</div>
                 <button
                   className="btn btn-secondary btn-sm"
                   onClick={() => setExpanded(isOpen ? null : o.ID)}
@@ -219,16 +204,7 @@ export default function Orders() {
                   <DeliveryTrack status={o.status} createdAt={o.CreatedAt || o.created_at} />
                   <div className="stack gap-8 mt-16">
                     {(o.items || []).map((it) => (
-                      <div
-                        key={it.ID}
-                        className="row"
-                        style={{
-                          justifyContent: "space-between",
-                          fontSize: 14,
-                          padding: "8px 0",
-                          borderTop: "1px solid var(--neutral-100)",
-                        }}
-                      >
+                      <div key={it.ID} className="row row-between order-item-line">
                         <span>
                           {emojiFor(it.product?.category)}{" "}
                           {it.product?.name || t("orders.productFallback", { id: it.product_id })}

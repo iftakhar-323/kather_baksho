@@ -83,7 +83,7 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🔒</div>
         <h3>Please log in</h3>
         <p>Sign in to view your dashboard.</p>
