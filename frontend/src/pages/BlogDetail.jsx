@@ -6,15 +6,9 @@ import { useTranslation } from "../i18n/I18nProvider";
 
 function fmtDate(s) {
   if (!s) return "";
-  try {
-    return new Date(s).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return "";
-  }
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
 export default function BlogDetail({ slug, onBack }) {
@@ -91,7 +85,7 @@ export default function BlogDetail({ slug, onBack }) {
       )}
       <h1 style={{ marginTop: 8 }}>{post.title}</h1>
       <div className="row muted" style={{ gap: 8, margin: "8px 0 24px" }}>
-        <span>{fmtDate(post.published_at || post.created_at)}</span>
+        <span>{fmtDate(post.published_at || post.CreatedAt || post.created_at)}</span>
         <span>·</span>
         <span>{t("blog.minRead", { n: post.read_min || 3 })}</span>
         {post.author_name && (

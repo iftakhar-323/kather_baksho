@@ -1,27 +1,29 @@
 import API from "./axios";
 
-// GET /api/blog?category=&search=&page=1
+// GET /api/blog?category=&search=&page=1  → { posts, page, pages }
 export const getBlogPosts = (params = {}) => API.get("/blog", { params });
 
-// GET /api/blog/post/:slug
-export const getBlogPost = (slug) => API.get(`/blog/post/${slug}`);
+// GET /api/blog/:slug
+export const getBlogPost = (slug) => API.get(`/blog/${slug}`);
 
 // POST /api/blog  (admin)
 export const createBlogPost = (payload) => API.post("/blog", payload);
 
-// PUT /api/blog/:id  (admin)
-export const updateBlogPost = (id, payload) => API.put(`/blog/${id}`, payload);
+// DELETE /api/blog/by-id/:id  (admin)
+export const deleteBlogPost = (id) => API.delete(`/blog/by-id/${id}`);
 
-// DELETE /api/blog/:id  (admin)
-export const deleteBlogPost = (id) => API.delete(`/blog/${id}`);
+// The backend has no blog-comment endpoint yet.
+export const addBlogComment = () =>
+  Promise.reject(new Error("Comments are coming soon."));
 
-// GET /api/blog/categories
-export const getBlogCategories = () => API.get("/blog/categories");
-
-// POST /api/blog/categories  (admin)
-export const createBlogCategory = (payload) =>
-  API.post("/blog/categories", payload);
-
-// POST /api/blog/:id/comments
-export const addBlogComment = (postId, payload) =>
-  API.post(`/blog/${postId}/comments`, payload);
+// The backend has no categories endpoint — derive the list from the posts.
+export const getBlogCategories = async () => {
+  const { data } = await API.get("/blog", { params: { page_size: 100 } });
+  const posts = Array.isArray(data) ? data : data?.posts || data?.items || [];
+  const seen = new Map();
+  for (const p of posts) {
+    const c = (p.category || "").trim();
+    if (c && !seen.has(c.toLowerCase())) seen.set(c.toLowerCase(), { slug: c, name: c });
+  }
+  return { data: { categories: [...seen.values()] } };
+};

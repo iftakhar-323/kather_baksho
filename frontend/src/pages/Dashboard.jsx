@@ -48,12 +48,13 @@ export default function Dashboard() {
         ? (ordersRes.value.data?.orders || ordersRes.value.data || [])
         : [];
       const totalSpent = orders.reduce((s, o) => s + (o.total_price || 0), 0);
-      const pending = orders.filter(o => o.status !== "delivered" && o.status !== "cancelled").length;
+      const st = (o) => String(o.status || "").toLowerCase();
+      const isDone = (o) => st(o) === "delivered" || st(o) === "cancelled" || st(o) === "returned" || st(o) === "refunded";
       setStats({
         totalOrders: orders.length,
         totalSpent,
-        pendingDeliveries: pending,
-        delivered: orders.filter(o => o.status === "delivered").length,
+        pendingDeliveries: orders.filter(o => !isDone(o)).length,
+        delivered: orders.filter(o => st(o) === "delivered").length,
       });
       setRecentOrders(orders.slice(0, 5));
 
@@ -66,11 +67,14 @@ export default function Dashboard() {
       // Loyalty
       const me = meRes.status === "fulfilled" ? meRes.value.data : {};
       const tier = tierRes.status === "fulfilled" ? tierRes.value.data : {};
+      const nextName = tier.next_tier?.name || tier.next_tier || "";
+      const need = tier.next_tier?.need_spend ?? 0;
+      const atTop = !nextName || nextName === tier.tier || need <= 0;
       setLoyalty({
-        points: me.points || 0,
+        points: tier.points ?? me.points ?? 0,
         tier: tier.tier || "Green Sprout",
-        nextTier: tier.next_tier?.name || tier.next_tier || "Growing Leaf",
-        progress: tier.progress || 0,
+        nextTier: atTop ? null : nextName,
+        progress: atTop ? 100 : Math.min(100, Math.round(((tier.total_spend || 0) / (tier.total_spend + need || 1)) * 100)),
       });
 
       setLoading(false);
@@ -225,7 +229,7 @@ export default function Dashboard() {
               <div>
                 <div className="dash-tier-name">{loyalty?.tier}</div>
                 <div className="dash-tier-next">
-                  Next: {loyalty?.nextTier}
+                  {loyalty?.nextTier ? `Next: ${loyalty.nextTier}` : "Top tier reached 🎉"}
                 </div>
               </div>
             </div>
@@ -239,9 +243,11 @@ export default function Dashboard() {
                 style={{ width: `${Math.min(100, loyalty?.progress || 0)}%` }}
               />
             </div>
-            <div className="dash-progress-label">
-              {Math.round(loyalty?.progress || 0)}% to {loyalty?.nextTier}
-            </div>
+            {loyalty?.nextTier && (
+              <div className="dash-progress-label">
+                {Math.round(loyalty?.progress || 0)}% to {loyalty.nextTier}
+              </div>
+            )}
           </div>
 
           {/* Active Subscriptions */}

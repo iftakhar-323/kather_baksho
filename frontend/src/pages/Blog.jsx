@@ -3,6 +3,11 @@ import { getBlogPosts, getBlogCategories } from "../api/blog";
 import { useTranslation } from "../i18n/I18nProvider";
 // real names used; backend returns { posts, total, page }
 
+function prettyCat(c) {
+  const s = String(c || "").replace(/[_-]+/g, " ").trim();
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
 function fmtDate(s) {
   if (!s) return "";
   try {
@@ -83,7 +88,7 @@ export default function Blog() {
         </button>
         {cats.map((c) => (
           <button
-            key={c.id || c.slug}
+            key={c.slug || c.id || c.name}
             className={
               "btn btn-sm " + (cat === (c.slug || c.id) ? "btn-primary" : "btn-secondary")
             }
@@ -92,7 +97,7 @@ export default function Blog() {
               setPage(1);
             }}
           >
-            {c.name}
+            {prettyCat(c.name || c.slug)}
           </button>
         ))}
       </div>
@@ -118,10 +123,10 @@ export default function Blog() {
         >
           {posts.map((p) => (
             <article
-              key={p.id}
+              key={p.ID || p.id || p.slug}
               className="card"
               style={{ overflow: "hidden", cursor: "pointer" }}
-              onClick={() => window.__katherboxSetView?.(`blog-${p.slug || p.id}`)}
+              onClick={() => window.__katherboxSetView?.(`blog-${p.slug || p.ID || p.id}`)}
             >
               <div
                 style={{
@@ -134,11 +139,20 @@ export default function Blog() {
                   fontSize: 56,
                 }}
               >
-                {p.cover_emoji || "🌿"}
+                {p.cover_url ? (
+                  <img
+                    src={p.cover_url}
+                    alt=""
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    onError={(e) => { e.currentTarget.style.display = "none"; }}
+                  />
+                ) : (
+                  p.cover_emoji || "🌿"
+                )}
               </div>
               <div style={{ padding: 16 }}>
-                {p.category_name && (
-                  <span className="tag tag-leaf">{p.category_name}</span>
+                {(p.category_name || p.category) && (
+                  <span className="tag tag-leaf">{prettyCat(p.category_name || p.category)}</span>
                 )}
                 <h3 style={{ margin: "8px 0" }}>{p.title}</h3>
                 <p

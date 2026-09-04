@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import {
   getMyLoyalty,
-  getAchievements,
+  getMyAchievements,
   claimAchievement,
   getRewards,
   redeemReward,
   getReferralCode,
+  getMyReferrals,
   applyReferral,
 } from "../api/loyalty";
+
+const asArray = (d) =>
+  Array.isArray(d) ? d : d?.achievements || d?.rewards || d?.items || [];
 // aliases intentionally omitted — using real names above
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
@@ -23,6 +27,7 @@ export default function Loyalty() {
   const [achievements, setAchievements] = useState([]);
   const [rewards, setRewards] = useState([]);
   const [referral, setReferral] = useState(null);
+  const [referralCount, setReferralCount] = useState(0);
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -30,9 +35,10 @@ export default function Loyalty() {
     getMyLoyalty()
       .then((r) => setMe(r.data))
       .catch(() => {});
-    getAchievements().then((r) => setAchievements(r.data?.achievements || r.data?.items || []));
-    getRewards().then((r) => setRewards(r.data?.rewards || r.data?.items || []));
+    getMyAchievements().then((r) => setAchievements(asArray(r.data))).catch(() => setAchievements([]));
+    getRewards().then((r) => setRewards(asArray(r.data))).catch(() => setRewards([]));
     getReferralCode().then((r) => setReferral(r.data)).catch(() => {});
+    getMyReferrals().then((r) => setReferralCount(asArray(r.data).length)).catch(() => {});
   };
 
   useEffect(() => {
@@ -129,7 +135,7 @@ export default function Loyalty() {
         </div>
         <div>
           <div className="muted">{t("loyalty.referralsLabel")}</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{fmt(me.referrals)}</div>
+          <div style={{ fontSize: 28, fontWeight: 700 }}>{fmt(referralCount)}</div>
         </div>
       </div>
 

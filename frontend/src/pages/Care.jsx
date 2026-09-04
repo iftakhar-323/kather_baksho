@@ -58,9 +58,11 @@ export default function Care() {
       getCareCalendar(month),
     ])
       .then(([j, s, c]) => {
-        setJournal(j.data?.journal || j.data?.items || []);
-        setSchedules(s.data?.schedules || s.data?.items || []);
-        setCalendar(c.data?.calendar || c.data?.items || []);
+        const arr = (d, ...keys) =>
+          Array.isArray(d) ? d : keys.map((k) => d?.[k]).find(Array.isArray) || [];
+        setJournal(arr(j.data, "journal", "items"));
+        setSchedules(arr(s.data, "schedules", "items"));
+        setCalendar(arr(c.data, "calendar", "items"));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -71,7 +73,7 @@ export default function Care() {
 
   useEffect(() => {
     getCareCalendar(month)
-      .then((r) => setCalendar(r.data?.calendar || r.data?.items || []))
+      .then((r) => setCalendar(Array.isArray(r.data) ? r.data : r.data?.calendar || r.data?.items || []))
       .catch(() => {});
   }, [month]);
 
