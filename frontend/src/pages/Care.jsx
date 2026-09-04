@@ -11,6 +11,8 @@ import {
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import Reminders from "./Reminders";
+import PageHeader from "../components/PageHeader";
+import Segmented from "../components/Segmented";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -142,51 +144,35 @@ export default function Care() {
   };
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("care.dashboard.heading")}</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        {t("care.dashboard.subhead")}
-      </p>
+    <div className="page-shell is-wide">
+      <PageHeader
+        title={t("care.dashboard.heading")}
+        sub={t("care.dashboard.subhead")}
+      />
 
-      <div className="row gap-8" style={{ marginBottom: 16 }}>
-        <button
-          className={"btn btn-sm " + (tab === "dashboard" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("dashboard")}
-        >
-          {t("care.dashboard.tabCalendar")}
-        </button>
-        <button
-          className={"btn btn-sm " + (tab === "journal" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("journal")}
-        >
-          {t("care.dashboard.tabJournal")}
-        </button>
-        <button
-          className={"btn btn-sm " + (tab === "schedules" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("schedules")}
-        >
-          {t("care.dashboard.tabSchedules")}
-        </button>
-        <button
-          className={"btn btn-sm " + (tab === "reminders" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("reminders")}
-        >
-          {t("reminders.head")}
-        </button>
-      </div>
+      <Segmented
+        className="mb-16"
+        value={tab}
+        onChange={setTab}
+        options={[
+          { value: "dashboard", label: t("care.dashboard.tabCalendar") },
+          { value: "journal", label: t("care.dashboard.tabJournal") },
+          { value: "schedules", label: t("care.dashboard.tabSchedules") },
+          { value: "reminders", label: t("reminders.head") },
+        ]}
+      />
 
       {tab === "reminders" && <Reminders embedded />}
 
       {tab === "dashboard" && (
         <div>
-          <div className="row mb-16" style={{ gap: 8 }}>
+          <div className="row mb-16 gap-8 row-wrap">
             <label className="muted">{t("care.dashboard.month")}</label>
             <input
               type="month"
-              className="input"
+              className="input care-month-input"
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              style={{ width: 180 }}
             />
             <span className="spacer" />
             <span className="muted">
@@ -199,15 +185,9 @@ export default function Care() {
                   })}
             </span>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-              gap: 12,
-            }}
-          >
+          <div className="card-grid is-tight">
             {(calendar || []).length === 0 && (
-              <div className="empty" style={{ gridColumn: "1/-1" }}>
+              <div className="empty care-empty-span">
                 <div className="emoji">🌤</div>
                 <h3>{t("care.dashboard.noTasksHeading")}</h3>
                 <p className="muted">{t("care.dashboard.noTasksBody")}</p>
@@ -218,17 +198,17 @@ export default function Care() {
               return (
                 <div key={i} className="card card-pad">
                   <div className="row">
-                    <span style={{ fontSize: 28 }}>{label.split(" ")[0]}</span>
+                    <span className="entry-card-emoji">{label.split(" ")[0]}</span>
                     <span className="spacer" />
                     <span className="muted">{fmtDate(c.due_date)}</span>
                   </div>
-                  <h4 style={{ margin: "8px 0 4px" }}>
+                  <h4 className="care-task-name">
                     {c.product_name ||
                       t("care.dashboard.productFallback", { id: c.product_id })}
                   </h4>
                   <span className="tag tag-leaf">{label}</span>
                   {c.done && (
-                    <span className="tag tag-success" style={{ marginLeft: 6 }}>
+                    <span className="tag tag-success care-done-tag">
                       {t("care.dashboard.done")}
                     </span>
                   )}
@@ -240,13 +220,9 @@ export default function Care() {
       )}
 
       {tab === "journal" && (
-        <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-          <form
-            onSubmit={onAddJournal}
-            className="card card-pad-lg"
-            style={{ flex: 1, minWidth: 280 }}
-          >
-            <h3 style={{ marginTop: 0 }}>{t("care.journal.formTitle")}</h3>
+        <div className="split-pane">
+          <form onSubmit={onAddJournal} className="card card-pad-lg pane-form">
+            <h3 className="mt-0">{t("care.journal.formTitle")}</h3>
             <label className="field-label">{t("care.journal.productId")}</label>
             <input
               className="input"
@@ -257,16 +233,15 @@ export default function Care() {
             />
             <label className="field-label mt-8">{t("care.journal.note")}</label>
             <textarea
-              className="input"
+              className="textarea"
               rows={3}
               value={jNote}
               onChange={(e) => setJNote(e.target.value)}
               placeholder={t("care.journal.notePlaceholder")}
               required
-              style={{ resize: "vertical" }}
             />
-            <div className="row mt-8" style={{ gap: 8 }}>
-              <div style={{ flex: 1 }}>
+            <div className="row mt-8 gap-8">
+              <div className="care-half">
                 <label className="field-label">{t("care.journal.emoji")}</label>
                 <input
                   className="input"
@@ -275,7 +250,7 @@ export default function Care() {
                   maxLength={4}
                 />
               </div>
-              <div style={{ flex: 1 }}>
+              <div className="care-half">
                 <label className="field-label">{t("care.journal.heightCm")}</label>
                 <input
                   className="input"
@@ -290,7 +265,7 @@ export default function Care() {
             </button>
           </form>
 
-          <div style={{ flex: 2, minWidth: 0 }}>
+          <div className="pane-list">
             {loading ? (
               <div className="empty">
                 <div className="emoji">⏳</div>
@@ -304,21 +279,17 @@ export default function Care() {
             ) : (
               <div>
                 {journal.map((j) => (
-                  <div
-                    key={j.id}
-                    className="card card-pad"
-                    style={{ marginBottom: 8 }}
-                  >
+                  <div key={j.id} className="card card-pad entry-card">
                     <div className="row">
-                      <span style={{ fontSize: 32 }}>{j.photo_emoji || "🌿"}</span>
-                      <div style={{ flex: 1, marginLeft: 12 }}>
+                      <span className="entry-card-emoji is-lg">{j.photo_emoji || "🌿"}</span>
+                      <div className="entry-card-main">
                         <strong>
                           {j.product_name ||
                             t("care.dashboard.productFallback", {
                               id: j.product_id,
                             })}
                         </strong>
-                        <div className="muted" style={{ fontSize: 12 }}>
+                        <div className="muted entry-card-meta">
                           {fmtDate(j.created_at)}
                           {j.height_cm
                             ? " · " +
@@ -335,7 +306,7 @@ export default function Care() {
                         🗑
                       </button>
                     </div>
-                    <p style={{ margin: "8px 0 0" }}>{j.note}</p>
+                    <p className="entry-card-note">{j.note}</p>
                   </div>
                 ))}
               </div>
@@ -345,13 +316,9 @@ export default function Care() {
       )}
 
       {tab === "schedules" && (
-        <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-          <form
-            onSubmit={onAddSchedule}
-            className="card card-pad-lg"
-            style={{ flex: 1, minWidth: 280 }}
-          >
-            <h3 style={{ marginTop: 0 }}>{t("care.schedules.formTitle")}</h3>
+        <div className="split-pane">
+          <form onSubmit={onAddSchedule} className="card card-pad-lg pane-form">
+            <h3 className="mt-0">{t("care.schedules.formTitle")}</h3>
             <label className="field-label">{t("care.schedules.productId")}</label>
             <input
               className="input"
@@ -362,7 +329,7 @@ export default function Care() {
             />
             <label className="field-label mt-8">{t("care.schedules.task")}</label>
             <select
-              className="input"
+              className="select"
               value={sType}
               onChange={(e) => setSType(e.target.value)}
             >
@@ -387,7 +354,7 @@ export default function Care() {
             </button>
           </form>
 
-          <div style={{ flex: 2, minWidth: 0 }}>
+          <div className="pane-list">
             {schedules.length === 0 ? (
               <div className="empty">
                 <div className="emoji">⏰</div>
@@ -398,21 +365,17 @@ export default function Care() {
                 {schedules.map((s) => {
                   const label = taskLabel(s.task_type);
                   return (
-                    <div
-                      key={s.id}
-                      className="card card-pad"
-                      style={{ marginBottom: 8 }}
-                    >
+                    <div key={s.id} className="card card-pad entry-card">
                       <div className="row">
-                        <span style={{ fontSize: 28 }}>{label.split(" ")[0]}</span>
-                        <div style={{ flex: 1, marginLeft: 12 }}>
+                        <span className="entry-card-emoji">{label.split(" ")[0]}</span>
+                        <div className="entry-card-main">
                           <strong>
                             {s.product_name ||
                               t("care.dashboard.productFallback", {
                                 id: s.product_id,
                               })}
                           </strong>
-                          <div className="muted" style={{ fontSize: 12 }}>
+                          <div className="muted entry-card-meta">
                             {s.interval_days === 1
                               ? t("care.schedules.everyDay", { n: s.interval_days })
                               : t("care.schedules.everyDays", { n: s.interval_days })}{" "}

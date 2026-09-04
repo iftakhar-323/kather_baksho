@@ -1052,6 +1052,32 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 .qa-product-input { width: 200px; }
 .qa-tags-input { flex: 1; min-width: 160px; }
 .qa-rank-col { width: 60px; }
+.qa-detail-col .qa-detail { position: sticky; }
+
+/* Two-pane layout: a form column beside a scrolling list column */
+.split-pane {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.split-pane .pane-form { flex: 1; min-width: 280px; }
+.split-pane .pane-list { flex: 2; min-width: 0; }
+
+/* Compact record card in a list (journal entry, schedule, …) */
+.entry-card { margin-bottom: 8px; }
+.entry-card-emoji { font-size: 28px; }
+.entry-card-emoji.is-lg { font-size: 32px; }
+.entry-card-main { flex: 1; margin-left: 12px; min-width: 0; }
+.entry-card-meta { font-size: 12px; }
+.entry-card-note { margin: 8px 0 0; }
+
+/* Care page */
+.care-month-input { width: 180px; }
+.care-empty-span { grid-column: 1 / -1; }
+.care-task-name { margin: 8px 0 4px; }
+.care-done-tag { margin-left: 6px; }
+.care-half { flex: 1; }
 .qa-mini-lb-row { padding: 6px 0; }
 .qa-mini-lb-rank { width: 24px; font-weight: 700; }
 .qa-mini-lb-name { flex: 1; }
