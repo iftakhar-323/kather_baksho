@@ -887,6 +887,9 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
   color: var(--text-h);
 }
 .mt-0 { margin-top: 0; }
+.row-end { justify-content: flex-end; }
+.row-between { justify-content: space-between; }
+.row-wrap { flex-wrap: wrap; }
 
 /* Loyalty page */
 .loyalty-card-icon { font-size: 28px; }
@@ -923,6 +926,53 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 .gc-card-meta { font-size: 13px; margin-top: 4px; }
 .gc-amounts { flex-wrap: wrap; margin-bottom: 10px; }
 .gc-amount-input { max-width: 200px; }
+
+/* Flush list of rows inside a single card (bookings, subscriptions, …) */
+.list-flush {
+  padding: 0;
+  overflow: hidden;
+}
+.list-flush .list-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.list-flush .list-row:last-child { border-bottom: none; }
+.list-flush .list-row:hover { background: var(--surface-2); }
+.list-row-main { flex: 1; min-width: 0; }
+.list-row-title { font-weight: 600; color: var(--text-h); }
+.list-row-sub { font-size: 13px; color: var(--ink-400); }
+.list-row-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  background: var(--brand-50);
+  flex-shrink: 0;
+}
+[data-theme="dark"] .list-row-icon { background: var(--surface-2); }
+.list-row-icon.is-alert { background: var(--danger-50); }
+[data-theme="dark"] .list-row-icon.is-alert { background: rgba(255, 107, 107, 0.12); }
+.list-row-when {
+  font-size: 13px;
+  color: var(--ink-400);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Consultations page */
+.consult-expert-emoji { font-size: 48px; }
+.consult-rate-note { font-size: 13px; }
+
+/* Seasonal page */
+.tabs.is-wrap { flex-wrap: wrap; }
+.seasonal-tile-icon { font-size: 28px; margin-bottom: 6px; }
+.seasonal-tile-name { margin: 6px 0; font-size: 1rem; }
+.seasonal-tile-why { font-size: 13px; }
 
 /* Auth (login / register) */
 .auth-card {
@@ -2309,6 +2359,7 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
   margin: 0 auto;
   padding-bottom: 80px;
 }
+.cart-page.is-narrow { max-width: 920px; }
 
 .cart-header {
   display: flex;

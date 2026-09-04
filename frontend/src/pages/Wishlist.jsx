@@ -58,7 +58,7 @@ export default function Wishlist() {
 
   if (!user) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🔒</div>
         <h3>{t("wishlist.loginTitle")}</h3>
         <p>{t("wishlist.loginBody")}</p>
@@ -74,7 +74,7 @@ export default function Wishlist() {
 
   if (loading) {
     return (
-      <div className="cart-page" style={{ maxWidth: 920 }}>
+      <div className="cart-page is-narrow">
         <div className="cart-header">
           <div><h2>{t("wishlist.headerTitle")}</h2></div>
         </div>
@@ -166,7 +166,7 @@ export default function Wishlist() {
 
   if (items.length === 0) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🍃</div>
         <h3>{t("wishlist.emptyTitle")}</h3>
         <p>{t("wishlist.emptyBody")}</p>
@@ -181,7 +181,7 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="cart-page" style={{ maxWidth: 920 }}>
+    <div className="cart-page is-narrow">
       {/* Header */}
       <div className="cart-header">
         <div>
@@ -274,7 +274,7 @@ export default function Wishlist() {
           >
             <h3 className="cart-modal-title">{confirm.title}</h3>
             <p className="cart-modal-body">{confirm.body}</p>
-            <div className="row gap-8" style={{ justifyContent: "flex-end" }}>
+            <div className="row gap-8 row-end">
               <button className="btn btn-ghost" onClick={() => setConfirm(null)}>
                 {t("actions.cancel")}
               </button>

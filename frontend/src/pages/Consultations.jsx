@@ -7,6 +7,7 @@ import {
 } from "../api/consultations";
 import { useTranslation } from "../i18n/I18nProvider";
 import { useConfirm } from "../components/Confirm";
+import PageHeader from "../components/PageHeader";
 
 export default function Consultations() {
   const { t } = useTranslation();
@@ -71,27 +72,25 @@ export default function Consultations() {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <h1 style={{ marginBottom: 6 }}>{t("consultations.head")}</h1>
-        <p className="muted">{t("consultations.subhead")}</p>
-      </div>
+    <div className="page-shell is-wide">
+      <PageHeader title={t("consultations.head")} sub={t("consultations.subhead")} />
 
-      {msg && <div className="card" style={{ padding: 12, color: "var(--brand-700)" }}>{msg}</div>}
+      {msg && <div className="notice">{msg}</div>}
       {error && <div className="warning">{error}</div>}
 
-      <h2>{t("consultations.expertsHeading")}</h2>
+      <section className="section">
+        <h2>{t("consultations.expertsHeading")}</h2>
       {loading && <div className="empty">…</div>}
       <div className="product-grid">
         {experts.map((e) => (
           <div key={e.name} className="product-card">
-            <div className="image"><span style={{ fontSize: 48 }}>👩‍🌾</span></div>
+            <div className="image"><span className="consult-expert-emoji">👩‍🌾</span></div>
             <div className="body">
               <h3>{e.name}</h3>
               <p className="desc">{e.specialty}</p>
               <div className="row" style={{ alignItems: "center" }}>
                 <span className="price">৳{e.rate}</span>
-                <span className="muted" style={{ fontSize: 13 }}>{t("consultations.perSession")}</span>
+                <span className="muted consult-rate-note">{t("consultations.perSession")}</span>
               </div>
               <button onClick={() => setActive(e)} className="btn btn-primary btn-block mt-8">
                 {t("consultations.bookBtn")}
@@ -100,6 +99,7 @@ export default function Consultations() {
           </div>
         ))}
       </div>
+      </section>
 
       {active && (
         <div className="modal-backdrop" onClick={() => setActive(null)}>
@@ -148,47 +148,37 @@ export default function Consultations() {
         </div>
       )}
 
-      <h2 style={{ marginTop: 32 }}>{t("consultations.yourBookingsHeading")}</h2>
-      {list.length === 0 && !loading && (
-        <div className="empty">
-          <div className="emoji">📅</div>
-          <h3>{t("consultations.noBookingsHeading")}</h3>
-        </div>
-      )}
-      {list.length > 0 && (
-        <div className="card" style={{ padding: 0 }}>
-          {list.map((c) => (
-            <div
-              key={c.ID}
-              className="row-card"
-              style={{
-                borderRadius: 0,
-                borderBottom: "1px solid var(--brand-100)",
-                alignItems: "center",
-              }}
-            >
-              <div className="row-icon" style={{ background: "linear-gradient(135deg,#e8f1e6,#cfe1cb)" }}>
-                <span style={{ fontSize: 22 }}>📅</span>
+      <section className="section">
+        <h2>{t("consultations.yourBookingsHeading")}</h2>
+        {list.length === 0 && !loading && (
+          <div className="empty">
+            <div className="emoji">📅</div>
+            <h3>{t("consultations.noBookingsHeading")}</h3>
+          </div>
+        )}
+        {list.length > 0 && (
+          <div className="card list-flush">
+            {list.map((c) => (
+              <div key={c.ID} className="list-row">
+                <div className="list-row-icon">📅</div>
+                <div className="list-row-main">
+                  <div className="list-row-title">{c.expert_name}</div>
+                  <div className="list-row-sub">{c.topic}</div>
+                </div>
+                <span className={"status-pill " + (c.status === "cancelled" ? "status-cancelled" : "status-delivered")}>
+                  {c.status}
+                </span>
+                <div className="list-row-when">{c.scheduled_at?.replace("T", " ")}</div>
+                {c.status !== "cancelled" && (
+                  <button onClick={() => cancel(c)} className="btn btn-danger btn-sm">
+                    {t("consultations.cancelBtnRow")}
+                  </button>
+                )}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600 }}>{c.expert_name}</div>
-                <div className="muted" style={{ fontSize: 13 }}>{c.topic}</div>
-              </div>
-              <span className={"status-pill " + (c.status === "cancelled" ? "status-cancelled" : "status-delivered")}>
-                {c.status}
-              </span>
-              <div className="muted" style={{ width: 170, textAlign: "right" }}>
-                {c.scheduled_at?.replace("T", " ")}
-              </div>
-              {c.status !== "cancelled" && (
-                <button onClick={() => cancel(c)} className="btn btn-danger btn-sm">
-                  {t("consultations.cancelBtnRow")}
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

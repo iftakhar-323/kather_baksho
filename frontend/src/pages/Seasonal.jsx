@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getSeasonalGuide } from "../api/seasonal";
 import { useTranslation } from "../i18n/I18nProvider";
+import PageHeader from "../components/PageHeader";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -28,15 +29,12 @@ export default function Seasonal() {
   }, []);
 
   if (loading) return <div className="empty">{t("seasonal.loading")}</div>;
-  if (error) return <div className="empty" style={{ color: "#b00020" }}>{error}</div>;
+  if (error) return <div className="empty"><p className="text-danger">{error}</p></div>;
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <h1 style={{ marginBottom: 6 }}>{t("seasonal.head")}</h1>
-        <p className="muted">{t("seasonal.subhead")}</p>
-      </div>
+    <div className="page-shell">
+      <PageHeader title={t("seasonal.head")} sub={t("seasonal.subhead")} />
 
-      <div className="tabs" style={{ flexWrap: "wrap" }}>
+      <div className="tabs is-wrap">
         {MONTHS.map((m) => (
           <button
             key={m}
@@ -51,8 +49,8 @@ export default function Seasonal() {
         ))}
       </div>
 
-      <div className="card">
-        <h2 style={{ marginTop: 0 }}>
+      <div className="card card-pad-lg mt-16">
+        <h2 className="mt-0">
           {t("seasonal.months." + active) !== "seasonal.months." + active
             ? t("seasonal.months." + active)
             : active}
@@ -60,15 +58,12 @@ export default function Seasonal() {
         {!data?.[active] ? (
           <p className="muted">{t("seasonal.noSuggestions")}</p>
         ) : (
-          <div
-            className="product-grid"
-            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))" }}
-          >
+          <div className="card-grid is-tight">
             {data[active].map((e, i) => (
-              <div key={i} className="product-card" style={{ padding: 16 }}>
-                <div style={{ fontSize: 28, marginBottom: 6 }}>🌱</div>
-                <h3 style={{ margin: "6px 0" }}>{e.name}</h3>
-                <p className="muted" style={{ fontSize: 13 }}>{e.why}</p>
+              <div key={i} className="card card-pad seasonal-tile">
+                <div className="seasonal-tile-icon">🌱</div>
+                <h3 className="seasonal-tile-name">{e.name}</h3>
+                <p className="muted seasonal-tile-why">{e.why}</p>
               </div>
             ))}
           </div>
