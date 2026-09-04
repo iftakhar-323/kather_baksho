@@ -291,7 +291,7 @@ function BlogCMS() {
 
       {showForm && (
         <form onSubmit={onSubmit} className="card card-pad-lg mb-16">
-          <div className="row" style={{ gap: 8 }}>
+          <div className="row gap-8">
             <input
               className="input"
               placeholder="Title *"
@@ -315,7 +315,7 @@ function BlogCMS() {
             value={form.body}
             onChange={(e) => setForm({ ...form, body: e.target.value })}
             required
-            style={{ resize: "vertical" }}
+           
           />
           <input
             className="input mt-8"
@@ -323,7 +323,7 @@ function BlogCMS() {
             value={form.excerpt}
             onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
           />
-          <div className="row mt-8" style={{ gap: 8 }}>
+          <div className="row mt-8 gap-8">
             <select
               className="input"
               value={form.category_id}
@@ -380,7 +380,7 @@ function BlogCMS() {
                 <th>Title</th>
                 <th>Category</th>
                 <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th className="th-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -399,7 +399,7 @@ function BlogCMS() {
                         {p.status}
                       </span>
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td className="td-right">
                       <button className="btn btn-danger btn-sm" onClick={() => onDelete(p.id ?? p.ID)}>
                         Delete
                       </button>
@@ -460,7 +460,7 @@ function CSVTools() {
 
   return (
     <div className="card card-pad-lg" style={{ maxWidth: 540 }}>
-      <h3 style={{ marginTop: 0 }}>CSV import / export</h3>
+      <h3 className="mt-0">CSV import / export</h3>
       <p className="muted">
         Bulk-update products by exporting current stock, editing in any
         spreadsheet, then importing back.
@@ -480,7 +480,7 @@ function CSVTools() {
           type="file"
           accept=".csv"
           ref={fileRef}
-          style={{ display: "none" }}
+          hidden
           onChange={onImport}
         />
       </div>
@@ -544,7 +544,7 @@ function BackupTools() {
 
   return (
     <div className="card card-pad-lg" style={{ maxWidth: 540 }}>
-      <h3 style={{ marginTop: 0 }}>Backup &amp; restore</h3>
+      <h3 className="mt-0">Backup &amp; restore</h3>
       <p className="muted">
         Download a full JSON snapshot of all data, or restore from a previous
         backup. Store backups offline for safety.
@@ -564,7 +564,7 @@ function BackupTools() {
           type="file"
           accept=".json"
           ref={fileRef}
-          style={{ display: "none" }}
+          hidden
           onChange={onRestore}
         />
       </div>
@@ -629,7 +629,7 @@ function RolesAdmin() {
                 <th>Avatar</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th style={{ textAlign: "right" }}>Role</th>
+                <th className="th-right">Role</th>
               </tr>
             </thead>
             <tbody>
@@ -645,7 +645,7 @@ function RolesAdmin() {
                     </td>
                     <td><strong>{u.name}</strong></td>
                     <td>{u.email}</td>
-                    <td style={{ textAlign: "right" }}>
+                    <td className="td-right">
                       <select
                         className="input"
                         value={u.role || "customer"}
@@ -826,7 +826,7 @@ function AdminRemindersTab() {
                   {r.completed ? "Done" : "Pending"}
                 </span>
               </td>
-              <td style={{ textAlign: "right" }}>
+              <td className="td-right">
                 {!r.completed && (
                   <button className="btn btn-sm btn-primary" onClick={() => onComplete(r.id ?? r.ID)}>
                     Mark done
@@ -914,7 +914,7 @@ function AdminSubscriptionsTab() {
                   {s.status || "—"}
                 </span>
               </td>
-              <td style={{ textAlign: "right" }}>
+              <td className="td-right">
                 <button className="btn btn-sm btn-danger" onClick={() => onDelete(s.id ?? s.ID)}>
                   Delete
                 </button>
@@ -1008,7 +1008,7 @@ function AdminConsultationsTab() {
                   {c.status || "—"}
                 </span>
               </td>
-              <td style={{ textAlign: "right" }}>
+              <td className="td-right">
                 <div className="row gap" style={{ justifyContent: "flex-end" }}>
                   {c.status !== "Confirmed" && c.status !== "confirmed" && c.status !== "completed" && (
                     <button className="btn btn-sm btn-primary" onClick={() => onConfirm(c.id ?? c.ID)}>
@@ -1074,7 +1074,7 @@ function AdminCorporateTab() {
             <th>Company & Contact</th>
             <th>Details & Message</th>
             <th>Status & Notes</th>
-            <th style={{ textAlign: "right" }}>Actions</th>
+            <th className="th-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -1098,11 +1098,11 @@ function AdminCorporateTab() {
                   <span className={"pill " + status} style={{ display: "inline-block", marginBottom: 6 }}>
                     {q.status}
                   </span><br/>
-                  <div className="muted" style={{ fontSize: 12 }}>
+                  <div className="muted text-xs">
                     <em>Notes:</em> {q.admin_notes || "none"}
                   </div>
                 </td>
-                <td style={{ textAlign: "right" }}>
+                <td className="td-right">
                   <div className="stack gap-4" style={{ alignItems: "flex-end" }}>
                     <input
                       className="input"
@@ -1196,7 +1196,7 @@ function ProductsTab() {
           + New Product
         </button>
         <span className="spacer" />
-        <span className="muted" style={{ fontSize: 13 }}>
+        <span className="muted text-sm">
           {products.length} product{products.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -1236,7 +1236,7 @@ function ProductsTab() {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th className="th-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1265,7 +1265,7 @@ function ProductsTab() {
                       {p.stock}
                     </span>
                   </td>
-                  <td style={{ textAlign: "right" }}>
+                  <td className="td-right">
                     <button
                       className="btn btn-secondary btn-sm"
                       onClick={() => {
@@ -1288,7 +1288,7 @@ function ProductsTab() {
               {products.length === 0 && (
                 <tr>
                   <td colSpan="6">
-                    <div className="empty" style={{ padding: 24 }}>
+                    <div className="empty table-empty">
                       <div className="emoji">🌱</div>
                       <h3>No products yet</h3>
                       <p>Click “New Product” to add the first one.</p>
@@ -1403,7 +1403,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             </select>
           </div>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Parent Category</label>
               <input
                 className="input"
@@ -1411,7 +1411,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 onChange={(e) => setParentCategory(e.target.value)}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Subcategory</label>
               <input
                 className="input"
@@ -1421,7 +1421,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             </div>
           </div>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Indoor / Outdoor</label>
               <select className="select" value={indoorOutdoor} onChange={(e) => setIndoorOutdoor(e.target.value)}>
                 <option value="">-</option>
@@ -1430,7 +1430,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 <option value="both">both</option>
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Difficulty</label>
               <select className="select" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
                 <option value="">-</option>
@@ -1441,7 +1441,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             </div>
           </div>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Sunlight</label>
               <select className="select" value={sunlight} onChange={(e) => setSunlight(e.target.value)}>
                 <option value="">-</option>
@@ -1451,7 +1451,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 <option value="direct">direct</option>
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Water</label>
               <select className="select" value={water} onChange={(e) => setWater(e.target.value)}>
                 <option value="">-</option>
@@ -1460,7 +1460,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 <option value="high">high</option>
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Humidity</label>
               <select className="select" value={humidity} onChange={(e) => setHumidity(e.target.value)}>
                 <option value="">-</option>
@@ -1475,7 +1475,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             <span>Pet Friendly</span>
           </label>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Price (৳)</label>
               <input
                 className="input"
@@ -1487,7 +1487,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 required
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Compare At Price (৳)</label>
               <input
                 className="input"
@@ -1500,7 +1500,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             </div>
           </div>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Discount %</label>
               <input
                 className="input"
@@ -1512,7 +1512,7 @@ function ProductForm({ initial, onClose, onSaved }) {
                 onChange={(e) => setDiscountPct(e.target.value)}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Stock</label>
               <input
                 className="input"
@@ -1525,7 +1525,7 @@ function ProductForm({ initial, onClose, onSaved }) {
             </div>
           </div>
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Offer Label</label>
               <input
                 className="input"
@@ -1932,7 +1932,7 @@ function OrderForm({ users, onClose, onSaved }) {
           </div>
 
           <div className="row gap-12">
-            <div style={{ flex: 1 }}>
+            <div className="flex-1">
               <label className="field-label">Status</label>
               <select
                 className="select"
@@ -2427,9 +2427,9 @@ function CouponsTab() {
   };
 
   return (
-    <div className="row gap-24 mt-16" style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
-      <div className="card" style={{ flex: 1, minWidth: 320, padding: 16 }}>
-        <h3 style={{ marginTop: 0 }}>All Coupons ({coupons.length})</h3>
+    <div className="admin-panels">
+      <div className="card admin-panel">
+        <h3 className="mt-0">All Coupons ({coupons.length})</h3>
         {loading ? (
           <div className="muted">Loading coupons…</div>
         ) : coupons.length === 0 ? (
@@ -2457,7 +2457,7 @@ function CouponsTab() {
                   </div>
                   <div>{c.discount_percent}%</div>
                   <div>৳{c.min_order_total || 0}</div>
-                  <div className="muted" style={{ fontSize: 12 }}>
+                  <div className="muted text-xs">
                     {c.expires_at || "Never"}
                   </div>
                   <div>
@@ -2473,7 +2473,7 @@ function CouponsTab() {
       </div>
 
       <div className="card" style={{ width: 340, padding: 16 }}>
-        <h3 style={{ marginTop: 0 }}>Create coupon</h3>
+        <h3 className="mt-0">Create coupon</h3>
         <form className="auth-form" onSubmit={submit}>
           <div>
             <label className="field-label">Code</label>
@@ -2563,7 +2563,7 @@ function ReviewsAdmin() {
 
   return (
     <div>
-      <div className="row mb-16" style={{ gap: 8, alignItems: "center" }}>
+      <div className="row mb-16 gap-8 dash-range-row">
         <input
           className="input"
           type="number"
@@ -2598,7 +2598,7 @@ function ReviewsAdmin() {
               <div>{r.user_name || `#${r.user_id}`}</div>
               <div>{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</div>
               <div style={{ maxWidth: 340 }}>{r.comment || <span className="muted">—</span>}</div>
-              <div className="muted" style={{ fontSize: 12 }}>
+              <div className="muted text-xs">
                 {new Date(r.CreatedAt ?? r.created_at ?? Date.now()).toLocaleDateString()}
               </div>
               <div>
@@ -2708,14 +2708,14 @@ function CategoriesAdmin() {
           + New category
         </button>
         <span className="spacer" />
-        <span className="muted" style={{ fontSize: 13 }}>
+        <span className="muted text-sm">
           {rows.length} categor{rows.length === 1 ? "y" : "ies"}
         </span>
       </div>
 
       {showForm && (
         <form onSubmit={onSubmit} className="card card-pad-lg mb-16">
-          <h3 style={{ marginTop: 0 }}>{editing ? "Edit category" : "New category"}</h3>
+          <h3 className="mt-0">{editing ? "Edit category" : "New category"}</h3>
           <div className="row gap-8" style={{ flexWrap: "wrap" }}>
             <input
               className="input"
@@ -2765,7 +2765,7 @@ function CategoriesAdmin() {
               <span>Active</span>
             </label>
           </div>
-          <div className="row mt-8" style={{ gap: 8 }}>
+          <div className="row mt-8 gap-8">
             <button type="submit" className="btn btn-primary">
               {editing ? "Update" : "Create"}
             </button>
@@ -2798,14 +2798,14 @@ function CategoriesAdmin() {
                 <th>Parent</th>
                 <th>Pos</th>
                 <th>Active</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th className="th-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((c) => (
                 <tr key={c.id ?? c.ID}>
                   <td style={{ fontSize: 22 }}>{c.icon || "📁"}</td>
-                  <td style={{ fontWeight: 600 }}>{c.name}</td>
+                  <td className="td-strong">{c.name}</td>
                   <td><code>{c.slug}</code></td>
                   <td>{c.parent || <span className="muted">—</span>}</td>
                   <td>{c.position}</td>
@@ -2816,11 +2816,11 @@ function CategoriesAdmin() {
                       <span className="pill pill-cancel">Off</span>
                     )}
                   </td>
-                  <td style={{ textAlign: "right" }}>
+                  <td className="td-right">
                     <button className="btn btn-secondary btn-sm" onClick={() => openEdit(c)}>
                       Edit
                     </button>
-                    <button className="btn btn-danger btn-sm" style={{ marginLeft: 6 }} onClick={() => onDelete(c)}>
+                    <button className="btn btn-danger btn-sm ml-1" onClick={() => onDelete(c)}>
                       Delete
                     </button>
                   </td>
