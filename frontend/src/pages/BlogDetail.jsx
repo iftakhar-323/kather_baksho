@@ -75,7 +75,7 @@ export default function BlogDetail({ slug, onBack }) {
   if (!post) return null;
 
   return (
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
+    <div className="page-shell is-narrow">
       <button onClick={onBack} className="btn btn-ghost mb-16">
         {t("blog.backToBlog")}
       </button>
@@ -83,8 +83,8 @@ export default function BlogDetail({ slug, onBack }) {
       {post.category_name && (
         <span className="tag tag-leaf">{post.category_name}</span>
       )}
-      <h1 style={{ marginTop: 8 }}>{post.title}</h1>
-      <div className="row muted" style={{ gap: 8, margin: "8px 0 24px" }}>
+      <h1 className="blogd-title">{post.title}</h1>
+      <div className="row muted blogd-meta">
         <span>{fmtDate(post.published_at || post.CreatedAt || post.created_at)}</span>
         <span>·</span>
         <span>{t("blog.minRead", { n: post.read_min || 3 })}</span>
@@ -126,27 +126,22 @@ export default function BlogDetail({ slug, onBack }) {
         </div>
       )}
 
-      <article
-        className="card card-pad-lg"
-        style={{ lineHeight: 1.75, whiteSpace: "pre-wrap" }}
-      >
+      <article className="card card-pad-lg blogd-body">
         {post.body || post.excerpt}
       </article>
 
-      <section className="mt-24">
+      <section className="section">
         <h2>{t("blog.commentsHeading", { count: (post.comments || []).length })}</h2>
 
         <form onSubmit={onSubmitComment} className="card card-pad mt-16">
           <textarea
-            className="input"
+            className="textarea"
             rows={3}
             placeholder={t("blog.commentPlaceholder")}
             value={commentBody}
             onChange={(e) => setCommentBody(e.target.value)}
-            style={{ resize: "vertical" }}
           />
-          <div className="row mt-8">
-            <span className="spacer" />
+          <div className="row mt-8 row-end">
             <button
               className="btn btn-primary"
               disabled={busy || !commentBody.trim()}
@@ -156,22 +151,18 @@ export default function BlogDetail({ slug, onBack }) {
           </div>
         </form>
 
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-16">
           {(post.comments || []).length === 0 && (
             <p className="muted">{t("blog.noComments")}</p>
           )}
           {(post.comments || []).map((c) => (
-            <div
-              key={c.id}
-              className="card card-pad"
-              style={{ marginBottom: 8 }}
-            >
-              <div className="row" style={{ fontSize: 13 }}>
+            <div key={c.id} className="card card-pad blogd-comment">
+              <div className="row blogd-comment-head">
                 <strong>{c.author_name || t("blog.anonymous")}</strong>
                 <span className="spacer" />
                 <span className="muted">{fmtDate(c.created_at)}</span>
               </div>
-              <p style={{ margin: "8px 0 0" }}>{c.body}</p>
+              <p className="blogd-comment-body">{c.body}</p>
             </div>
           ))}
         </div>

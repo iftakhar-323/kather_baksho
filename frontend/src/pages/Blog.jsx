@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getBlogPosts, getBlogCategories } from "../api/blog";
 import { useTranslation } from "../i18n/I18nProvider";
+import PageHeader from "../components/PageHeader";
 // real names used; backend returns { posts, total, page }
 
 function prettyCat(c) {
@@ -57,28 +58,21 @@ export default function Blog() {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("blog.head")}</h1>
-      <p className="muted" style={{ marginBottom: 24 }}>
-        {t("blog.subhead")}
-      </p>
+    <div className="page-shell is-wide">
+      <PageHeader title={t("blog.head")} sub={t("blog.subhead")} />
 
-      <div
-        className="row"
-        style={{ gap: 8, flexWrap: "wrap", marginBottom: 16 }}
-      >
+      <div className="row gap-8 row-wrap mb-16">
         <input
-          className="input"
+          className="input blog-search"
           placeholder={t("blog.searchPlaceholder")}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setPage(1);
           }}
-          style={{ flex: 1, minWidth: 220 }}
         />
         <button
-          className={"btn btn-sm " + (cat === "" ? "btn-primary" : "btn-secondary")}
+          className={"chip" + (cat === "" ? " is-active" : "")}
           onClick={() => {
             setCat("");
             setPage(1);
@@ -89,9 +83,7 @@ export default function Blog() {
         {cats.map((c) => (
           <button
             key={c.slug || c.id || c.name}
-            className={
-              "btn btn-sm " + (cat === (c.slug || c.id) ? "btn-primary" : "btn-secondary")
-            }
+            className={"chip" + (cat === (c.slug || c.id) ? " is-active" : "")}
             onClick={() => {
               setCat(c.slug || c.id);
               setPage(1);
@@ -114,63 +106,34 @@ export default function Blog() {
           <p className="muted">{t("blog.emptyBody")}</p>
         </div>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            gap: 16,
-          }}
-        >
+        <div className="card-grid">
           {posts.map((p) => (
             <article
               key={p.ID || p.id || p.slug}
-              className="card"
-              style={{ overflow: "hidden", cursor: "pointer" }}
+              className="card card-clickable blog-card"
               onClick={() => window.__katherboxSetView?.(`blog-${p.slug || p.ID || p.id}`)}
             >
-              <div
-                style={{
-                  height: 140,
-                  background:
-                    "linear-gradient(135deg, var(--brand-100), var(--brand-200))",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 56,
-                }}
-              >
+              <div className="blog-card-cover">
                 {p.cover_url ? (
                   <img
                     src={p.cover_url}
                     alt=""
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    className="blog-card-img"
                     onError={(e) => { e.currentTarget.style.display = "none"; }}
                   />
                 ) : (
                   p.cover_emoji || "🌿"
                 )}
               </div>
-              <div style={{ padding: 16 }}>
+              <div className="blog-card-body">
                 {(p.category_name || p.category) && (
                   <span className="tag tag-leaf">{prettyCat(p.category_name || p.category)}</span>
                 )}
-                <h3 style={{ margin: "8px 0" }}>{p.title}</h3>
-                <p
-                  className="muted"
-                  style={{
-                    fontSize: 14,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
+                <h3 className="blog-card-title">{p.title}</h3>
+                <p className="muted blog-card-excerpt">
                   {p.excerpt || p.body?.slice(0, 120)}
                 </p>
-                <div
-                  className="row muted"
-                  style={{ fontSize: 12, marginTop: 12, gap: 8 }}
-                >
+                <div className="row muted blog-card-meta">
                   <span>{fmtDate(p.published_at || p.created_at)}</span>
                   <span>·</span>
                   <span>{t("blog.minRead", { n: p.read_min || 3 })}</span>
@@ -182,10 +145,7 @@ export default function Blog() {
       )}
 
       {totalPages > 1 && (
-        <div
-          className="row"
-          style={{ justifyContent: "center", gap: 8, marginTop: 24 }}
-        >
+        <div className="row row-center gap-8 mt-24">
           <button
             className="btn btn-secondary btn-sm"
             disabled={page <= 1}

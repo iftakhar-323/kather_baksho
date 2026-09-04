@@ -26,7 +26,7 @@ export default function Login({ onSwitch, onSuccess }) {
   return (
     <div className="auth-card">
       <div className="brand">
-        <span style={{ fontSize: 24 }}>🌿</span>
+        <span className="brand-emoji">🌿</span>
         <span>{t("brand.name")}</span>
       </div>
       <p className="subtitle">{t("auth.subtitleLogin")}</p>
@@ -76,10 +76,7 @@ export default function Login({ onSwitch, onSuccess }) {
 
       <p className="auth-foot">
         <span className="muted">{t("auth.noAccount")}</span>{" "}
-        <a
-          onClick={onSwitch}
-          style={{ color: "var(--primary)", fontWeight: 600, cursor: "pointer" }}
-        >
+        <a onClick={onSwitch} className="auth-link">
           {t("auth.switchToRegister")}
         </a>
       </p>

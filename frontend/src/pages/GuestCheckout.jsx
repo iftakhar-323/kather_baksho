@@ -46,22 +46,20 @@ export default function GuestCheckout({ cart, onClose, onSuccess }) {
         address below.
       </p>
       <form onSubmit={onSubmit}>
-        <div className="row" style={{ gap: 8 }}>
+        <div className="row gap-8">
           <input
-            className="input"
+            className="input flex-1"
             placeholder="Full name *"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            style={{ flex: 1 }}
           />
           <input
-            className="input"
+            className="input flex-1"
             placeholder="Phone *"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             required
-            style={{ flex: 1 }}
           />
         </div>
         <input
@@ -81,19 +79,17 @@ export default function GuestCheckout({ cart, onClose, onSuccess }) {
         />
         <div className="row mt-8 gap-8">
           <input
-            className="input"
+            className="input flex-2"
             placeholder="City *"
             value={city}
             onChange={(e) => setCity(e.target.value)}
             required
-            style={{ flex: 2 }}
           />
           <input
-            className="input"
+            className="input flex-1"
             placeholder="Postal code"
             value={postal}
             onChange={(e) => setPostal(e.target.value)}
-            style={{ flex: 1 }}
           />
         </div>
         <div className="row mt-8 gap-8">
