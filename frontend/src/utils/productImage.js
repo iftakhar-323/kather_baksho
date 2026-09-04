@@ -99,8 +99,26 @@ function leaf(cx, cy, len, wide, rot, fill, curve = 0) {
        stroke="#000" stroke-opacity="0.12" stroke-width="2"/>`;
 }
 
+// Packaging colours for care products so a shelf of bottles/bags/boxes
+// isn't all the same green. [body, cap/label-accent]
+const CARE_PACK = [
+  ["#3d7d54", "#eaf3ec"], // brand green
+  ["#c98a2e", "#3a2a10"], // amber
+  ["#3f7a8c", "#e7f2f4"], // teal
+  ["#c06a3f", "#f3e3d6"], // terracotta
+  ["#5c6b61", "#e9ede9"], // slate
+  ["#8a5a2b", "#f0e4d4"], // kraft brown
+  ["#6a4b8a", "#efe7f5"], // violet
+];
+
 function plantSvg(form, h, foliage) {
   const f2 = pick(FOLIAGE, h + 3);
+  if (form.startsWith("care") || form === "giftbox") {
+    const [body, accent] = pick(CARE_PACK, h);
+    foliage = body;
+    // f2 is `const`; shadow it locally for the packaging accent
+    return careOrBoxSvg(form, h, body, accent);
+  }
   switch (form) {
     case "blades": {
       let s = "";
@@ -176,59 +194,11 @@ function plantSvg(form, h, foliage) {
       }
       return s;
     }
-    case "care":
-    case "care-bottle": {
-      const capW = 40 + (h % 3) * 8;
-      return `
-        <rect x="${250 - capW / 2}" y="118" width="${capW}" height="34" rx="6" fill="${f2}"/>
-        <rect x="234" y="150" width="32" height="26" fill="${f2}"/>
-        <path d="M198 176 Q198 200 210 214 L210 400 Q210 420 230 420 L270 420 Q290 420 290 400 L290 214 Q302 200 302 176 Z" fill="${foliage}"/>
-        <rect x="214" y="250" width="72" height="96" rx="6" fill="#fff" fill-opacity="0.9"/>
-        <line x1="226" y1="272" x2="274" y2="272" stroke="${foliage}" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"/>
-        <line x1="226" y1="292" x2="274" y2="292" stroke="${foliage}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
-        <line x1="226" y1="312" x2="258" y2="312" stroke="${foliage}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>`;
-    }
-    case "care-bag": {
-      const lean = (h % 5) - 2;
-      return `
-        <path d="M170 180 L330 180 L316 200 L184 200 Z" fill="${f2}"/>
-        <path d="M182 200 L318 200 Q330 200 330 214 L${322 + lean} 418 Q320 440 296 440 L204 440 Q180 440 178 418 L${170 + lean} 214 Q170 200 182 200 Z" fill="${foliage}"/>
-        <rect x="206" y="252" width="88" height="104" rx="6" fill="#fff" fill-opacity="0.9"/>
-        <circle cx="250" cy="292" r="20" fill="${foliage}" fill-opacity="0.5"/>
-        <path d="M250 300 q-14 -22 0 -40 q14 18 0 40" fill="${foliage}" fill-opacity="0.6"/>`;
-    }
-    case "care-box": {
-      return `
-        <path d="M160 214 L250 180 L340 214 L250 250 Z" fill="${f2}"/>
-        <path d="M160 214 L250 250 L250 430 L160 392 Z" fill="${foliage}"/>
-        <path d="M340 214 L250 250 L250 430 L340 392 Z" fill="${foliage}" fill-opacity="0.82"/>
-        <path d="M250 250 L250 430 M205 232 L205 411" stroke="#000" stroke-opacity="0.08" stroke-width="4"/>
-        <rect x="196" y="300" width="70" height="54" rx="5" fill="#fff" fill-opacity="0.9" transform="skewY(11)"/>`;
-    }
-    case "care-tub": {
-      return `
-        <ellipse cx="250" cy="196" rx="76" ry="18" fill="${f2}"/>
-        <path d="M174 196 L174 388 Q174 410 250 410 Q326 410 326 388 L326 196" fill="${foliage}"/>
-        <ellipse cx="250" cy="196" rx="76" ry="18" fill="#000" fill-opacity="0.12"/>
-        <ellipse cx="250" cy="188" rx="64" ry="14" fill="${f2}"/>
-        <rect x="210" y="258" width="80" height="86" rx="6" fill="#fff" fill-opacity="0.9"/>`;
-    }
-    case "giftbox": {
-      const ribbon = pick(BLOOM_COLORS, h + 1);
-      const lidTilt = (h % 5) - 2;
-      return `
-        <rect x="162" y="230" width="176" height="180" rx="10" fill="${foliage}"/>
-        <rect x="162" y="230" width="176" height="180" rx="10" fill="#000" fill-opacity="0.05"/>
-        <rect x="150" y="${196 + lidTilt}" width="200" height="52" rx="10" fill="${f2}"/>
-        <rect x="234" y="196" width="32" height="214" fill="${ribbon}" fill-opacity="0.92"/>
-        <rect x="150" y="212" width="200" height="26" fill="${ribbon}" fill-opacity="0.92"/>
-        <path d="M250 196 Q218 150 196 176 Q188 200 250 208 Q312 200 304 176 Q282 150 250 196 Z" fill="${ribbon}"/>
-        <path d="M196 300 q-14 -30 4 -48 M214 300 q-6 -34 14 -46 M232 298 q4 -30 22 -34" stroke="#fff" stroke-opacity="0.35" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <circle cx="210" cy="264" r="12" fill="#fff" fill-opacity="0.25"/>
-        <circle cx="292" cy="286" r="10" fill="#fff" fill-opacity="0.22"/>`;
-    }
     case "pot-only":
       return "";
+    case "care": case "care-bottle": case "care-bag":
+    case "care-box": case "care-tub": case "giftbox":
+      return careOrBoxSvg(form, h, foliage, f2); // safety net; normally handled above
     case "bushy":
     default: {
       let s = "";
@@ -242,6 +212,60 @@ function plantSvg(form, h, foliage) {
       return s;
     }
   }
+}
+
+// Care packaging + gift boxes. `body` is the pack colour, `accent` the
+// cap / label / lid colour.
+function careOrBoxSvg(form, h, body, accent) {
+  if (form === "care-bag" || (form === "care" && h % 4 === 1)) {
+    const lean = (h % 5) - 2;
+    return `
+      <path d="M170 180 L330 180 L316 200 L184 200 Z" fill="${accent}"/>
+      <path d="M182 200 L318 200 Q330 200 330 214 L${322 + lean} 418 Q320 440 296 440 L204 440 Q180 440 178 418 L${170 + lean} 214 Q170 200 182 200 Z" fill="${body}"/>
+      <rect x="206" y="252" width="88" height="104" rx="6" fill="#fff" fill-opacity="0.92"/>
+      <circle cx="250" cy="292" r="18" fill="${body}" fill-opacity="0.5"/>
+      <path d="M250 300 q-13 -20 0 -37 q13 17 0 37" fill="${body}" fill-opacity="0.6"/>`;
+  }
+  if (form === "care-box") {
+    return `
+      <path d="M160 214 L250 180 L340 214 L250 250 Z" fill="${accent}"/>
+      <path d="M160 214 L250 250 L250 430 L160 392 Z" fill="${body}"/>
+      <path d="M340 214 L250 250 L250 430 L340 392 Z" fill="${body}" fill-opacity="0.82"/>
+      <path d="M250 250 L250 430" stroke="#000" stroke-opacity="0.10" stroke-width="4"/>
+      <rect x="190" y="296" width="70" height="52" rx="5" fill="#fff" fill-opacity="0.92" transform="skewY(11)"/>`;
+  }
+  if (form === "care-tub") {
+    return `
+      <ellipse cx="250" cy="196" rx="74" ry="17" fill="${accent}"/>
+      <path d="M176 196 L176 386 Q176 408 250 408 Q324 408 324 386 L324 196" fill="${body}"/>
+      <ellipse cx="250" cy="196" rx="74" ry="17" fill="#000" fill-opacity="0.12"/>
+      <ellipse cx="250" cy="189" rx="62" ry="13" fill="${accent}"/>
+      <rect x="210" y="256" width="80" height="86" rx="6" fill="#fff" fill-opacity="0.92"/>`;
+  }
+  if (form === "giftbox") {
+    const ribbon = pick(BLOOM_COLORS, h + 1);
+    const lidTilt = (h % 5) - 2;
+    return `
+      <rect x="162" y="230" width="176" height="180" rx="10" fill="${body}"/>
+      <rect x="162" y="230" width="176" height="180" rx="10" fill="#000" fill-opacity="0.05"/>
+      <rect x="150" y="${196 + lidTilt}" width="200" height="52" rx="10" fill="${accent}"/>
+      <rect x="234" y="196" width="32" height="214" fill="${ribbon}" fill-opacity="0.92"/>
+      <rect x="150" y="212" width="200" height="26" fill="${ribbon}" fill-opacity="0.92"/>
+      <path d="M250 196 Q218 150 196 176 Q188 200 250 208 Q312 200 304 176 Q282 150 250 196 Z" fill="${ribbon}"/>
+      <circle cx="210" cy="264" r="12" fill="#fff" fill-opacity="0.22"/>
+      <circle cx="292" cy="286" r="10" fill="#fff" fill-opacity="0.20"/>`;
+  }
+  // default: care-bottle
+  const capW = 40 + (h % 3) * 8;
+  const tall = (h % 3) * 14;
+  return `
+    <rect x="${250 - capW / 2}" y="${118 - tall}" width="${capW}" height="34" rx="6" fill="${accent}"/>
+    <rect x="234" y="${150 - tall}" width="32" height="${26 + tall}" fill="${accent}"/>
+    <path d="M198 176 Q198 200 210 214 L210 400 Q210 420 230 420 L270 420 Q290 420 290 400 L290 214 Q302 200 302 176 Z" fill="${body}"/>
+    <rect x="214" y="248" width="72" height="100" rx="6" fill="#fff" fill-opacity="0.92"/>
+    <line x1="226" y1="270" x2="274" y2="270" stroke="${body}" stroke-opacity="0.5" stroke-width="5" stroke-linecap="round"/>
+    <line x1="226" y1="290" x2="274" y2="290" stroke="${body}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+    <line x1="226" y1="310" x2="256" y2="310" stroke="${body}" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>`;
 }
 
 // Build one 500x500 SVG for a product. `variant` shifts the framing/backdrop
