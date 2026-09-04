@@ -19,6 +19,7 @@ RUN go build -ldflags="-w -s" -o katherbox main.go
 RUN go build -ldflags="-w -s" -o seedusers ./cmd/resetusers
 RUN go build -ldflags="-w -s" -o seedproducts ./cmd/seedproducts
 RUN go build -ldflags="-w -s" -o seeddummy ./cmd/seeddummy
+RUN go build -ldflags="-w -s" -o productimages ./cmd/productimages
 
 # Step 2: Final runtime stage
 FROM alpine:3.20
@@ -38,6 +39,7 @@ COPY --from=builder /app/katherbox /app/
 COPY --from=builder /app/seedusers /app/
 COPY --from=builder /app/seedproducts /app/
 COPY --from=builder /app/seeddummy /app/
+COPY --from=builder /app/productimages /app/
 
 # Environment defaults
 ENV PORT=8081

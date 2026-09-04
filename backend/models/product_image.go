@@ -104,13 +104,13 @@ var nameKeyword = []struct{ kw, slug string }{
 // Every slug here has a real photo.
 var subcategoryPool = map[string][]string{
 	"indoor_plant":  {"monstera", "snake-plant", "pothos", "calathea", "philodendron", "peace-lily", "zz-plant"},
-	"outdoor_plant": {"rose", "hibiscus", "marigold", "bougainvillea", "sunflower", "zinnia", "jasmine"},
+	"outdoor_plant": {"rose", "hibiscus", "marigold", "bougainvillea", "sunflower", "zinnia", "jasmine", "poinsettia", "tulip", "plumeria"},
 	"decor":         {"terracotta-pot", "ceramic-planter", "watering-can", "macrame-hanger", "grow-light", "hanging-planter"},
 	"soil":          {"potting-soil", "perlite"},
-	// these have no reliable product photos → drawn illustration
-	"plant_box":  {},
-	"fertilizer": {},
-	"care_kit":   {},
+	// use available photos for boxes and care instead of drawn illustrations
+	"plant_box":  {"succulent-arrangement", "herb-garden", "terrarium", "greenhouse"},
+	"fertilizer": {"potting-soil", "perlite", "neem-oil"},
+	"care_kit":   {"garden-trowel", "watering-can", "pruning-shears", "mister-spray"},
 }
 
 var categoryPool = map[string][]string{
