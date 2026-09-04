@@ -156,8 +156,7 @@ function Footer() {
           <div className="footer-brand">
             <span className="brand-line">
               <span className="leaf">🌿</span>
-              <span>KatherBox</span>
-              <span className="nav-admin-badge">{roleBadge(user?.role)}</span>
+              <span>Kather Baksho</span>
             </span>
             <p className="footer-tagline">{t("admin.footer.tagline") || "Workspace"}</p>
           </div>
@@ -168,7 +167,7 @@ function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© {year} KatherBox. {t("footer.rights")}.</span>
+          <span>© {year} Kather Baksho. {t("footer.rights")}.</span>
         </div>
       </footer>
     );
@@ -180,7 +179,7 @@ function Footer() {
         <div className="footer-brand">
           <span className="brand-line">
             <span className="leaf">🌿</span>
-            <span>KatherBox</span>
+            <span>Kather Baksho</span>
           </span>
           <p className="footer-tagline">{t("brand.tagline")}</p>
         </div>
@@ -219,7 +218,7 @@ function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <span>© {year} KatherBox. {t("footer.rights")}.</span>
+        <span>© {year} Kather Baksho. {t("footer.rights")}.</span>
         <div className="socials">
           <a href="#" aria-label="Facebook">f</a>
           <a href="#" aria-label="Instagram">◎</a>
@@ -362,8 +361,7 @@ function Navbar() {
           onClick={() => go(isAdmin && currentView !== "home" ? "admin" : "home")}
         >
           <span className="leaf">🌿</span>
-          <span className="nav-brand-text">KatherBox</span>
-          {isAdmin && <span className="nav-admin-badge">{badge}</span>}
+          <span className="nav-brand-text">Kather Baksho</span>
         </span>
 
         {user && !isAdmin && (
@@ -491,8 +489,7 @@ function Navbar() {
             <div className="nav-drawer-head">
               <span className="nav-brand">
                 <span className="leaf">🌿</span>
-                <span className="nav-brand-text">KatherBox</span>
-                {isAdmin && <span className="nav-admin-badge">{badge}</span>}
+                <span className="nav-brand-text">Kather Baksho</span>
               </span>
               <button
                 className="nav-drawer-close"
