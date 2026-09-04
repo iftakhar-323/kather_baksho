@@ -14,6 +14,7 @@ const asArray = (d) =>
   Array.isArray(d) ? d : d?.achievements || d?.rewards || d?.items || [];
 // aliases intentionally omitted — using real names above
 import { useToast } from "../components/Toast";
+import PageHeader from "../components/PageHeader";
 import { useTranslation } from "../i18n/I18nProvider";
 
 function fmt(n) {
@@ -101,65 +102,40 @@ export default function Loyalty() {
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("loyalty.head")}</h1>
-      <p className="muted" style={{ marginBottom: 24 }}>
-        {t("loyalty.subhead")}
-      </p>
+    <div className="page-shell">
+      <PageHeader title={t("loyalty.head")} sub={t("loyalty.subhead")} />
 
-      <div
-        className="card card-pad-lg"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))",
-          gap: 16,
-          background:
-            "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
-        }}
-      >
+      <div className="stat-band">
         <div>
-          <div className="muted">{t("loyalty.pointsLabel")}</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--brand-700)" }}>
-            {fmt(me.points)}
-          </div>
+          <div className="stat-label">{t("loyalty.pointsLabel")}</div>
+          <div className="stat-value is-accent">{fmt(me.points)}</div>
         </div>
         <div>
-          <div className="muted">{t("loyalty.tierLabel")}</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>
-            {me.tier || t("loyalty.defaultTier")}
-          </div>
+          <div className="stat-label">{t("loyalty.tierLabel")}</div>
+          <div className="stat-value">{me.tier || t("loyalty.defaultTier")}</div>
         </div>
         <div>
-          <div className="muted">{t("loyalty.totalSpentLabel")}</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>৳{fmt(me.total_spend)}</div>
+          <div className="stat-label">{t("loyalty.totalSpentLabel")}</div>
+          <div className="stat-value">৳{fmt(me.total_spend)}</div>
         </div>
         <div>
-          <div className="muted">{t("loyalty.referralsLabel")}</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{fmt(referralCount)}</div>
+          <div className="stat-label">{t("loyalty.referralsLabel")}</div>
+          <div className="stat-value">{fmt(referralCount)}</div>
         </div>
       </div>
 
-      <section className="mt-24">
+      <section className="section">
         <h2>{t("loyalty.achievementsHeading")}</h2>
         {achievements.length === 0 && (
           <p className="muted">{t("loyalty.achievementsEmpty")}</p>
         )}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
-            gap: 12,
-            marginTop: 12,
-          }}
-        >
+        <div className="card-grid is-tight">
           {achievements.map((a) => (
-            <div key={a.id} className="card" style={{ padding: 16 }}>
-              <div style={{ fontSize: 28 }}>{a.icon || "🏅"}</div>
-              <h4 style={{ margin: "8px 0 4px" }}>{a.name}</h4>
-              <p className="muted" style={{ fontSize: 13, minHeight: 36 }}>
-                {a.description}
-              </p>
-              <div className="row" style={{ marginTop: 8 }}>
+            <div key={a.id} className="card card-pad">
+              <div className="loyalty-card-icon">{a.icon || "🏅"}</div>
+              <h4 className="loyalty-card-title">{a.name}</h4>
+              <p className="muted loyalty-card-desc">{a.description}</p>
+              <div className="row mt-8">
                 <span className="tag tag-leaf">
                   {t("loyalty.pointsTag", { n: a.points })}
                 </span>
@@ -181,27 +157,18 @@ export default function Loyalty() {
         </div>
       </section>
 
-      <section className="mt-24">
+      <section className="section">
         <h2>{t("loyalty.rewardsHeading")}</h2>
         {rewards.length === 0 && (
           <p className="muted">{t("loyalty.rewardsEmpty")}</p>
         )}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px,1fr))",
-            gap: 12,
-            marginTop: 12,
-          }}
-        >
+        <div className="card-grid is-tight">
           {rewards.map((r) => (
-            <div key={r.id} className="card" style={{ padding: 16 }}>
-              <div style={{ fontSize: 28 }}>{r.icon || "🎟️"}</div>
-              <h4 style={{ margin: "8px 0 4px" }}>{r.name}</h4>
-              <p className="muted" style={{ fontSize: 13, minHeight: 36 }}>
-                {r.description}
-              </p>
-              <div className="row" style={{ marginTop: 8 }}>
+            <div key={r.id} className="card card-pad">
+              <div className="loyalty-card-icon">{r.icon || "🎟️"}</div>
+              <h4 className="loyalty-card-title">{r.name}</h4>
+              <p className="muted loyalty-card-desc">{r.description}</p>
+              <div className="row mt-8">
                 <span className="tag tag-leaf">
                   {t("loyalty.pointsCostTag", { n: r.points_cost })}
                 </span>
@@ -219,23 +186,12 @@ export default function Loyalty() {
         </div>
       </section>
 
-      <section className="mt-24 card card-pad-lg">
-        <h2 style={{ marginTop: 0 }}>{t("loyalty.referralHeading")}</h2>
+      <section className="section card card-pad-lg">
+        <h2 className="mt-0">{t("loyalty.referralHeading")}</h2>
         <p className="muted">{t("loyalty.referralSubhead")}</p>
         {referral?.code && (
-          <div className="row" style={{ marginTop: 12 }}>
-            <code
-              style={{
-                padding: "8px 12px",
-                background: "var(--brand-50)",
-                border: "1px solid var(--brand-100)",
-                borderRadius: 8,
-                fontSize: 18,
-                fontWeight: 700,
-              }}
-            >
-              {referral.code}
-            </code>
+          <div className="row gap-8 mt-12">
+            <code className="loyalty-code">{referral.code}</code>
             <button
               className="btn btn-secondary btn-sm"
               onClick={() => {
@@ -253,17 +209,12 @@ export default function Loyalty() {
             </span>
           </div>
         )}
-        <form
-          onSubmit={onApplyCode}
-          className="row"
-          style={{ marginTop: 16, gap: 8 }}
-        >
+        <form onSubmit={onApplyCode} className="row gap-8 mt-16">
           <input
-            className="input"
+            className="input loyalty-code-input"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder={t("loyalty.codePlaceholder")}
-            style={{ flex: 1, maxWidth: 320 }}
           />
           <button className="btn btn-primary" disabled={busy}>
             {t("loyalty.applyBtn")}

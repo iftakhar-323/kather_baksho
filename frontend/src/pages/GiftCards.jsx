@@ -6,6 +6,8 @@ import {
 } from "../api/shopping";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
+import PageHeader from "../components/PageHeader";
+import Segmented from "../components/Segmented";
 import { useTranslation } from "../i18n/I18nProvider";
 
 function fmtBDT(n) {
@@ -104,41 +106,31 @@ export default function GiftCards() {
     }
   };
 
-  return (
-    <div style={{ maxWidth: 720, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 8 }}>{t("giftCards.head")}</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        {t("giftCards.subhead")}
-      </p>
+  const tabOptions = [
+    { value: "redeem", label: t("giftCards.tabRedeem") },
+    ...(user
+      ? [
+          { value: "buy", label: t("giftCards.tabBuy") },
+          { value: "my", label: t("giftCards.tabMy") },
+        ]
+      : []),
+  ];
 
-      <div className="row gap-8 mb-16">
-        <button
-          className={"btn btn-sm " + (tab === "redeem" ? "btn-primary" : "btn-secondary")}
-          onClick={() => setTab("redeem")}
-        >
-          {t("giftCards.tabRedeem")}
-        </button>
-        {user && (
-          <>
-            <button
-              className={"btn btn-sm " + (tab === "buy" ? "btn-primary" : "btn-secondary")}
-              onClick={() => setTab("buy")}
-            >
-              {t("giftCards.tabBuy")}
-            </button>
-            <button
-              className={"btn btn-sm " + (tab === "my" ? "btn-primary" : "btn-secondary")}
-              onClick={() => setTab("my")}
-            >
-              {t("giftCards.tabMy")}
-            </button>
-          </>
-        )}
-      </div>
+  return (
+    <div className="page-shell is-narrow">
+      <PageHeader title={t("giftCards.head")} sub={t("giftCards.subhead")} />
+
+      <Segmented
+        className="mb-16"
+        value={tab}
+        onChange={setTab}
+        options={tabOptions}
+        ariaLabel={t("giftCards.head")}
+      />
 
       {tab === "redeem" && (
         <div className="card card-pad-lg">
-          <h3 style={{ marginTop: 0 }}>{t("giftCards.redeemHeading")}</h3>
+          <h3 className="mt-0">{t("giftCards.redeemHeading")}</h3>
           <form onSubmit={onCheckBalance}>
             <input
               className="input"
@@ -168,21 +160,12 @@ export default function GiftCards() {
           </form>
 
           {balance && (
-            <div
-              style={{
-                marginTop: 16,
-                padding: 16,
-                background: "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
-                borderRadius: 12,
-              }}
-            >
+            <div className="gc-card mt-16">
               <div className="row">
-                <strong style={{ flex: 1, fontSize: 18 }}>{balance.code || code}</strong>
-                <span style={{ fontSize: 24, fontWeight: 700, color: "var(--brand-700)" }}>
-                  {fmtBDT(balance.value_remaining)}
-                </span>
+                <strong className="gc-card-code">{balance.code || code}</strong>
+                <span className="gc-card-value">{fmtBDT(balance.value_remaining)}</span>
               </div>
-              <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+              <div className="muted gc-card-meta">
                 {t("giftCards.statusLabel")} {balance.status || t("giftCards.statusActive")}
                 {balance.expires_at &&
                   t("giftCards.expiresOn", {
@@ -196,34 +179,28 @@ export default function GiftCards() {
 
       {tab === "buy" && user && (
         <form onSubmit={onBuy} className="card card-pad-lg">
-          <h3 style={{ marginTop: 0 }}>{t("giftCards.buyHeading")}</h3>
+          <h3 className="mt-0">{t("giftCards.buyHeading")}</h3>
 
-          {[
-            500, 1000, 2000, 5000,
-          ].map((a) => (
-            <button
-              key={a}
-              type="button"
-              className={
-                "btn btn-sm " + (amount === a ? "btn-primary" : "btn-secondary")
-              }
-              style={{ margin: "0 6px 6px 0" }}
-              onClick={() => setAmount(a)}
-            >
-              {fmtBDT(a)}
-            </button>
-          ))}
-          <div>
-            <input
-              className="input"
-              type="number"
-              min="100"
-              max="50000"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              style={{ maxWidth: 200 }}
-            />
+          <div className="row gap-8 gc-amounts">
+            {[500, 1000, 2000, 5000].map((a) => (
+              <button
+                key={a}
+                type="button"
+                className={"btn btn-sm " + (Number(amount) === a ? "btn-primary" : "btn-secondary")}
+                onClick={() => setAmount(a)}
+              >
+                {fmtBDT(a)}
+              </button>
+            ))}
           </div>
+          <input
+            className="input gc-amount-input"
+            type="number"
+            min="100"
+            max="50000"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
 
           <label className="field-label mt-8">{t("giftCards.recipientName")}</label>
           <input
@@ -240,11 +217,10 @@ export default function GiftCards() {
           />
           <label className="field-label mt-8">{t("giftCards.giftMessageOptional")}</label>
           <textarea
-            className="input"
+            className="textarea"
             rows={2}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            style={{ resize: "vertical" }}
           />
           <button className="btn btn-primary mt-8" disabled={busy}>
             {busy ? t("giftCards.issuing") : t("giftCards.issueFor", { amount: fmtBDT(amount) })}
@@ -261,22 +237,13 @@ export default function GiftCards() {
             </div>
           ) : (
             myCards.map((c) => (
-              <div
-                key={c.id}
-                className="card card-pad mb-8"
-                style={{
-                  background:
-                    "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
-                }}
-              >
+              <div key={c.id} className="card card-pad mb-8 gc-card">
                 <div className="row">
-                  <strong style={{ fontSize: 16 }}>{c.code}</strong>
+                  <strong className="gc-card-code">{c.code}</strong>
                   <span className="spacer" />
-                  <span style={{ fontSize: 22, fontWeight: 700, color: "var(--brand-700)" }}>
-                    {fmtBDT(c.value_remaining)}
-                  </span>
+                  <span className="gc-card-value">{fmtBDT(c.value_remaining)}</span>
                 </div>
-                <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                <div className="muted gc-card-meta">
                   {t("giftCards.ofAmount", { amount: fmtBDT(c.amount) })} · {c.status}
                   {c.recipient_name && t("giftCards.toRecipient", { name: c.recipient_name })}
                 </div>
