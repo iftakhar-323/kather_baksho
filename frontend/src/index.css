@@ -1230,6 +1230,93 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 
 /* Profile page */
 .profile-field-inline { flex: 1; margin: 0; }
+
+/* ============ Admin / workspace shared bits ============ */
+/* Filter / action toolbar above a table */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 16px 0;
+}
+.field-sm { max-width: 200px; }
+.field-md { max-width: 280px; }
+.select-sm { padding: 6px 10px; font-size: 13px; width: auto; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.th-right, .td-right { text-align: right; }
+.td-strong { font-weight: 600; }
+.td-total { font-weight: 700; }
+.cell-mono {
+  font-size: 11px;
+  color: var(--ink-400);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+.table-empty { padding: 24px; }
+.cap { text-transform: capitalize; }
+
+/* Admin dashboard panels + mini-lists */
+.admin-panels {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.admin-panel {
+  flex: 1;
+  min-width: 280px;
+  padding: 16px;
+}
+.admin-panel > h3 { margin-top: 0; }
+.admin-panel-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.admin-panel-stat-label { font-size: 12px; color: var(--ink-400); }
+.admin-panel-stat-value { font-size: 20px; font-weight: 700; color: var(--text-h); }
+.mini-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.mini-row:last-child { border-bottom: none; }
+.mini-rank { width: 22px; color: var(--brand-700); font-weight: 700; }
+[data-theme="dark"] .mini-rank { color: var(--brand-300); }
+.mini-grow { flex: 1; min-width: 0; }
+.mini-amt { min-width: 80px; text-align: right; font-weight: 600; }
+.mini-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.spark-empty { height: 36px; display: flex; align-items: center; }
+.admin-print-head { display: none; margin-bottom: 12px; }
+.dash-range-row { align-items: center; }
+.dash-panel-head { align-items: center; margin-bottom: 4px; }
+.dash-spark-caption { margin-bottom: 6px; }
+.dash-pie-row { align-items: center; gap: 16px; }
+.dash-legend-row { font-size: 13px; padding: 3px 0; }
+.dash-stock-left { font-weight: 700; color: var(--warning); }
+.dash-stock-left.is-out { color: var(--danger-strong); }
+[data-theme="dark"] .dash-stock-left.is-out { color: var(--danger); }
+.dash-status-pill { font-size: 14px; }
+/* Form field grid inside admin modals/forms */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
 .qa-mini-lb-row { padding: 6px 0; }
 .qa-mini-lb-rank { width: 24px; font-weight: 700; }
 .qa-mini-lb-name { flex: 1; }

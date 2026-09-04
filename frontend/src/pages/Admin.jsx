@@ -716,22 +716,22 @@ function ReturnsAdmin() {
                 <th>Type</th>
                 <th>Reason</th>
                 <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th className="th-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id ?? r.ID}>
                   <td><strong>#{r.order_id ?? r.ID}</strong></td>
-                  <td style={{ textTransform: "capitalize" }}>{r.type || "return"}</td>
+                  <td className="cap">{r.type || "return"}</td>
                   <td>{r.reason || r.details}</td>
                   <td>
                     <span className={`pill ${r.status === "approved" || r.status === "refunded" ? "pill-active" : r.status === "rejected" ? "pill-cancel" : "pill-pending"}`}>
                       {r.status}
                     </span>
                   </td>
-                  <td style={{ textAlign: "right" }}>
-                    <div className="row gap-4" style={{ justifyContent: "flex-end" }}>
+                  <td className="td-right">
+                    <div className="row gap-4 row-end">
                       <button
                         className="btn btn-primary btn-xs"
                         onClick={() => onUpdate(r.id ?? r.ID, "approved")}
@@ -1687,7 +1687,7 @@ function OrdersTab() {
 
   return (
     <div>
-      <div className="row mt-16 mb-16 gap-8" style={{ flexWrap: "wrap" }}>
+      <div className="toolbar">
         <button
           className="btn btn-primary"
           onClick={() => setShowForm(true)}
@@ -1695,15 +1695,13 @@ function OrdersTab() {
           + New Order
         </button>
         <input
-          className="input"
-          style={{ maxWidth: 280 }}
+          className="input field-md"
           placeholder="Search by #id, user, status…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <select
-          className="select"
-          style={{ maxWidth: 180 }}
+          className="select field-sm"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -1715,7 +1713,7 @@ function OrdersTab() {
           ))}
         </select>
         <span className="spacer" />
-        <span className="muted" style={{ fontSize: 13 }}>
+        <span className="muted text-sm">
           {filtered.length} of {orders.length} order{orders.length === 1 ? "" : "s"}
         </span>
       </div>
@@ -1751,13 +1749,13 @@ function OrdersTab() {
                 <th>Items</th>
                 <th>Total</th>
                 <th>Status</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th className="th-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((o) => (
                 <tr key={o.ID}>
-                  <td style={{ fontWeight: 600 }}>#{o.ID}</td>
+                  <td className="td-strong">#{o.ID}</td>
                   <td>{userLabel(o.user_id)}</td>
                   <td>{new Date(o.CreatedAt ?? o.created_at ?? Date.now()).toLocaleDateString()}</td>
                   <td>
@@ -1765,30 +1763,27 @@ function OrdersTab() {
                       {o.payment_method || 'cod'}
                     </span>
                     {o.transaction_id && (
-                      <div style={{ fontSize: 11, color: 'var(--ink-400)', fontFamily: 'var(--mono)', marginTop: 2 }}>
-                        {o.transaction_id}
-                      </div>
+                      <div className="cell-mono">{o.transaction_id}</div>
                     )}
                   </td>
                   <td>
                     <div className="stack gap-4">
                       {(o.items || []).map((it) => (
-                        <div key={it.id ?? it.ID} style={{ fontSize: 13 }}>
+                        <div key={it.id ?? it.ID} className="text-sm">
                           {it.product?.name || `#${it.product_id}`}{" "}
                           <span className="muted">× {it.quantity}</span>
                         </div>
                       ))}
                     </div>
                   </td>
-                  <td style={{ fontWeight: 700 }}>
+                  <td className="td-total">
                     ৳{Number(o.total_price).toFixed(2)}
                   </td>
                   <td>
                     <select
-                      className="select"
+                      className="select select-sm"
                       value={o.status}
                       onChange={(e) => changeStatus(o, e.target.value)}
-                      style={{ padding: "6px 10px", fontSize: 13 }}
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s}>
@@ -1797,7 +1792,7 @@ function OrdersTab() {
                       ))}
                     </select>
                   </td>
-                  <td style={{ textAlign: "right" }}>
+                  <td className="td-right">
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => remove(o)}
@@ -1810,7 +1805,7 @@ function OrdersTab() {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan="7">
-                    <div className="empty" style={{ padding: 24 }}>
+                    <div className="empty table-empty">
                       <div className="emoji">📭</div>
                       <h3>No orders match your filters</h3>
                     </div>
@@ -2150,17 +2145,14 @@ function DashboardTab() {
 
   return (
     <div className="kb-print-area" id="admin-dashboard">
-      <div
-        className="kb-print-only"
-        style={{ display: "none", marginBottom: 12 }}
-      >
-        <h1 style={{ margin: 0 }}>🪴 KatherBox — Analytics report</h1>
+      <div className="kb-print-only admin-print-head">
+        <h1 className="mt-0">🪴 KatherBox — Analytics report</h1>
         <div className="muted">
           Last {days} days · generated {new Date().toLocaleString("en-GB")}
         </div>
       </div>
 
-      <div className="row mb-16 no-print" style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <div className="row mb-16 no-print gap-8 row-wrap dash-range-row">
         <label className="muted">Window:</label>
         <div className="kb-analytics-range">
           {[7, 30, 90, 365].map((d) => (
@@ -2174,19 +2166,13 @@ function DashboardTab() {
             </button>
           ))}
         </div>
-        <span style={{ flex: 1 }} />
+        <span className="spacer" />
         <button type="button" className="btn btn-secondary btn-sm" onClick={printReport}>
           🖨 Print / Save as PDF
         </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))",
-          gap: 12,
-        }}
-      >
+      <div className="card-grid is-tight">
         {tiles.map((t) => (
           <div key={t.label} className="card admin-kpi">
             <span className="k-emoji" aria-hidden="true">{t.emoji}</span>
@@ -2197,9 +2183,9 @@ function DashboardTab() {
       </div>
 
       {summary && (
-        <div className="card mt-16" style={{ padding: 16 }}>
-          <div className="row" style={{ alignItems: "center", marginBottom: 4 }}>
-            <h3 style={{ margin: 0, flex: 1 }}>📊 Revenue — last {days} days</h3>
+        <div className="card admin-panel mt-16">
+          <div className="row dash-panel-head">
+            <h3 className="mt-0 mini-grow">📊 Revenue — last {days} days</h3>
             <button
               type="button"
               className="btn btn-ghost btn-sm"
@@ -2223,7 +2209,7 @@ function DashboardTab() {
               ⬇ Export CSV
             </button>
           </div>
-          <div className="row" style={{ gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+          <div className="admin-panel-stats">
             {[
               { label: `Revenue (${days}d)`, value: `৳${Number(summary.total_revenue || 0).toLocaleString()}` },
               { label: `Orders (${days}d)`, value: Number(summary.total_orders || 0).toLocaleString() },
@@ -2231,8 +2217,8 @@ function DashboardTab() {
               { label: "Avg. order value", value: `৳${Number(summary.avg_order || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}` },
             ].map((s) => (
               <div key={s.label}>
-                <div className="muted" style={{ fontSize: 12 }}>{s.label}</div>
-                <div style={{ fontSize: 20, fontWeight: 700 }}>{s.value}</div>
+                <div className="admin-panel-stat-label">{s.label}</div>
+                <div className="admin-panel-stat-value">{s.value}</div>
               </div>
             ))}
           </div>
@@ -2248,10 +2234,10 @@ function DashboardTab() {
       )}
 
       {summary && (
-        <div className="row mt-16" style={{ alignItems: "stretch", gap: 12 }}>
-          <div className="card" style={{ flex: 1, padding: 16 }}>
-            <h3 style={{ marginTop: 0 }}>📈 Traffic sparkline ({days}d)</h3>
-            <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>
+        <div className="admin-panels">
+          <div className="card admin-panel">
+            <h3>📈 Traffic sparkline ({days}d)</h3>
+            <div className="muted text-sm dash-spark-caption">
               {last14.length === 0
                 ? "No traffic logged yet"
                 : `${last14.reduce((s, t) => s + (t.page_views || t.views || 0), 0)} page views in last 14 logged days`}
@@ -2273,18 +2259,16 @@ function DashboardTab() {
                 })}
               </svg>
             ) : (
-              <div className="muted" style={{ height: sparkH, display: "flex", alignItems: "center" }}>
-                No data
-              </div>
+              <div className="muted spark-empty">No data</div>
             )}
           </div>
 
-          <div className="card" style={{ flex: 1, padding: 16 }}>
-            <h3 style={{ marginTop: 0 }}>🥧 Revenue by category</h3>
+          <div className="card admin-panel">
+            <h3>🥧 Revenue by category</h3>
             {categories.length === 0 ? (
               <p className="muted">No sales yet.</p>
             ) : (
-              <div className="row" style={{ alignItems: "center", gap: 16 }}>
+              <div className="row dash-pie-row">
                 <svg width={pieSize} height={pieSize} viewBox={`0 0 ${pieSize} ${pieSize}`}>
                   {pieArcs.map((a, i) => (
                     <path key={i} d={a.d} fill={a.color}>
@@ -2293,20 +2277,11 @@ function DashboardTab() {
                   ))}
                   <circle cx={pieCx} cy={pieCy} r={pieR * 0.55} fill="white" />
                 </svg>
-                <div style={{ flex: 1 }}>
+                <div className="mini-grow">
                   {pieArcs.map((a, i) => (
-                    <div key={i} className="row" style={{ fontSize: 13, padding: "3px 0" }}>
-                      <span
-                        style={{
-                          width: 12,
-                          height: 12,
-                          background: a.color,
-                          borderRadius: 3,
-                          display: "inline-block",
-                          marginRight: 6,
-                        }}
-                      />
-                      <span style={{ flex: 1 }}>{a.label}</span>
+                    <div key={i} className="row dash-legend-row">
+                      <span className="mini-swatch" style={{ background: a.color }} />
+                      <span className="mini-grow">{a.label}</span>
                       <span className="muted">{a.pct}%</span>
                     </div>
                   ))}
@@ -2317,38 +2292,32 @@ function DashboardTab() {
         </div>
       )}
 
-      <div className="row mt-16" style={{ alignItems: "stretch", gap: 12, flexWrap: "wrap" }}>
-        <div className="card" style={{ flex: 1, minWidth: 280, padding: 16 }}>
-          <h3 style={{ marginTop: 0 }}>🏆 Top-selling products</h3>
+      <div className="admin-panels">
+        <div className="card admin-panel">
+          <h3>🏆 Top-selling products</h3>
           {(stats.top_products || []).length === 0 && <p className="muted">No sales yet.</p>}
           {(stats.top_products || []).map((p, i) => (
-            <div key={p.product_id} className="row" style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}>
-              <span style={{ width: 24, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
-              <span style={{ flex: 1 }}>{p.name}</span>
+            <div key={p.product_id} className="mini-row">
+              <span className="mini-rank">#{i + 1}</span>
+              <span className="mini-grow">{p.name}</span>
               <span className="muted">{p.sold} sold</span>
-              <span style={{ minWidth: 80, textAlign: "right", fontWeight: 600 }}>
-                ৳{Number(p.revenue).toFixed(0)}
-              </span>
+              <span className="mini-amt">৳{Number(p.revenue).toFixed(0)}</span>
             </div>
           ))}
         </div>
 
-        <div className="card" style={{ flex: 1, minWidth: 280, padding: 16 }}>
-          <h3 style={{ marginTop: 0 }}>👑 Top customers</h3>
+        <div className="card admin-panel">
+          <h3>👑 Top customers</h3>
           {topCustomers.length === 0 ? (
             <p className="muted">No buyers yet.</p>
           ) : (
             topCustomers.map((u, i) => (
-              <div
-                key={u.user_id || u.email}
-                className="row"
-                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)", alignItems: "center", gap: 8 }}
-              >
-                <span style={{ width: 20, color: "var(--brand-700)", fontWeight: 700 }}>#{i + 1}</span>
+              <div key={u.user_id || u.email} className="mini-row">
+                <span className="mini-rank">#{i + 1}</span>
                 <Avatar name={u.name} email={u.email} size={26} />
-                <span style={{ flex: 1 }}>{u.name || u.email}</span>
+                <span className="mini-grow">{u.name || u.email}</span>
                 <span className="muted">{u.orders ?? u.order_count ?? 0} orders</span>
-                <span style={{ minWidth: 80, textAlign: "right", fontWeight: 600 }}>
+                <span className="mini-amt">
                   ৳{Number(u.spent || u.total_spent || u.total_spend || 0).toFixed(0)}
                 </span>
               </div>
@@ -2356,24 +2325,15 @@ function DashboardTab() {
           )}
         </div>
 
-        <div className="card" style={{ flex: 1, minWidth: 280, padding: 16 }}>
-          <h3 style={{ marginTop: 0 }}>⚠️ Low stock</h3>
+        <div className="card admin-panel">
+          <h3>⚠️ Low stock</h3>
           {inventory.length === 0 ? (
             <p className="muted">All products healthy.</p>
           ) : (
             inventory.slice(0, 8).map((p) => (
-              <div
-                key={p.ID || p.id}
-                className="row"
-                style={{ padding: "6px 0", borderBottom: "1px solid var(--brand-100)" }}
-              >
-                <span style={{ flex: 1 }}>{p.name}</span>
-                <span
-                  style={{
-                    color: p.stock === 0 ? "var(--danger-strong)" : "var(--warning)",
-                    fontWeight: 700,
-                  }}
-                >
+              <div key={p.ID || p.id} className="mini-row">
+                <span className="mini-grow">{p.name}</span>
+                <span className={"dash-stock-left" + (p.stock === 0 ? " is-out" : "")}>
                   {p.stock} left
                 </span>
               </div>
@@ -2382,12 +2342,12 @@ function DashboardTab() {
         </div>
       </div>
 
-      <div className="card mt-16" style={{ padding: 16 }}>
-        <h3 style={{ marginTop: 0 }}>📦 Orders by status</h3>
-        <div className="row" style={{ gap: 12, flexWrap: "wrap" }}>
+      <div className="card admin-panel mt-16">
+        <h3>📦 Orders by status</h3>
+        <div className="row gap-12 row-wrap">
           {(stats.orders_by_status || []).length === 0 && <p className="muted">No orders yet.</p>}
           {(stats.orders_by_status || []).map((s) => (
-            <span key={s.status} className="status-pill" style={{ fontSize: 14 }}>
+            <span key={s.status} className="status-pill dash-status-pill">
               {s.status} <strong>· {s.count}</strong>
             </span>
           ))}
