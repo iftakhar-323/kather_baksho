@@ -12,6 +12,7 @@ import {
 import { useToast } from "../components/Toast";
 import { useConfirm } from "../components/Confirm";
 import { useTranslation } from "../i18n/I18nProvider";
+import PageHeader from "../components/PageHeader";
 
 const PLAN_KEYS = [
   { key: "monthly", price: 1200, interval: 30, emoji: "🪴" },
@@ -126,56 +127,46 @@ export default function Subscriptions() {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <h1 style={{ marginBottom: 6 }}>{t("subscriptions.headerTitle")}</h1>
-        <p className="muted">
-          {t("subscriptions.headerSubtitle")}
-        </p>
-      </div>
+    <div className="page-shell is-wide">
+      <PageHeader
+        title={t("subscriptions.headerTitle")}
+        sub={t("subscriptions.headerSubtitle")}
+      />
 
-      {msg && (
-        <div
-          className="card"
-          style={{
-            padding: 12,
-            color: "var(--brand-700)",
-            marginBottom: 12,
-          }}
-        >
-          {msg}
-        </div>
-      )}
+      {msg && <div className="notice">{msg}</div>}
       {error && <div className="warning">{error}</div>}
 
-      <h2>{t("subscriptions.availablePlans")}</h2>
-      <div className="product-grid">
-        {PLAN_KEYS.map((p) => (
-          <div key={p.key} className="product-card">
-            <div className="image">
-              <span style={{ fontSize: 56 }}>{p.emoji}</span>
-            </div>
-            <div className="body">
-              <h3>{t(`subscriptions.plans.${p.key}.name`)}</h3>
-              <p className="desc">{t(`subscriptions.plans.${p.key}.desc`)}</p>
-              <div className="row" style={{ alignItems: "center" }}>
-                <span className="price">৳{p.price}</span>
-                <span className="muted" style={{ fontSize: 13 }}>
-                  {t("subscriptions.planInterval", { count: p.interval })}
-                </span>
+      <section className="section">
+        <h2>{t("subscriptions.availablePlans")}</h2>
+        <div className="product-grid">
+          {PLAN_KEYS.map((p) => (
+            <div key={p.key} className="product-card">
+              <div className="image">
+                <span className="sub-plan-emoji">{p.emoji}</span>
               </div>
-              <button
-                onClick={() => subscribe(p)}
-                className="btn btn-primary btn-block mt-8"
-              >
-                {t("subscriptions.subscribe")}
-              </button>
+              <div className="body">
+                <h3>{t(`subscriptions.plans.${p.key}.name`)}</h3>
+                <p className="desc">{t(`subscriptions.plans.${p.key}.desc`)}</p>
+                <div className="row" style={{ alignItems: "center" }}>
+                  <span className="price">৳{p.price}</span>
+                  <span className="muted sub-interval-note">
+                    {t("subscriptions.planInterval", { count: p.interval })}
+                  </span>
+                </div>
+                <button
+                  onClick={() => subscribe(p)}
+                  className="btn btn-primary btn-block mt-8"
+                >
+                  {t("subscriptions.subscribe")}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
 
-      <h2 style={{ marginTop: 32 }}>{t("subscriptions.yourSubs")}</h2>
+      <section className="section">
+        <h2>{t("subscriptions.yourSubs")}</h2>
       {loading && <div className="empty">{t("subscriptions.loading")}</div>}
       {!loading && list.length === 0 && (
         <div className="empty">
@@ -185,7 +176,7 @@ export default function Subscriptions() {
         </div>
       )}
       {!loading && list.length > 0 && (
-        <div className="card" style={{ padding: 0 }}>
+        <div className="card list-flush">
           {list.map((s) => {
             const overdue =
               s.status === "active" &&
@@ -204,28 +195,11 @@ export default function Subscriptions() {
                 ? t("subscriptions.statusDeliveryDue")
                 : t("subscriptions.statusActive");
             return (
-              <div
-                key={s.ID}
-                className="row-card"
-                style={{
-                  borderRadius: 0,
-                  borderBottom: "1px solid var(--brand-100)",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: 8,
-                }}
-              >
-                <div
-                  className="row-icon"
-                  style={{
-                    background: "linear-gradient(135deg,#e8f1e6,#cfe1cb)",
-                  }}
-                >
-                  <span style={{ fontSize: 24 }}>📦</span>
-                </div>
-                <div style={{ flex: 1, minWidth: 180 }}>
-                  <div style={{ fontWeight: 600 }}>{s.plan_name}</div>
-                  <div className="muted" style={{ fontSize: 13 }}>
+              <div key={s.ID} className="list-row is-wrap">
+                <div className="list-row-icon">📦</div>
+                <div className="list-row-main">
+                  <div className="list-row-title">{s.plan_name}</div>
+                  <div className="list-row-sub">
                     {t("subscriptions.subPriceInterval", {
                       price: "৳" + s.price,
                       count: s.interval_days,
@@ -236,18 +210,12 @@ export default function Subscriptions() {
                   </div>
                 </div>
                 <span className={"status-pill " + pillCls}>{pillTxt}</span>
-                <div
-                  className="muted"
-                  style={{ width: 110, textAlign: "right" }}
-                >
+                <div className="list-row-when">
                   {s.next_delivery
                     ? t("subscriptions.nextOn", { date: fmtDate(s.next_delivery) })
                     : t("subscriptions.nextNone")}
                 </div>
-                <div
-                  className="row"
-                  style={{ gap: 6, flexWrap: "wrap" }}
-                >
+                <div className="row gap-8 row-wrap">
                   {s.status === "active" && (
                     <>
                       <button
@@ -316,6 +284,7 @@ export default function Subscriptions() {
           })}
         </div>
       )}
+      </section>
 
       {historyOf && (
         <DeliveryHistory

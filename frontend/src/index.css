@@ -941,6 +941,7 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 }
 .list-flush .list-row:last-child { border-bottom: none; }
 .list-flush .list-row:hover { background: var(--surface-2); }
+.list-row.is-wrap { flex-wrap: wrap; }
 .list-row-main { flex: 1; min-width: 0; }
 .list-row-title { font-weight: 600; color: var(--text-h); }
 .list-row-sub { font-size: 13px; color: var(--ink-400); }
@@ -967,6 +968,30 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 /* Consultations page */
 .consult-expert-emoji { font-size: 48px; }
 .consult-rate-note { font-size: 13px; }
+
+/* Subscriptions page */
+.sub-plan-emoji { font-size: 56px; }
+.sub-interval-note { font-size: 13px; }
+
+/* Corporate page */
+.corp-field { flex: 1; min-width: 200px; }
+.corp-recipient-row { margin-bottom: 6px; flex-wrap: wrap; }
+.corp-recipient-name { flex: 1; min-width: 140px; }
+.corp-recipient-addr { flex: 2; min-width: 200px; }
+
+/* Corporate orders page */
+.co-field-grow { flex: 1; min-width: 200px; }
+.co-field-qty { width: 120px; }
+.co-field-budget { width: 160px; }
+.co-order-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+.co-order-card:hover { border-color: var(--brand-300); }
+.co-order-date { font-size: 12px; margin-top: 4px; }
 
 /* Seasonal page */
 .tabs.is-wrap { flex-wrap: wrap; }

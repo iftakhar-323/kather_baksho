@@ -8,6 +8,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
+import PageHeader from "../components/PageHeader";
 
 function fmtBDT(n) {
   return `৳${Number(n || 0).toLocaleString("en-IN")}`;
@@ -120,14 +121,12 @@ export default function CorporateOrders({ embedded = false }) {
   };
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+    <div className={embedded ? "" : "page-shell is-wide"}>
       {!embedded && (
-        <>
-          <h1 style={{ marginBottom: 8 }}>{t("corporateOrders.head")}</h1>
-          <p className="muted" style={{ marginBottom: 16 }}>
-            {t("corporateOrders.subhead")}
-          </p>
-        </>
+        <PageHeader
+          title={t("corporateOrders.head")}
+          sub={t("corporateOrders.subhead")}
+        />
       )}
 
       <div className="row mb-16">
@@ -141,9 +140,9 @@ export default function CorporateOrders({ embedded = false }) {
 
       {showForm && (
         <form onSubmit={onSubmit} className="card card-pad-lg mb-16">
-          <h3 style={{ marginTop: 0 }}>{t("corporateOrders.formHeading")}</h3>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 200 }}>
+          <h3 className="mt-0">{t("corporateOrders.formHeading")}</h3>
+          <div className="row gap-8 row-wrap">
+            <div className="co-field-grow">
               <label className="field-label">{t("corporateOrders.companyLabel")}</label>
               <input
                 className="input"
@@ -152,7 +151,7 @@ export default function CorporateOrders({ embedded = false }) {
                 required
               />
             </div>
-            <div style={{ width: 120 }}>
+            <div className="co-field-qty">
               <label className="field-label">{t("corporateOrders.quantityLabel")}</label>
               <input
                 className="input"
@@ -162,7 +161,7 @@ export default function CorporateOrders({ embedded = false }) {
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </div>
-            <div style={{ width: 160 }}>
+            <div className="co-field-budget">
               <label className="field-label">{t("corporateOrders.budgetLabel")}</label>
               <input
                 className="input"
@@ -183,14 +182,14 @@ export default function CorporateOrders({ embedded = false }) {
           />
           <label className="field-label mt-8">{t("corporateOrders.notesLabel")}</label>
           <textarea
-            className="input"
+            className="textarea"
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
           <label className="field-label mt-8">{t("corporateOrders.brandingLabel")}</label>
           <textarea
-            className="input"
+            className="textarea"
             rows={2}
             value={branding}
             onChange={(e) => setBranding(e.target.value)}
@@ -211,15 +210,15 @@ export default function CorporateOrders({ embedded = false }) {
           <h3>{t("corporateOrders.noOrdersHeading")}</h3>
         </div>
       ) : (
-        <div>
+        <div className="stack gap-8">
           {orders.map((o) => (
-            <div
+            <button
               key={o.id}
-              className="card card-pad"
-              style={{ marginBottom: 8, cursor: "pointer" }}
+              type="button"
+              className="card card-pad co-order-card"
               onClick={() => setActive(o)}
             >
-              <div className="row">
+              <div className="row gap-8">
                 <strong>{o.company_name || t("corporateOrders.orderFallback", { id: o.id })}</strong>
                 <span className="tag tag-leaf">{o.status}</span>
                 <span className="spacer" />
@@ -227,35 +226,20 @@ export default function CorporateOrders({ embedded = false }) {
                   {t("corporateOrders.qtyPcsBudget", { qty: o.quantity, budget: fmtBDT(o.budget) })}
                 </span>
               </div>
-              <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              <div className="muted co-order-date">
                 {t("corporateOrders.submittedOn", {
                   date: new Date(o.created_at).toLocaleDateString(),
                 })}
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
 
       {active && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 100,
-          }}
-          onClick={() => setActive(null)}
-        >
-          <div
-            className="card card-pad-lg"
-            style={{ maxWidth: 560, width: "90%", maxHeight: "85vh", overflow: "auto" }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 style={{ marginTop: 0 }}>
+        <div className="modal-backdrop" onClick={() => setActive(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h2 className="mt-0">
               {active.company_name || t("corporateOrders.orderFallback", { id: active.id })}
             </h2>
             <p className="muted">
@@ -271,7 +255,7 @@ export default function CorporateOrders({ embedded = false }) {
             {isAdmin && (
               <>
                 <h4>{t("corporateOrders.updateStatusHeading")}</h4>
-                <div className="row gap-4" style={{ flexWrap: "wrap" }}>
+                <div className="row gap-4 row-wrap">
                   {STATUS_FLOW.map((s) => (
                     <button
                       key={s}
