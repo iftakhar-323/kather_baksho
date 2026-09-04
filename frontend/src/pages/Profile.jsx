@@ -134,7 +134,7 @@ function EditProfileTab({ onSaved }) {
       <h3>{t("profile.editProfile")}</h3>
       <p className="profile-hint">{t("profile.editHint")}</p>
 
-      <div className="kb-user-cell" style={{ marginBottom: 16 }}>
+      <div className="kb-user-cell mb-16">
         <Avatar
           name={form.name}
           email={user?.email}
@@ -142,7 +142,7 @@ function EditProfileTab({ onSaved }) {
           size={64}
           ring
         />
-        <label className="profile-field" style={{ flex: 1, margin: 0 }}>
+        <label className="profile-field profile-field-inline">
           <span>{t("profile.avatarUrl")}</span>
           <input
             type="url"

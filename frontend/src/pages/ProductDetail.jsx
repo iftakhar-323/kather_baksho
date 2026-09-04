@@ -141,7 +141,7 @@ export default function ProductDetail({ productId, onBack }) {
   const stockOk = product.stock > 0;
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto" }}>
+    <div className="page-shell">
       <Breadcrumbs
         items={[
           { label: t("nav.shop"), to: "/" },
@@ -158,23 +158,16 @@ export default function ProductDetail({ productId, onBack }) {
         {t("productDetail.backToShop")}
       </button>
 
-      <div
-        className="card card-pad-lg"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "minmax(220px, 320px) 1fr",
-          gap: 32,
-        }}
-      >
+      <div className="card card-pad-lg pdp-layout">
         <ProductGallery
           product={product}
           zoomHint={t("productDetail.clickToZoom")}
         />
 
         <div>
-          <h1 style={{ marginBottom: 8 }}>{product.name}</h1>
+          <h1 className="pdp-name">{product.name}</h1>
 
-          <div className="row gap-8" style={{ flexWrap: "wrap" }}>
+          <div className="row gap-8 row-wrap">
             <span className="tag">{product.category}</span>
             {product.subcategory && (
               <span className="tag tag-bark">
@@ -186,25 +179,11 @@ export default function ProductDetail({ productId, onBack }) {
             )}
           </div>
 
-          <div
-            style={{
-              fontFamily: "var(--heading)",
-              fontWeight: 700,
-              fontSize: 30,
-              color: "var(--brand-700)",
-              marginTop: 16,
-            }}
-          >
+          <div className="pdp-price">
             ৳{Number(product.price).toLocaleString()}
           </div>
 
-          <div
-            className="mt-8 mb-16"
-            style={{
-              color: stockOk ? "var(--brand-700)" : "var(--danger-strong)",
-              fontWeight: 600,
-            }}
-          >
+          <div className={"mt-8 mb-16 pdp-stock" + (stockOk ? "" : " is-out")}>
             {stockOk
               ? product.stock < 5
                 ? t("productDetail.stockLow", { count: product.stock })
@@ -212,17 +191,11 @@ export default function ProductDetail({ productId, onBack }) {
               : t("productDetail.stockOut")}
           </div>
 
-          <p
-            style={{
-              lineHeight: 1.65,
-              color: "var(--ink-500)",
-              marginBottom: 20,
-            }}
-          >
+          <p className="pdp-desc">
             {product.description || t("productDetail.noDescription")}
           </p>
 
-          <div className="row gap-12" style={{ flexWrap: "wrap" }}>
+          <div className="row gap-12 row-wrap">
             {stockOk && (
               <div className="qty" aria-label={t("productDetail.quantity") || "Quantity"}>
                 <button
@@ -247,16 +220,13 @@ export default function ProductDetail({ productId, onBack }) {
             <button
               onClick={handleAdd}
               disabled={!stockOk || status === "loading"}
-              className="btn btn-primary btn-lg"
-              style={{
-                background: status === "added" ? "var(--success)" : undefined,
-              }}
+              className={"btn btn-lg " + (status === "added" ? "btn-success" : "btn-primary")}
             >
               {btnLabel}
             </button>
           </div>
 
-          <div className="row gap-8 mt-12" style={{ flexWrap: "wrap" }}>
+          <div className="row gap-8 mt-12 row-wrap">
             <button
               className={"btn btn-secondary btn-sm" + (inCompare ? "" : "")}
               onClick={() => {
@@ -313,9 +283,9 @@ export default function ProductDetail({ productId, onBack }) {
       </div>
 
       {fbt.length > 0 && (
-        <section className="card card-pad-lg fbt-section" style={{ marginTop: 24 }}>
-          <h2 style={{ marginBottom: 4 }}>{t("productDetail.fbtHeading")}</h2>
-          <p className="muted" style={{ marginBottom: 16 }}>{t("productDetail.fbtSubhead")}</p>
+        <section className="card card-pad-lg fbt-section section">
+          <h2 className="pdp-sub-h2">{t("productDetail.fbtHeading")}</h2>
+          <p className="muted mb-16">{t("productDetail.fbtSubhead")}</p>
 
           <div className="fbt-row">
             <div className="fbt-tile fbt-tile-main">
@@ -368,8 +338,8 @@ export default function ProductDetail({ productId, onBack }) {
       <ReviewsSection productId={product.ID} />
 
       {related.length > 0 && (
-        <section style={{ marginTop: 32 }}>
-          <h2 style={{ marginBottom: 14 }}>{t("productDetail.relatedHeading")}</h2>
+        <section className="section">
+          <h2>{t("productDetail.relatedHeading")}</h2>
           <div className="product-grid">
             {related.slice(0, 4).map((p) => (
               <ProductCard key={p.ID} product={p} />

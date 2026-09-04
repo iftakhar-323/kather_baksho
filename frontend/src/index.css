@@ -1179,6 +1179,57 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
 /* Flex helpers for form rows */
 .flex-1 { flex: 1; }
 .flex-2 { flex: 2; }
+
+/* Cart order-placed screen */
+.cart-success { max-width: 520px; margin: 32px auto; text-align: center; }
+.cart-success-emoji { font-size: 64px; }
+.cart-summary-left { text-align: left; }
+.txn-id { font-family: var(--mono); font-size: 13px; }
+
+/* Success-state button (transient "Added ✓") */
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover:not(:disabled) { background: var(--success); filter: brightness(0.95); }
+
+/* Product detail page */
+.pdp-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 32px;
+}
+@media (max-width: 720px) {
+  .pdp-layout { grid-template-columns: 1fr; gap: 20px; }
+}
+.pdp-name { margin-bottom: 8px; }
+.pdp-price {
+  font-family: var(--heading);
+  font-weight: 700;
+  font-size: 30px;
+  color: var(--brand-700);
+  margin-top: 16px;
+}
+[data-theme="dark"] .pdp-price { color: var(--brand-300); }
+.pdp-stock { color: var(--brand-700); font-weight: 600; }
+.pdp-stock.is-out { color: var(--danger-strong); }
+[data-theme="dark"] .pdp-stock { color: var(--brand-300); }
+[data-theme="dark"] .pdp-stock.is-out { color: var(--danger); }
+.pdp-desc { line-height: 1.65; color: var(--ink-500); margin-bottom: 20px; }
+[data-theme="dark"] .pdp-desc { color: var(--text); }
+.pdp-sub-h2 { margin-bottom: 4px; }
+
+/* Home / storefront */
+.gift-finder { margin-bottom: 24px; scroll-margin-top: 88px; }
+.gift-finder-head { align-items: center; gap: 12px; }
+.gift-finder-emoji { font-size: 24px; }
+.gift-finder-title { margin: 0; font-size: 1.15rem; }
+.gift-finder-sub { font-size: 13px; }
+.gift-finder-error { padding: 12px 0; }
+.home-results-h2 { font-size: 1.25rem; }
+.home-sort { padding: 6px 10px; font-size: 13px; width: auto; }
+.home-page-of { align-self: center; font-size: 13px; }
+#shop { scroll-margin-top: 88px; }
+
+/* Profile page */
+.profile-field-inline { flex: 1; margin: 0; }
 .qa-mini-lb-row { padding: 6px 0; }
 .qa-mini-lb-rank { width: 24px; font-weight: 700; }
 .qa-mini-lb-name { flex: 1; }

@@ -116,7 +116,7 @@ export default function Cart({ onOrderPlaced }) {
 
   if (!user) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🔒</div>
         <h3>{t("cart.loginPromptTitle")}</h3>
         <p>{t("cart.loginPromptBody")}</p>
@@ -146,7 +146,7 @@ export default function Cart({ onOrderPlaced }) {
     return (
       <div className="empty">
         <div className="emoji">⚠️</div>
-        <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
+        <h3 className="text-danger">{error}</h3>
       </div>
     );
   }
@@ -264,17 +264,14 @@ export default function Cart({ onOrderPlaced }) {
     const sub = order.subtotal || 0;
     const disc = order.discount_total || 0;
     return (
-      <div
-        className="card card-pad-lg"
-        style={{ maxWidth: 520, margin: "32px auto", textAlign: "center" }}
-      >
-        <div style={{ fontSize: 64 }}>🎉</div>
-        <h2 style={{ color: "var(--brand-700)" }}>{t("cart.placed")}</h2>
+      <div className="card card-pad-lg cart-success">
+        <div className="cart-success-emoji">🎉</div>
+        <h2 className="text-accent">{t("cart.placed")}</h2>
         <p className="muted mt-8">
           Order <strong>#{order.order.ID}</strong>
         </p>
 
-        <div className="cart-summary mt-16" style={{ textAlign: "left" }}>
+        <div className="cart-summary mt-16 cart-summary-left">
           <div className="cart-summary-row"><span>{t("cart.subtotal")}</span><strong>{fmtBDT(sub)}</strong></div>
           {disc > 0 && (
             <div className="cart-summary-row cart-savings"><span>{t("cart.youSaved")}</span><strong>−{fmtBDT(disc)}</strong></div>
@@ -288,7 +285,7 @@ export default function Cart({ onOrderPlaced }) {
           {order.order.transaction_id && (
             <div className="cart-summary-row">
               <span>Transaction ID</span>
-              <strong style={{ fontFamily: 'var(--mono)', fontSize: 13 }}>{order.order.transaction_id}</strong>
+              <strong className="txn-id">{order.order.transaction_id}</strong>
             </div>
           )}
           <div className="cart-summary-row cart-summary-total"><span>{t("cart.totalPaid")}</span><strong>{fmtBDT(order.order.total_price)}</strong></div>
@@ -300,7 +297,7 @@ export default function Cart({ onOrderPlaced }) {
           </div>
         )}
 
-        <div className="row gap-8 mt-16" style={{ justifyContent: "center" }}>
+        <div className="row gap-8 mt-16 row-center">
           <button
             className="btn btn-primary"
             onClick={() => {
@@ -324,7 +321,7 @@ export default function Cart({ onOrderPlaced }) {
   // ── Empty cart ────────────────────────────────────────────────────────────
   if (items.length === 0) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty empty-gate">
         <div className="emoji">🪴</div>
         <h3>{t("cart.title")}</h3>
         <p>{t("cart.emptyBody")}</p>
@@ -689,7 +686,7 @@ export default function Cart({ onOrderPlaced }) {
           >
             <h3 className="cart-modal-title">{confirm.title}</h3>
             <p className="cart-modal-body">{confirm.body}</p>
-            <div className="row gap-8" style={{ justifyContent: "flex-end" }}>
+            <div className="row gap-8 row-end">
               <button
                 className="btn btn-ghost"
                 onClick={() => setConfirm(null)}

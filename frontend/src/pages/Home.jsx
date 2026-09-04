@@ -179,12 +179,12 @@ export default function Home({ slot = null }) {
       {slot}
 
       {/* ===== Gift recommender widget ===== */}
-      <section id="gift-finder" className="card" style={{ marginBottom: 24, scrollMarginTop: 88 }}>
-        <div className="row" style={{ alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 24 }}>🎁</span>
-          <h2 style={{ margin: 0, fontSize: "1.15rem" }}>{t("home.giftTitle")}</h2>
+      <section id="gift-finder" className="card card-pad gift-finder">
+        <div className="row row-wrap gift-finder-head">
+          <span className="gift-finder-emoji">🎁</span>
+          <h2 className="gift-finder-title">{t("home.giftTitle")}</h2>
           <span className="spacer" />
-          <span className="muted" style={{ fontSize: 13 }}>{t("home.giftSubtitle")}</span>
+          <span className="muted gift-finder-sub">{t("home.giftSubtitle")}</span>
         </div>
 
         <form
@@ -205,8 +205,7 @@ export default function Home({ slot = null }) {
               setGiftLoading(false);
             }
           }}
-          className="filter-bar"
-          style={{ marginTop: 12 }}
+          className="filter-bar mt-12"
         >
           <input
             className="input"
@@ -243,13 +242,13 @@ export default function Home({ slot = null }) {
         </form>
 
         {giftError && (
-          <div className="empty" style={{ color: "#b00020", padding: "12px 0" }}>
-            {giftError}
+          <div className="empty gift-finder-error">
+            <p className="text-danger">{giftError}</p>
           </div>
         )}
 
         {giftResults.length > 0 && (
-          <div className="product-grid" style={{ marginTop: 16 }}>
+          <div className="product-grid mt-16">
             {giftResults.map((r) => (
               <div key={r.product.ID} className="product-card">
                 <div className="image">
@@ -280,7 +279,7 @@ export default function Home({ slot = null }) {
       </section>
 
       {/* search + filter bar */}
-      <form id="shop" onSubmit={apply} className="filter-bar" style={{ scrollMarginTop: 88 }}>
+      <form id="shop" onSubmit={apply} className="filter-bar">
         <input
           className="input"
           placeholder={t("home.searchPlaceholder")}
@@ -367,21 +366,20 @@ export default function Home({ slot = null }) {
       )}
 
       <div className="row mt-24 mb-12">
-        <h2 style={{ fontSize: "1.25rem" }}>
+        <h2 className="home-results-h2">
           {loading
             ? t("home.loading")
             : t(total === 1 ? "home.totalItems" : "home.totalItemsPlural", { count: total })}
         </h2>
         <span className="spacer" />
         <select
-          className="select"
           value={filters.sort}
           onChange={(e) => {
             const next = { ...filters, sort: e.target.value };
             setFilters(next);
             load(next, page);
           }}
-          style={{ padding: "6px 10px", fontSize: 13 }}
+          className="select home-sort"
         >
           <option value="featured">{t("home.sortFeatured")}</option>
           <option value="newest">{t("home.sortNewest")}</option>
@@ -393,7 +391,7 @@ export default function Home({ slot = null }) {
       </div>
 
       {totalPages > 1 && (
-        <div className="row" style={{ justifyContent: "center", gap: 8, marginBottom: 16 }}>
+        <div className="row row-center gap-8 mb-16">
           <button
             className="btn btn-secondary btn-sm"
             disabled={page <= 1 || loading}
@@ -405,7 +403,7 @@ export default function Home({ slot = null }) {
           >
             {t("home.prev")}
           </button>
-          <span className="muted" style={{ alignSelf: "center", fontSize: 13 }}>
+          <span className="muted home-page-of">
             {t("home.pageOf", { page, total: totalPages })}
           </span>
           <button
@@ -427,7 +425,7 @@ export default function Home({ slot = null }) {
       ) : error ? (
         <div className="empty">
           <div className="emoji">⚠️</div>
-          <h3 style={{ color: "var(--danger-strong)" }}>{error}</h3>
+          <h3 className="text-danger">{error}</h3>
         </div>
       ) : products.length === 0 ? (
         <div className="empty">
