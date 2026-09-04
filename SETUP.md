@@ -139,10 +139,11 @@ Open <http://localhost:5173> in your browser. You should see the KatherBox store
 
 Pick any demo account:
 
-| Email                 | Password         | Where it lands           |
-|-----------------------|------------------|--------------------------|
-| `admin@katherbox.com` | `Admin@12345`    | `/admin` panel           |
-| `customer@test.com`   | `Customer@12345` | `/` with full demo data  |
+| Email                 | Password         | Where it lands                          |
+|-----------------------|------------------|-----------------------------------------|
+| `admin@katherbox.com` | `Admin@12345`    | `/admin` — full back-office workspace    |
+| `staff@katherbox.com` | `Staff@12345`    | `/admin` — Orders + Returns only (fulfilment) |
+| `customer@test.com`   | `Customer@12345` | `/` with full demo data                 |
 
 The customer account already has 32 orders, 4 subscriptions, 5 wishlist items, 5 reviews, 3 addresses, 4 journal entries, 2 community posts, and a Gold loyalty tier — perfect for poking every screen.
 

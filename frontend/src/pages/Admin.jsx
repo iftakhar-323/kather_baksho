@@ -74,10 +74,42 @@ const TAB_META = {
   categories:    { title: "Categories",        desc: "Organise the catalogue's category tree." },
 };
 
+// Sidebar order. `staff: true` marks a tab that "staff" (fulfilment) accounts
+// may also open; every other tab is admin-only.
+const NAV_ITEMS = [
+  { key: "dashboard",     emoji: "📊", label: "Dashboard" },
+  { key: "products",      emoji: "📦", label: "Products" },
+  { key: "orders",        emoji: "🛒", label: "Orders", staff: true },
+  { key: "corporate",     emoji: "🏢", label: "Corporate" },
+  { key: "subscriptions", emoji: "📅", label: "Subs" },
+  { key: "consultations", emoji: "🩺", label: "Consults" },
+  { key: "reminders",     emoji: "⏰", label: "Reminders" },
+  { key: "coupons",       emoji: "🏷️", label: "Coupons" },
+  { key: "blog",          emoji: "📚", label: "Blog" },
+  { key: "csv",           emoji: "⇋", label: "CSV" },
+  { key: "backup",        emoji: "💾", label: "Backup" },
+  { key: "roles",         emoji: "👥", label: "Roles" },
+  { key: "returns",       emoji: "↩", label: "Returns", staff: true },
+  { key: "reviews",       emoji: "★", label: "Reviews" },
+  { key: "categories",    emoji: "🗂", label: "Categories" },
+];
+
 export default function Admin() {
   const { user } = useAuth();
-  const [tab, setTab] = useState("products");
+  const role = user?.role;
+  const isAdmin = role === "admin";
+  const isStaff = role === "staff" || isAdmin;
+  const navItems = useMemo(
+    () => (isAdmin ? NAV_ITEMS : NAV_ITEMS.filter((it) => it.staff)),
+    [isAdmin]
+  );
+  const [tab, setTab] = useState(isAdmin ? "products" : "orders");
   const [authError, setAuthError] = useState(null);
+
+  // Keep the active tab within what this role may see.
+  useEffect(() => {
+    if (!navItems.some((it) => it.key === tab)) setTab(navItems[0]?.key || "orders");
+  }, [navItems, tab]);
 
   // Re-verify role against server on mount (fixes stale-JWT-after-promotion bug)
   useEffect(() => {
@@ -85,8 +117,8 @@ export default function Admin() {
     API.get("/auth/me")
       .then((res) => {
         if (!mounted) return;
-        if (res.data.role !== "admin") {
-          setAuthError("Your account is not an admin. Log out and log back in to refresh your role.");
+        if (res.data.role !== "admin" && res.data.role !== "staff") {
+          setAuthError("Your account is not staff or admin. Log out and log back in to refresh your role.");
         }
       })
       .catch(() => {
@@ -100,22 +132,22 @@ export default function Admin() {
 
   if (!user) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty admin-gate">
         <div className="emoji">🔒</div>
         <h3>Please log in</h3>
-        <p>Sign in to access the admin panel.</p>
+        <p>Sign in to access the workspace.</p>
       </div>
     );
   }
 
-  if (user.role !== "admin") {
+  if (!isStaff) {
     return (
-      <div className="empty" style={{ marginTop: 64 }}>
+      <div className="empty admin-gate">
         <div className="emoji">🚫</div>
-        <h3 style={{ color: "var(--danger-strong)" }}>Admin access required</h3>
+        <h3 className="text-danger">Workspace access required</h3>
         <p>
           {authError ||
-            "Your account does not have admin privileges. If you were just promoted, please log out and log back in."}
+            "Your account does not have staff or admin privileges. If you were just promoted, please log out and log back in."}
         </p>
       </div>
     );
@@ -125,103 +157,23 @@ export default function Admin() {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <nav className="admin-nav">
-          <button
-            className={`admin-nav-item ${tab === "dashboard" ? "active" : ""}`}
-            onClick={() => setTab("dashboard")}
-          >
-            📊 Dashboard
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "products" ? "active" : ""}`}
-            onClick={() => setTab("products")}
-          >
-            📦 Products
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "orders" ? "active" : ""}`}
-            onClick={() => setTab("orders")}
-          >
-            🛒 Orders
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "corporate" ? "active" : ""}`}
-            onClick={() => setTab("corporate")}
-          >
-            🏢 Corporate
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "subscriptions" ? "active" : ""}`}
-            onClick={() => setTab("subscriptions")}
-          >
-            📅 Subs
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "consultations" ? "active" : ""}`}
-            onClick={() => setTab("consultations")}
-          >
-            🩺 Consults
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "reminders" ? "active" : ""}`}
-            onClick={() => setTab("reminders")}
-          >
-            ⏰ Reminders
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "coupons" ? "active" : ""}`}
-            onClick={() => setTab("coupons")}
-          >
-            🏷️ Coupons
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "blog" ? "active" : ""}`}
-            onClick={() => setTab("blog")}
-          >
-            📚 Blog
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "csv" ? "active" : ""}`}
-            onClick={() => setTab("csv")}
-          >
-            ⇋ CSV
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "backup" ? "active" : ""}`}
-            onClick={() => setTab("backup")}
-          >
-            💾 Backup
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "roles" ? "active" : ""}`}
-            onClick={() => setTab("roles")}
-          >
-            👥 Roles
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "returns" ? "active" : ""}`}
-            onClick={() => setTab("returns")}
-          >
-            ↩ Returns
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "reviews" ? "active" : ""}`}
-            onClick={() => setTab("reviews")}
-          >
-            ★ Reviews
-          </button>
-          <button
-            className={`admin-nav-item ${tab === "categories" ? "active" : ""}`}
-            onClick={() => setTab("categories")}
-          >
-            🗂 Categories
-          </button>
+          <span className="admin-nav-role">{isAdmin ? "Admin" : "Staff"} workspace</span>
+          {navItems.map((it) => (
+            <button
+              key={it.key}
+              className={`admin-nav-item ${tab === it.key ? "active" : ""}`}
+              onClick={() => setTab(it.key)}
+            >
+              <span aria-hidden="true">{it.emoji}</span> {it.label}
+            </button>
+          ))}
         </nav>
       </aside>
 
       <main className="admin-main">
         <header className="admin-header">
           <h2>{(TAB_META[tab] || { title: tab }).title}</h2>
-          <p className="muted" style={{ marginTop: 4 }}>
+          <p className="muted admin-header-desc">
             {(TAB_META[tab] || { desc: `Manage ${tab} records and configurations.` }).desc}
           </p>
         </header>

@@ -21,6 +21,14 @@ func userIsAdmin(c *gin.Context) bool {
 	return false
 }
 
+// userIsStaff is true for both "staff" and "admin" — the fulfillment tier.
+func userIsStaff(c *gin.Context) bool {
+	if v, ok := c.Get("role"); ok && (v == "staff" || v == "admin") {
+		return true
+	}
+	return false
+}
+
 // ---------- Order Event timeline ----------
 
 // POST /api/orders/:id/events
@@ -204,7 +212,7 @@ func ListReturns(c *gin.Context) {
 	uid := c.GetUint("user_id")
 	var rs []models.ReturnRequest
 	q := database.DB.Order("created_at desc")
-	if !userIsAdmin(c) {
+	if !userIsStaff(c) {
 		q = q.Where("user_id = ?", uid)
 	}
 	if s := c.Query("status"); s != "" {
@@ -214,10 +222,10 @@ func ListReturns(c *gin.Context) {
 	c.JSON(http.StatusOK, rs)
 }
 
-// PATCH /api/returns/:id  (admin)
+// PATCH /api/returns/:id  (staff / admin)
 func UpdateReturnRequest(c *gin.Context) {
-	if !userIsAdmin(c) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "admin only"})
+	if !userIsStaff(c) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "staff only"})
 		return
 	}
 	id, err := strconv.Atoi(c.Param("id"))

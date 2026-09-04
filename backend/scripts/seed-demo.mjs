@@ -93,9 +93,10 @@ while (usersHave + usersMade < TARGET_USERS) {
   while (seenEmail.has(email)) email = `${fn}.${ln}${k++}`.toLowerCase() + "@katherbox.demo";
   seenEmail.add(email);
   const created = daysAgo(rnd(365) + 1);
-  const role = chance(0.06) ? "staff" : "customer";
+  // Bulk demo users are all shoppers. "staff" is an operational role assigned
+  // deliberately (see cmd/resetusers / cmd/seedusers), not sprinkled at random.
   insUser.run(
-    created, created, `${fn} ${ln}`, email, CUST_HASH, role,
+    created, created, `${fn} ${ln}`, email, CUST_HASH, "customer",
     rnd(20) * 50, chance(0.85) ? 1 : 0, phone(),
     `${addrLine()}, ${pick(CITIES)} ${pad(rnd(9000) + 1000, 4)}, Bangladesh`
   );

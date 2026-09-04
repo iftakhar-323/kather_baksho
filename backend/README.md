@@ -219,9 +219,14 @@ Set by `cmd/resetusers/`:
 |---|---|---|
 | `admin@katherbox.com` | `Admin@12345` | admin |
 | `admin@demo.com` | `Admin@12345` | admin |
+| `staff@katherbox.com` | `Staff@12345` | staff |
 | `customer@test.com` | `Customer@12345` | customer |
 | `iftakhar@gmail.com` | `Customer@12345` | customer |
 | `cust1@test.com` | `Customer@12345` | customer |
+
+The **staff** role is a fulfilment tier: it can reach the workspace but only the
+**Orders** and **Returns** tabs (`StaffMiddleware` — see `middleware/staff_middleware.go`).
+Everything else (catalogue, coupons, CMS, analytics, user roles, backups) stays admin-only.
 
 ---
 

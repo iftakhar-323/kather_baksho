@@ -135,17 +135,21 @@ function RouteLoader() {
   );
 }
 
+// Roles that see the back-office workspace instead of the storefront chrome.
+const isWorkspaceRole = (role) => role === "admin" || role === "staff";
+const roleBadge = (role) => (role === "admin" ? "ADMIN" : "STAFF");
+
 function Footer() {
   const year = new Date().getFullYear();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const isWorkspace = isWorkspaceRole(user?.role);
   // `pathFor` is defined in the same file (after this component) so we just
   // import via the helper. Footer only needs the canonical customer paths.
   const linkTo = (slug) => pathFor(slug);
 
-  if (isAdmin) {
-    // Slim workspace footer — admin users don't need the marketing columns.
+  if (isWorkspace) {
+    // Slim workspace footer — staff/admin don't need the marketing columns.
     return (
       <footer className="footer is-admin-footer" role="contentinfo">
         <div className="footer-inner footer-inner-admin">
@@ -153,9 +157,9 @@ function Footer() {
             <span className="brand-line">
               <span className="leaf">🌿</span>
               <span>KatherBox</span>
-              <span className="nav-admin-badge">ADMIN</span>
+              <span className="nav-admin-badge">{roleBadge(user?.role)}</span>
             </span>
-            <p className="footer-tagline">{t("admin.footer.tagline") || "Admin workspace"}</p>
+            <p className="footer-tagline">{t("admin.footer.tagline") || "Workspace"}</p>
           </div>
           <div className="footer-admin-meta">
             <span>{t("admin.footer.environment") || "Environment"}: dev</span>
@@ -240,7 +244,9 @@ function NavCartBadge({ itemKey }) {
 
 function Navbar() {
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === "admin";
+  // `isAdmin` here means "sees the back-office chrome" — true for staff too.
+  const isAdmin = isWorkspaceRole(user?.role);
+  const badge = roleBadge(user?.role);
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -357,7 +363,7 @@ function Navbar() {
         >
           <span className="leaf">🌿</span>
           <span className="nav-brand-text">KatherBox</span>
-          {isAdmin && <span className="nav-admin-badge">ADMIN</span>}
+          {isAdmin && <span className="nav-admin-badge">{badge}</span>}
         </span>
 
         {user && !isAdmin && (
@@ -428,11 +434,13 @@ function Navbar() {
                 <button
                   className={"btn btn-sm nav-view-toggle" + (currentView === "home" ? " is-active" : "")}
                   onClick={() => go(currentView === "home" ? "admin" : "home")}
-                  title={currentView === "home" ? "Back to admin panel" : "View storefront"}
+                  title={currentView === "home" ? "Back to workspace" : "View storefront"}
                 >
                   <span aria-hidden="true">{currentView === "home" ? "🛠" : "🏪"}</span>
                   <span className="nav-view-toggle-text">
-                    {currentView === "home" ? t("nav.admin") : (t("nav.viewStorefront") || "Storefront")}
+                    {currentView === "home"
+                      ? (badge === "STAFF" ? "Workspace" : t("nav.admin"))
+                      : (t("nav.viewStorefront") || "Storefront")}
                   </span>
                 </button>
               )}
@@ -484,7 +492,7 @@ function Navbar() {
               <span className="nav-brand">
                 <span className="leaf">🌿</span>
                 <span className="nav-brand-text">KatherBox</span>
-                {isAdmin && <span className="nav-admin-badge">ADMIN</span>}
+                {isAdmin && <span className="nav-admin-badge">{badge}</span>}
               </span>
               <button
                 className="nav-drawer-close"
@@ -530,8 +538,8 @@ function LoginPage({ navigate }) {
     <Login
       onSwitch={() => navigate("/register")}
       onSuccess={(loggedInUser) => {
-        // Admins land directly on the admin panel; everyone else on home.
-        navigate(loggedInUser?.role === "admin" ? "/admin" : "/");
+        // Staff & admin land in the workspace; everyone else on home.
+        navigate(isWorkspaceRole(loggedInUser?.role) ? "/admin" : "/");
       }}
     />
   );
@@ -578,7 +586,9 @@ function MainApp() {
   // Currently-opened order (used by OrderDetail)
   const [orderCtx, setOrderCtx] = useState(null);
 
-  const isAdmin = user?.role === "admin";
+  // Staff & admin both get the workspace shell and are kept out of the
+  // customer-only pages.
+  const isAdmin = isWorkspaceRole(user?.role);
   const currentView = viewFromPath(location.pathname).view;
 
   // expose navigate globally so deeply nested components (e.g. ProductCard)

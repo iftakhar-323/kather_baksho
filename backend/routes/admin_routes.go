@@ -7,40 +7,49 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AdminRoutes mounts admin-only endpoints under /api/admin/*.
+// AdminRoutes mounts the back-office endpoints under /api/admin/*.
+//
+// Most are admin-only. A small fulfillment subset (order list, manual order
+// entry and status updates) is also open to "staff" via StaffMiddleware —
+// see middleware/staff_middleware.go.
 func AdminRoutes(router *gin.Engine) {
 	g := router.Group("/api/admin")
-	g.Use(middleware.AuthMiddleware(), middleware.AdminMiddleware())
-	{
-		g.GET("/orders", controllers.GetAllOrders)
-		g.POST("/orders", controllers.CreateAdminOrder)
-		g.PUT("/orders/:id/status", controllers.UpdateOrderStatus)
-		g.DELETE("/orders/:id", controllers.DeleteOrder)
-		g.GET("/analytics", controllers.GetAdminAnalytics)
+	g.Use(middleware.AuthMiddleware())
 
-		// reminders
-		g.GET("/reminders", controllers.AdminListReminders)
-		g.POST("/reminders/:id/complete", controllers.AdminCompleteReminder)
+	admin := middleware.AdminMiddleware()
+	staff := middleware.StaffMiddleware()
 
-		// subscriptions
-		g.GET("/subscriptions", controllers.AdminListSubscriptions)
-		g.POST("/subscriptions/:id/cancel", controllers.AdminCancelSubscription)
+	// ---- Fulfillment: staff + admin ----
+	g.GET("/orders", staff, controllers.GetAllOrders)
+	g.POST("/orders", staff, controllers.CreateAdminOrder)
+	g.PUT("/orders/:id/status", staff, controllers.UpdateOrderStatus)
 
-		// consultations
-		g.GET("/consultations", controllers.AdminListConsultations)
-		g.POST("/consultations/:id/confirm", controllers.AdminConfirmConsultation)
-		g.POST("/consultations/:id/cancel", controllers.AdminCancelConsultation)
+	// ---- Admin-only ----
+	g.DELETE("/orders/:id", admin, controllers.DeleteOrder)
+	g.GET("/analytics", admin, controllers.GetAdminAnalytics)
 
-		// corporate quotes
-		g.GET("/corporate", controllers.GetAllCorporateQuotes)
-		g.PUT("/corporate/:id", controllers.UpdateCorporateStatus)
-		g.DELETE("/corporate/:id", controllers.DeleteCorporateQuote)
+	// reminders
+	g.GET("/reminders", admin, controllers.AdminListReminders)
+	g.POST("/reminders/:id/complete", admin, controllers.AdminCompleteReminder)
 
-		// users + roles
-		g.GET("/users", controllers.AdminListUsers)
-		g.PUT("/users/:id/role", controllers.AdminUpdateUserRole)
+	// subscriptions
+	g.GET("/subscriptions", admin, controllers.AdminListSubscriptions)
+	g.POST("/subscriptions/:id/cancel", admin, controllers.AdminCancelSubscription)
 
-		// reviews
-		g.GET("/reviews", controllers.AdminListReviews)
-	}
+	// consultations
+	g.GET("/consultations", admin, controllers.AdminListConsultations)
+	g.POST("/consultations/:id/confirm", admin, controllers.AdminConfirmConsultation)
+	g.POST("/consultations/:id/cancel", admin, controllers.AdminCancelConsultation)
+
+	// corporate quotes
+	g.GET("/corporate", admin, controllers.GetAllCorporateQuotes)
+	g.PUT("/corporate/:id", admin, controllers.UpdateCorporateStatus)
+	g.DELETE("/corporate/:id", admin, controllers.DeleteCorporateQuote)
+
+	// users + roles
+	g.GET("/users", admin, controllers.AdminListUsers)
+	g.PUT("/users/:id/role", admin, controllers.AdminUpdateUserRole)
+
+	// reviews
+	g.GET("/reviews", admin, controllers.AdminListReviews)
 }

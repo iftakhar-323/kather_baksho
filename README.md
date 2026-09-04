@@ -92,7 +92,8 @@ Open <http://localhost:5173> (or <http://localhost> with Docker) and log in.
 
 | Role     | Email                  | Password         | Notes                         |
 |----------|------------------------|------------------|-------------------------------|
-| **Admin**| `admin@katherbox.com`  | `Admin@12345`    | Full `/admin` panel           |
+| **Admin**| `admin@katherbox.com`  | `Admin@12345`    | Full `/admin` back-office     |
+| **Staff**| `staff@katherbox.com`  | `Staff@12345`    | `/admin` limited to Orders + Returns (fulfilment role) |
 | Customer | `customer@test.com`    | `Customer@12345` | Pre-loaded: 32 orders, 4 subs, 5 wishlist, 5 reviews, 4 journal entries, 2 community posts, 3 addresses, Gold loyalty tier |
 | Customer | `iftakhar@gmail.com`   | `Customer@12345` | Same shape as customer@test   |
 | Customer | `cust1@test.com`       | `Customer@12345` | Same                          |

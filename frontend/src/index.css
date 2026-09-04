@@ -4134,6 +4134,21 @@ a:hover { color: var(--primary-hover); text-decoration: underline; }
   background: #0062d1;
 }
 
+/* Role label above the workspace nav */
+.admin-nav-role {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-300, #94a3b8);
+  padding: 4px 16px 8px;
+}
+
+/* Shared helpers */
+.admin-gate { margin-top: 64px; }
+.admin-header-desc { margin-top: 4px; }
+.text-danger { color: var(--danger-strong, #b42318); }
+
 .admin-main {
   flex: 1;
   display: flex;
