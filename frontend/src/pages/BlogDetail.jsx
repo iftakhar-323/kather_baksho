@@ -96,7 +96,7 @@ export default function BlogDetail({ slug, onBack }) {
         )}
       </div>
 
-      {post.cover_emoji && (
+      {(post.cover_url || post.cover_emoji) && (
         <div
           style={{
             fontSize: 96,
@@ -104,11 +104,25 @@ export default function BlogDetail({ slug, onBack }) {
             background:
               "linear-gradient(135deg, var(--brand-100), var(--brand-50))",
             borderRadius: "var(--radius-lg)",
-            padding: 24,
             marginBottom: 24,
+            overflow: "hidden",
+            ...(post.cover_url ? {} : { padding: 24 }),
           }}
         >
-          {post.cover_emoji}
+          {post.cover_url ? (
+            <img
+              src={post.cover_url}
+              alt=""
+              style={{ width: "100%", maxHeight: 340, objectFit: "cover", display: "block" }}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.parentElement.style.padding = "24px";
+                e.currentTarget.parentElement.textContent = post.cover_emoji || "🌿";
+              }}
+            />
+          ) : (
+            post.cover_emoji
+          )}
         </div>
       )}
 
