@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
   getCart,
@@ -62,7 +62,7 @@ export default function Cart({ onOrderPlaced }) {
     setTimeout(() => setToast(null), 2800);
   };
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     getCart()
       .then((res) => {
@@ -79,7 +79,7 @@ export default function Cart({ onOrderPlaced }) {
         );
       })
       .finally(() => setLoading(false));
-  };
+  }, [t]);
 
   useEffect(() => {
     if (user) {
@@ -88,7 +88,7 @@ export default function Cart({ onOrderPlaced }) {
         .then((res) => setUserPoints(res.data.points || 0))
         .catch(() => {});
     }
-  }, [user]);
+  }, [user, load]);
 
   const items = useMemo(() => cart?.items || [], [cart]);
   const subtotal = useMemo(

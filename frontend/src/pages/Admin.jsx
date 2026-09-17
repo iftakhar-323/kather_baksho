@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
 import {
@@ -579,7 +579,7 @@ function RolesAdmin() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     getAllUsers()
       .then((r) => {
@@ -590,9 +590,9 @@ function RolesAdmin() {
         toast.err(e?.response?.data?.error || "Failed to load users");
         setLoading(false);
       });
-  };
+  }, [toast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const onRoleChange = async (u, role) => {
     try {
@@ -1666,11 +1666,11 @@ function OrdersTab() {
     }
   };
 
-  const userLabel = (uid) => {
+  const userLabel = useCallback((uid) => {
     const u = userById.get(uid);
     if (!u) return `User #${uid}`;
     return `${u.name} (${u.email})`;
-  };
+  }, [userById]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -1683,7 +1683,7 @@ function OrdersTab() {
       if (o.status?.toLowerCase().includes(q)) return true;
       return false;
     });
-  }, [orders, search, statusFilter, users]);
+  }, [orders, search, statusFilter, userLabel]);
 
   return (
     <div>
@@ -2510,7 +2510,7 @@ function ReviewsAdmin() {
   const [productId, setProductId] = useState("");
   const [hint, setHint] = useState("");
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     if (productId) {
       listProductReviews(productId)
@@ -2538,11 +2538,11 @@ function ReviewsAdmin() {
           setLoading(false);
         });
     }
-  };
+  }, [productId, toast]);
 
   useEffect(() => {
     load();
-  }, [productId]);
+  }, [load]);
 
   const onDelete = async (id) => {
     const ok = await confirm({
@@ -2624,7 +2624,7 @@ function CategoriesAdmin() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", slug: "", parent: "", icon: "🌿", position: 0, active: true });
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     listCategories()
       .then((res) => {
@@ -2635,9 +2635,9 @@ function CategoriesAdmin() {
         toast.err(e?.response?.data?.error || "Failed to load");
         setLoading(false);
       });
-  };
+  }, [toast]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const openNew = () => {
     setEditing(null);

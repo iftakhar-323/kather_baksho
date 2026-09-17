@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getBlogPost, addBlogComment } from "../api/blog";
 // real names used
 import { useToast } from "../components/Toast";
@@ -20,7 +20,7 @@ export default function BlogDetail({ slug, onBack }) {
   const [commentBody, setCommentBody] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const load = () => {
+  const load = useCallback(() => {
     setLoading(true);
     setError("");
     getBlogPost(slug)
@@ -32,12 +32,11 @@ export default function BlogDetail({ slug, onBack }) {
         setError(e?.response?.data?.error || e.message);
         setLoading(false);
       });
-  };
+  }, [slug]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     load();
-  }, [slug]);
+  }, [load]);
 
   const onSubmitComment = async (e) => {
     e.preventDefault();
