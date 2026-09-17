@@ -30,7 +30,7 @@ func ConnectDatabase() {
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
 		Logger:                                   logger.Default.LogMode(logLevel),
-		PrepareStmt:                              true,
+		PrepareStmt:                              false,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {

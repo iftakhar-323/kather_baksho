@@ -52,7 +52,10 @@ func Register(c *gin.Context) {
 		Password: hashedPassword,
 		Role:     "customer",
 	}
-	database.DB.Create(&user)
+	if err := database.DB.Create(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user: " + err.Error()})
+		return
+	}
 
 	token, _ := utils.GenerateJWT(user.ID, user.Email, user.Role)
 
@@ -498,7 +501,7 @@ func VerifyEmail(c *gin.Context) {
 	database.DB.Model(&user).Update("email_verified", true)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":       "Email verified",
+		"message":        "Email verified",
 		"email_verified": true,
 	})
 }

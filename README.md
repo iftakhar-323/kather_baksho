@@ -5,18 +5,19 @@
 
 This README is the **main entry point**. For deeper docs see:
 
-| Doc | Purpose |
-|---|---|
-| [`backend/README.md`](./backend/README.md) | Go API, routes, seeders, helpers |
-| [`frontend/README.md`](./frontend/README.md) | React app, components, routing |
-| [`DATABASE.md`](./DATABASE.md) | SQLite schema, how to inspect / reset |
-| [`SETUP.md`](./SETUP.md) | Step-by-step install on a fresh machine |
+| Doc                                           | Purpose                                 |
+| --------------------------------------------- | --------------------------------------- |
+| [`backend/README.md`](./backend/README.md)   | Go API, routes, seeders, helpers        |
+| [`frontend/README.md`](./frontend/README.md) | React app, components, routing          |
+| [`DATABASE.md`](./DATABASE.md)               | SQLite schema, how to inspect / reset   |
+| [`SETUP.md`](./SETUP.md)                     | Step-by-step install on a fresh machine |
 
 ---
 
 ## 1. Features
 
 ### Customer-facing
+
 - 🛍 Product catalog with categories, search, sort, filter, pagination, gift-wrap
 - 🛒 Cart, checkout, order history, order detail
 - ❤️ Wishlist, ⏰ Reminders, 🎁 Gift recommendations
@@ -30,6 +31,7 @@ This README is the **main entry point**. For deeper docs see:
 - 🔔 In-app notifications + 🌓 dark mode + 🇧🇩/🇬🇧 i18n
 
 ### Admin panel (`/admin`)
+
 - Dashboard (revenue, top customers, top products)
 - Orders, returns, refunds
 - Product + category CRUD
@@ -42,12 +44,12 @@ This README is the **main entry point**. For deeper docs see:
 
 ## 2. Tech stack at a glance
 
-| Layer    | Tech                                                      |
-|----------|-----------------------------------------------------------|
-| Backend  | Go 1.25 · Gin · GORM · SQLite · JWT (HS256) · bcrypt     |
-| Frontend | React 19 · Vite · Axios · React Router v7 · plain CSS    |
-| Storage  | SQLite file (`backend/katherbox.db`) + `localStorage`     |
-| Auth     | JWT in `localStorage.kb_token`; user object in `kb_user` |
+| Layer    | Tech                                                        |
+| -------- | ----------------------------------------------------------- |
+| Backend  | Go 1.25 · Gin · GORM · SQLite · JWT (HS256) · bcrypt   |
+| Frontend | React 19 · Vite · Axios · React Router v7 · plain CSS   |
+| Storage  | SQLite file (`backend/katherbox.db`) + `localStorage`   |
+| Auth     | JWT in`localStorage.kb_token`; user object in `kb_user` |
 
 See `backend/README.md` and `frontend/README.md` for the full picture.
 
@@ -63,8 +65,8 @@ Run the full stack (Go backend + React frontend + SQLite storage + Nginx proxy) 
 docker compose up --build
 ```
 
-- **Frontend**: <http://localhost> (Port 80)
-- **Backend API**: <http://localhost:8081>
+- **Frontend**: [http://localhost](http://localhost) (Port 80)
+- **Backend API**: [http://localhost:8081](http://localhost:8081)
 
 ---
 
@@ -84,19 +86,19 @@ npm install
 npm run dev                     # Web → http://localhost:5173
 ```
 
-Open <http://localhost:5173> (or <http://localhost> with Docker) and log in.
+Open [http://localhost:5173](http://localhost:5173) (or [http://localhost](http://localhost) with Docker) and log in.
 
 ---
 
 ## 4. Demo accounts
 
-| Role     | Email                  | Password         | Notes                         |
-|----------|------------------------|------------------|-------------------------------|
-| **Admin**| `admin@katherbox.com`  | `Admin@12345`    | Full `/admin` back-office     |
-| **Staff**| `staff@katherbox.com`  | `Staff@12345`    | `/admin` limited to Orders + Returns (fulfilment role) |
-| Customer | `customer@test.com`    | `Customer@12345` | Pre-loaded: 32 orders, 4 subs, 5 wishlist, 5 reviews, 4 journal entries, 2 community posts, 3 addresses, Gold loyalty tier |
-| Customer | `iftakhar@gmail.com`   | `Customer@12345` | Same shape as customer@test   |
-| Customer | `cust1@test.com`       | `Customer@12345` | Same                          |
+| Role            | Email                   | Password           | Notes                                                                                                                      |
+| --------------- | ----------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Admin** | `admin@katherbox.com` | `Admin@12345`    | Full`/admin` back-office                                                                                                 |
+| **Staff** | `staff@katherbox.com` | `Staff@12345`    | `/admin` limited to Orders + Returns (fulfilment role)                                                                   |
+| Customer        | `customer@test.com`   | `Customer@12345` | Pre-loaded: 32 orders, 4 subs, 5 wishlist, 5 reviews, 4 journal entries, 2 community posts, 3 addresses, Gold loyalty tier |
+| Customer        | `iftakhar@gmail.com`  | `Customer@12345` | Same shape as customer@test                                                                                                |
+| Customer        | `cust1@test.com`      | `Customer@12345` | Same                                                                                                                       |
 
 > Demo data is created by `backend/cmd/seeddummy/` (50 rows per table, random user IDs 1–50). The `customer@test.com` user is then **manually topped up** with wishlist, addresses, reviews, community posts, and care-journal entries — see [`DATABASE.md`](./DATABASE.md#test-customer-account-customer-testcom).
 >
@@ -108,18 +110,18 @@ Open <http://localhost:5173> (or <http://localhost> with Docker) and log in.
 
 Every page has a real, shareable URL via React Router v7.
 
-| Page | URL |
-|---|---|
-| Home / storefront | `/` |
-| Login / Register | `/login`, `/register` |
-| Profile | `/profile` |
-| Admin panel | `/admin` |
-| Cart / Orders / Wishlist | `/cart`, `/orders`, `/orders/:id`, `/wishlist` |
-| Subscriptions / Consultations / Corporate | `/subscriptions`, `/consultations`, `/corporate`, `/corp-portal` |
-| Community / Blog | `/community`, `/communityqa`, `/blog`, `/blog/:slug` |
-| Loyalty / Care / Reminders / Seasonal / Gift cards | `/loyalty`, `/care`, `/reminders`, `/seasonal`, `/gift-cards` |
-| Product detail | `/product/:id` (e.g. `/product/1202`) |
-| Static pages | `/about`, `/contact`, `/faq`, `/privacy`, `/terms`, `/shipping`, `/refund` |
+| Page                                               | URL                                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Home / storefront                                  | `/`                                                                                    |
+| Login / Register                                   | `/login`, `/register`                                                                |
+| Profile                                            | `/profile`                                                                             |
+| Admin panel                                        | `/admin`                                                                               |
+| Cart / Orders / Wishlist                           | `/cart`, `/orders`, `/orders/:id`, `/wishlist`                                   |
+| Subscriptions / Consultations / Corporate          | `/subscriptions`, `/consultations`, `/corporate`, `/corp-portal`                 |
+| Community / Blog                                   | `/community`, `/communityqa`, `/blog`, `/blog/:slug`                             |
+| Loyalty / Care / Reminders / Seasonal / Gift cards | `/loyalty`, `/care`, `/reminders`, `/seasonal`, `/gift-cards`                  |
+| Product detail                                     | `/product/:id` (e.g. `/product/1202`)                                                |
+| Static pages                                       | `/about`, `/contact`, `/faq`, `/privacy`, `/terms`, `/shipping`, `/refund` |
 
 Admins are auto-redirected from customer-only pages to `/admin`.
 

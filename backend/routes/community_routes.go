@@ -9,13 +9,17 @@ import (
 
 func CommunityRoutes(router *gin.Engine) {
 	g := router.Group("/api/community")
-	g.Use(middleware.AuthMiddleware())
 	{
 		g.GET("/posts", controllers.ListPosts)
-		g.POST("/posts", controllers.CreatePost)
 		g.GET("/posts/:id/comments", controllers.ListComments)
-		g.POST("/posts/:id/comments", controllers.AddComment)
-		g.POST("/posts/:id/like", controllers.ToggleLike)
-		g.DELETE("/posts/:id", controllers.DeletePost)
+	}
+
+	auth := router.Group("/api/community")
+	auth.Use(middleware.AuthMiddleware())
+	{
+		auth.POST("/posts", controllers.CreatePost)
+		auth.POST("/posts/:id/comments", controllers.AddComment)
+		auth.POST("/posts/:id/like", controllers.ToggleLike)
+		auth.DELETE("/posts/:id", controllers.DeletePost)
 	}
 }

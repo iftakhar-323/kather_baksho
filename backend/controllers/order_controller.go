@@ -241,13 +241,32 @@ func UpdateOrderStatus(c *gin.Context) {
 	}
 
 	var order models.Order
-	if err := database.DB.First(&order, orderID).Error; err != nil {
+	if err := database.DB.Preload("Items").First(&order, orderID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
 		return
 	}
 
+	oldStatus := order.Status
 	order.Status = input.Status
-	database.DB.Save(&order)
+	if err := database.DB.Save(&order).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order status"})
+		return
+	}
+
+	// Stock restoration on cancellation, re-deduction on reinstatement
+	if input.Status == "Cancelled" && oldStatus != "Cancelled" {
+		for _, it := range order.Items {
+			database.DB.Model(&models.Product{}).
+				Where("id = ?", it.ProductID).
+				Update("stock", gorm.Expr("stock + ?", it.Quantity))
+		}
+	} else if oldStatus == "Cancelled" && input.Status != "Cancelled" {
+		for _, it := range order.Items {
+			database.DB.Model(&models.Product{}).
+				Where("id = ?", it.ProductID).
+				Update("stock", gorm.Expr("CASE WHEN stock >= ? THEN stock - ? ELSE 0 END", it.Quantity, it.Quantity))
+		}
+	}
 
 	// notify user + console-log (simulated SMS/email per spec)
 	database.DB.Create(&models.Notification{
@@ -289,11 +308,13 @@ func DeleteOrder(c *gin.Context) {
 		return
 	}
 
-	// restore stock so totals stay consistent
-	for _, it := range order.Items {
-		database.DB.Model(&models.Product{}).
-			Where("id = ?", it.ProductID).
-			Update("stock", gorm.Expr("stock + ?", it.Quantity))
+	// restore stock so totals stay consistent only if not already Cancelled
+	if order.Status != "Cancelled" {
+		for _, it := range order.Items {
+			database.DB.Model(&models.Product{}).
+				Where("id = ?", it.ProductID).
+				Update("stock", gorm.Expr("stock + ?", it.Quantity))
+		}
 	}
 
 	// order items soho delete koro

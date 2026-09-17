@@ -7,6 +7,7 @@ import (
 	"katherbox/models"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // User-er cart ta khuje ber kore, na thakle notun banay
@@ -70,7 +71,7 @@ func AddToCart(c *gin.Context) {
 
 	if totalRequested > available {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Not enough stock",
+			"error":     "Not enough stock",
 			"available": available,
 		})
 		return
@@ -92,7 +93,7 @@ func AddToCart(c *gin.Context) {
 
 	// stock theke quantity komiye dao (reservation)
 	product.Stock -= input.Quantity
-	database.DB.Save(&product)
+	database.DB.Model(&models.Product{}).Where("id = ?", product.ID).Update("stock", product.Stock)
 
 	updatedCart := getOrCreateCart(userID)
 	c.JSON(http.StatusOK, updatedCart)
@@ -130,7 +131,7 @@ func UpdateCartItem(c *gin.Context) {
 
 	if needed > available {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Not enough stock",
+			"error":     "Not enough stock",
 			"available": available,
 		})
 		return
@@ -140,7 +141,7 @@ func UpdateCartItem(c *gin.Context) {
 	delta := int(needed) - int(item.Quantity)
 	if delta != 0 {
 		product.Stock = uint(int(product.Stock) - delta)
-		database.DB.Save(&product)
+		database.DB.Model(&models.Product{}).Where("id = ?", product.ID).Update("stock", product.Stock)
 	}
 
 	item.Quantity = input.Quantity
@@ -160,11 +161,8 @@ func RemoveCartItem(c *gin.Context) {
 	}
 
 	// reserved stock abar product e ferot dao
-	var product models.Product
-	if err := database.DB.First(&product, item.ProductID).Error; err == nil {
-		product.Stock += item.Quantity
-		database.DB.Save(&product)
-	}
+	database.DB.Model(&models.Product{}).Where("id = ?", item.ProductID).
+		Update("stock", gorm.Expr("stock + ?", item.Quantity))
 
 	database.DB.Delete(&item)
 	c.JSON(http.StatusOK, gin.H{"message": "Item removed from cart"})
