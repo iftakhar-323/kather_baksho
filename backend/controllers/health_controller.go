@@ -82,6 +82,19 @@ func ReadinessCheck(c *gin.Context) {
 		"status":   redisStatus,
 	}
 
+	var mongoStatus = "disabled"
+	if database.MongoClient != nil {
+		if err := database.MongoPing(); err != nil {
+			mongoStatus = "unreachable: " + err.Error()
+		} else {
+			mongoStatus = "connected"
+		}
+	}
+	stats["nosql_database"] = gin.H{
+		"provider": "mongodb",
+		"status":   mongoStatus,
+	}
+
 	if dbStatus != "connected" {
 		c.JSON(http.StatusServiceUnavailable, stats)
 		return

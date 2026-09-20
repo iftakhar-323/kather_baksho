@@ -11,6 +11,7 @@ import { useToast } from "../components/Toast";
 import { useTranslation } from "../i18n/I18nProvider";
 import { useAuth } from "../context/AuthContext";
 import DeliveryTrack from "../components/DeliveryTrack";
+import LiveDeliveryRadar from "../components/LiveDeliveryRadar";
 import Breadcrumbs from "../components/Breadcrumbs";
 import Invoice from "../components/Invoice";
 
@@ -187,6 +188,12 @@ export default function OrderDetail({ order, onBack }) {
       <div className="mb-16 mt-16">
         <DeliveryTrack status={order.status} createdAt={(order.CreatedAt || order.created_at)} />
       </div>
+
+      {order.status !== "Cancelled" && order.status !== "Returned" && (
+        <div className="mb-16">
+          <LiveDeliveryRadar orderId={order.id || order.ID} />
+        </div>
+      )}
 
       <div className="card card-pad mb-16 row row-wrap od-payment-row">
         <div>

@@ -1,38 +1,44 @@
 # 🌿 Kather Baksho (কাঠের বাক্স)
 ### High-Performance, Resilient Full-Stack E-Commerce & Botanical Platform
 
-> **100% Local Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite + React Router v7)**, **SQLite / PostgreSQL**, **Redis In-Memory Caching**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **Payment Idempotency**, **AI Plant Doctor**, and **Interactive Algorithm Visualizers**.
+> **100% Local Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite + React Router v7)**, **Node.js & TypeScript Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0)**, **Traefik v3.1 Cloud-Native API Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **Payment Idempotency**, **OpenAPI 3.0 / Swagger UI**, **AI Plant Doctor**, **Algorithm Visualizers**, and **AWS EC2 Infrastructure-as-Code (Terraform)**.
 
 [![Backend Tests](https://img.shields.io/badge/Go%20Unit%20Tests-Passing-brightgreen)](https://github.com/iftakhar-323/kather_baksho)
-[![E2E Tests](https://img.shields.io/badge/E2E%20Regression-40%2F40%20Passing-success)](https://github.com/iftakhar-323/kather_baksho)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Ready-blue)](https://github.com/iftakhar-323/kather_baksho)
+[![E2E Tests](https://img.shields.io/badge/E2E%20Regression-54%2F54%20Passing-success)](https://github.com/iftakhar-323/kather_baksho)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-8%20Services%20Active-blue)](https://github.com/iftakhar-323/kather_baksho)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.3-teal)](http://localhost:8085/docs)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://github.com/iftakhar-323/kather_baksho)
 
 ---
 
 ## 🚀 1-Command Quickstart (100% Localhost)
 
-Run the complete multi-service stack (Frontend, Backend, Redis, Prometheus, Grafana) with one command:
+Run the complete multi-service stack (Frontend, Backend, TypeScript Worker, MongoDB, Redis, Traefik, Prometheus, Grafana) with one command:
 
 ```bash
 git clone https://github.com/iftakhar-323/kather_baksho.git
 cd kather_baksho
-./run.sh
+docker compose up -d --build
 ```
 
-*(Alternatively, you can also run `docker compose up -d --build`)*
+*(Or run `./run.sh`)*
 
 ### 🌐 Local Service Map & Credentials
 
 | Service | Local URL | Description | Default Credentials |
 | :--- | :--- | :--- | :--- |
-| **Frontend Web App** | [http://localhost:8082](http://localhost:8082) | Storefront, Customer Portal, Admin Panel, AI Doctor & Algorithm Studio | Public / Demo User |
-| **Algorithm Studio** | [http://localhost:8082/algorithms](http://localhost:8082/algorithms) | Interactive Dijkstra Routing & Bin Packing Visualizer | Direct Navigation |
-| **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics & Caching | `admin@kather_baksho.com` / `Admin@12345` |
-| **TypeScript Worker Service** | [http://localhost:8083](http://localhost:8083) | Node.js & TypeScript microservice for PDF Invoices & Reports | Public API / Inter-service |
+| **Traefik Cloud-Native Ingress Gateway** | [http://localhost:8085](http://localhost:8085) | Primary unified edge proxy routing frontend, API, worker & WebSockets | Direct Access |
+| **Traefik Live Dashboard** | [http://localhost:8086/dashboard/](http://localhost:8086/dashboard/) | Real-time reverse proxy telemetry, router health, and active middlewares | Direct Access |
+| **Interactive Swagger / OpenAPI UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | Interactive OpenAPI 3.0 API explorer with parameter schemas and JWT auth | Direct Access |
+| **Frontend Web App** | [http://localhost:8082](http://localhost:8082) | Storefront, Customer Portal, Admin Panel, IoT Plant Care, AI Doctor & Algorithm Studio | Public / Demo User |
+| **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics, Mongo & Redis Caching | `admin@kather_baksho.com` / `Admin@12345` |
+| **Real-Time WebSocket Courier Radar** | `ws://localhost:8085/ws/orders/:id/track` | Goroutine WebSocket streaming live courier GPS coordinates across Dhaka | Direct Stream |
+| **Node.js & TypeScript Worker** | [http://localhost:8083](http://localhost:8083) | Microservice for enterprise vector PDF invoices and analytics reports | Inter-service / Direct |
+| **MongoDB 7.0 IoT Datastore** | `localhost:27019` (Internal `27017`) | Polyglot document & time-series database storing botanical sensor telemetry | Direct Access |
+| **Redis Cache** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & prefix invalidation | Passwordless local |
 | **Prometheus Telemetry** | [http://localhost:9090](http://localhost:9090) | Scrapes backend `/metrics` every 5 seconds | Direct Access |
 | **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | Pre-provisioned Kather_Baksho Observability Dashboard | `admin` / `admin` |
-| **Redis Cache** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & prefix invalidation | Passwordless local |
-| **Readiness Probe** | [http://localhost:8081/health/ready](http://localhost:8081/health/ready) | Deep system health (DB, Redis, Memory, Goroutines, Circuit Breakers) | Public API |
+| **Tri-Database Readiness Probe** | [http://localhost:8081/health/ready](http://localhost:8081/health/ready) | Deep health probe validating SQLite WAL, Redis PONG, and MongoDB 7.0 ping | Public API |
 
 ---
 
@@ -42,89 +48,73 @@ cd kather_baksho
 | :--- | :--- | :--- | :--- |
 | **Super Admin** | `admin@kather_baksho.com` | `Admin@12345` | Complete `/admin` back-office, catalog management, order approvals, analytics |
 | **Staff Member** | `staff@kather_baksho.com` | `Staff@12345` | Fulfilment dashboard (Orders & Returns management) |
-| **Customer** | `customer@test.com` | `Customer@12345` | Seeded with 32 orders, subscriptions, wishlist, reviews, care journal, Gold loyalty |
+| **Customer** | `customer@test.com` | `Customer@12345` | Seeded with orders, subscriptions, wishlist, reviews, care journal, Gold loyalty |
 | **Customer (Alt)** | `iftakhar@gmail.com` | `Customer@12345` | Pre-configured customer profile |
-
-*(You can also register new customer accounts directly on the storefront).*
 
 ---
 
-## 🛠️ Complete Feature & Technical Update Log (Phases 1 – 6)
+## 🛠️ Complete Architectural Engineering Implementation
 
 Every component below was engineered, tested, and verified:
 
-### 1. 🛡️ Phase 1: Resilience & Observability
+### 1. 🛡️ Resilience, Circuit Breakers & Distributed Tracing
 - **Request ID Propagation**: Generates or forwards a unique `X-Request-ID` across every incoming HTTP request for distributed tracing.
-- **Structured JSON Logging**: Custom high-speed logger capturing request duration, HTTP method, path, client IP, user agent, and status code formatted for ELK/Loki ingestion.
+- **Structured JSON Logging**: High-speed logger capturing request duration, HTTP method, path, client IP, user agent, and status code formatted for ELK/Loki ingestion.
 - **Token-Bucket Rate Limiter**: Thread-safe in-memory rate limiter allocating 120 requests/minute per IP with burst capacity. Bursts exceeding limits return `HTTP 429 Too Many Requests` with dynamic `Retry-After` headers.
-- **Circuit Breaker Pattern**: Three-state state machine (`Closed`, `Open`, `Half-Open`) protecting external dependencies (payment gateways, AI APIs) with fallback execution and automated health recovery.
-- **Comprehensive Health Probes**:
-  - `/health` / `/api/health`: General uptime and version check.
-  - `/health/live`: Kubernetes / Docker liveness probe.
-  - `/health/ready`: Deep readiness probe inspecting database connection pools, memory allocations (`alloc_mb`, `sys_mb`), active goroutines, GC cycles, and circuit breaker status.
+- **Circuit Breaker Pattern**: Three-state state machine (`Closed`, `Open`, `Half-Open`) protecting external dependencies with fallback execution and automated health recovery.
+- **Tri-Database Readiness Probe (`/health/ready`)**: Validates SQLite WAL, Redis cache ping, and MongoDB 7.0 ping concurrently alongside memory allocations (`alloc_mb`, `sys_mb`), active goroutines, and GC stats.
 
-### 2. 📊 Phase 2: Prometheus Metrics & Grafana Dashboard
-- **Standard Prometheus Instrumentation**: Integrated `github.com/prometheus/client_golang` exposing `/metrics` with:
-  - `http_requests_total` (labeled by method, handler, status code).
-  - `http_request_duration_seconds` (histogram with p50, p90, p99 percentiles).
-  - `http_requests_in_flight` (gauge tracking concurrent requests).
-- **Auto-Provisioned Prometheus**: Pre-configured `monitoring/prometheus/prometheus.yml` actively scraping `backend:8081/metrics` every 5 seconds.
-- **Auto-Provisioned Grafana**: Containerized Grafana instance with pre-loaded Prometheus datasource and a custom `Kather_Baksho System Dashboard` (`monitoring/grafana/provisioning/dashboards/kather_baksho_dashboard.json`) charting throughput, latencies, and error rates.
+### 2. 📊 Prometheus Metrics & Grafana Observability
+- **Prometheus Exporter (`/metrics`)**: Standard Prometheus metrics exposing request counts, latencies (p50, p90, p99), error rates, and concurrent in-flight requests.
+- **Auto-Provisioned Grafana**: Containerized Grafana instance with pre-loaded Prometheus datasource and a custom `Kather_Baksho System Dashboard` charting throughput, latencies, and error rates.
 
-### 3. ⚡ Phase 3: High Concurrency, Inventory Locking & Payment Idempotency
-- **Atomic Stock Reservation**: Eliminated inventory overselling and race conditions by enforcing conditional SQL updates (`UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?`) and verifying affected row counts inside transactional blocks.
-- **Idempotent Request Handling**: Custom `Idempotency-Key` header middleware backed by `IdempotencyRecord` database table:
-  - Duplicate requests replay cached responses with `X-Cache-Lookup: HIT`.
-  - Concurrent in-flight duplicate requests are blocked with `HTTP 409 Conflict`.
-- **Cryptographic Payment Gateway Flow**:
-  - Payment session initiation via `/api/payments/initiate`.
-  - Cryptographic HMAC-SHA256 signature generation and callback verification via `/api/payments/callback`.
-  - Automated transition of order status to `Processing` and payment status to `Paid`.
+### 3. ⚡ High Concurrency, Inventory Locking & Payment Idempotency
+- **Atomic Stock Reservation**: Eliminated inventory overselling by enforcing conditional SQL updates (`UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?`) and verifying affected row counts inside transactional blocks.
+- **Idempotent Request Handling**: Custom `Idempotency-Key` header middleware backed by `IdempotencyRecord` database table with replay caching and conflict resolution.
+- **Cryptographic Payment Gateway**: Mock payment session initiation and HMAC-SHA256 signature verification with automated order status transitions.
 
-### 4. 🩺 Phase 4: AI/LLM Plant Doctor (Dual-Mode Architecture)
-- **Dual-Mode Intelligence**:
-  - **Online Cloud Mode**: Connects to Google Gemini 1.5 Flash API when `GEMINI_API_KEY` is present.
-  - **Offline Local Heuristic Mode**: Automated fallback to a pure-Go botanical expert knowledge base capable of diagnosing Chlorosis, Septoria Leaf Spot, Overwatering, Nitrogen deficiency, and Spider mites.
-- **Interactive Global Modal**: Global Floating Action Button (`🩺🌿 AI Plant Doctor`) accessible across the entire customer application with:
-  - Quick-select symptom chips (e.g. Yellow Leaves, Brown Spots, Drooping, White Pests).
-  - Diagnostic report with confidence score, severity rating, and step-by-step action plans.
-  - Conversational Q&A chat for real-time plant care inquiries.
+### 4. 🩺 Dual-Mode AI Plant Doctor & Algorithm Studio
+- **Dual-Mode Intelligence**: Connects to Google Gemini 1.5 Flash when `GEMINI_API_KEY` is present, with an automated fallback to a local botanical expert heuristic engine.
+- **Algorithm Studio (`/algorithms`)**:
+  - **Dijkstra Delivery Routing Visualizer**: Graph animation finding the shortest path across 7 major Dhaka delivery hubs with real-time distance calculations.
+  - **First-Fit Decreasing Box Packing Visualizer**: Solves the bin packing problem, animating how plant pots of varying dimensions are packed into standard nursery wooden shipping crates.
+  - **ML Model Comparison Benchmark**: Benchmarks `MobilePlantNet-v3` vs `DeepBotanist-ResNet50`.
 
-### 5. 🔬 Phase 5: ML Model Comparison & Interactive Algorithm Studio
-- **Machine Learning Model Comparison Harness**:
-  - Compares lightweight edge vision model (`MobilePlantNet-v3`, Quantized INT8, ~4ms) vs cloud deep learning model (`DeepBotanist-ResNet50`, FP32, ~30ms).
-  - Measures latency speedup, inference throughput (IPS), memory footprint, confidence scores, and outputs production deployment recommendations.
-  - Exposes `/api/ml/compare` endpoint.
-- **Interactive Algorithm Studio (`/algorithms`)**:
-  - **Dijkstra Delivery Routing Visualizer**: Graph animation finding the shortest path across 7 major Dhaka delivery hubs (Mirpur, Uttara, Dhanmondi, Gulshan, Motijheel, Old Dhaka, Farmgate) with distance telemetry.
-  - **First-Fit Decreasing Box Packing Visualizer**: Solves the 1D/2D bin packing problem, animating how plant pots of varying dimensions are packed into standard wooden nursery shipping crates.
-  - **Live Benchmark Telemetry**: Side-by-side comparative cards with live execution timers.
+### 5. 🚀 Node.js & TypeScript Worker Microservice
+- **Dedicated Containerized Worker**: Running on port `8083` (`kather_baksho-worker-ts`) built with Express, TypeScript 5.5, and PDFKit.
+- **Vector PDF Generation Engine**:
+  - `POST /api/v1/invoices/generate`: Generates high-resolution vector PDF invoices with typography and botanical branding.
+  - `POST /api/v1/reports/sales-pdf`: Generates executive sales and analytics reports with KPI cards.
+- **Go Backend Microservice Bridge**: `GET /api/orders/:id/invoice/pdf` and `GET /api/analytics/report/pdf` proxying requests directly to the worker.
 
-### 6. 🗄️ Phase 6: Multi-Database Support (Redis Caching & PostgreSQL)
-- **Redis Read-Through Caching Layer**:
-  - Transparently caches product searches/pagination (`/api/products`) and category listings (`/api/categories`) with `X-Cache: HIT` and `X-Cache: MISS` telemetry.
-  - Automated prefix-based cache invalidation (`products:*`, `categories:*`) triggered whenever an admin creates, updates, or deletes a product or category.
-  - Graceful degradation: If Redis is offline or disabled, backend seamlessly falls back to direct database queries without request failure.
-- **Multi-Driver Database Architecture**:
-  - Configurable via `DB_DRIVER` in `backend/database/database.go`.
-  - Defaults to zero-dependency pure-Go SQLite for instant local development.
-  - Supports PostgreSQL via `DB_DRIVER=postgres` with production connection pooling (`SetMaxOpenConns(25)`, `SetMaxIdleConns(10)`).
-  - PostgreSQL container service ready in `docker-compose.yml` under `--profile postgres`.
-- **Frontend Authentication Resilience**:
-  - Added Axios 401 response interceptor with reactive `auth:logout` event dispatching.
-  - Re-validates tokens against `/api/auth/me` on application mount to prevent stale/invalid `localStorage` sessions.
-  - Added explicit Sign-In recovery buttons to cart and error views.
+### 6. 🌱 MongoDB Polyglot Persistence & IoT Botanical Telemetry
+- **MongoDB 7.0 Datastore**: Running on port `27019` (`kather_baksho-mongo`) storing time-series plant telemetry data.
+- **Botanical Sensor Telemetry Engine**:
+  - Ingests soil moisture, ambient temperature, humidity, sunlight lux, and pH levels.
+  - Automatically assesses botanical status: `Optimal Health`, `Needs Water` (moisture < 25%), `High Heat Caution` (temp > 35°C), `Low Light` (lux < 200).
+- **Interactive UI Monitor**: Embedded in `/care` with real-time gauges, status badges, and sample telemetry simulators.
 
-### 7. 🚀 Phase 7: Node.js & TypeScript Worker Microservice
-- **Dedicated Containerized Worker**: Running on port `8083` (`kather_baksho-worker-ts`) built with Node.js, Express, and strict TypeScript.
-- **Enterprise PDF Generation Engine**:
-  - `POST /api/v1/invoices/generate`: Generates branded botanical PDF invoices formatted for print and digital dispatch.
-  - `POST /api/v1/reports/sales-pdf`: Generates executive sales and analytics reports with KPI cards and categorical breakdowns.
-- **Go Backend Microservice Bridge**:
-  - `GET /api/orders/:id/invoice/pdf`: Authenticated endpoint forwarding order data to the TypeScript worker and streaming real `%PDF` bytes back to the user.
-  - `GET /api/analytics/report/pdf`: Admin endpoint compiling real-time database sales data and requesting executive PDF rendering.
-- **Frontend One-Click Download**:
-  - Integrated "Official PDF (TS Worker)" button in order invoice modal with asynchronous stream handling.
+### 7. 🔀 Traefik v3.1 Cloud-Native Reverse Proxy & API Gateway
+- **Unified Ingress Edge**: Exposes port `8085` as the primary application entrypoint.
+- **Dynamic Routing**:
+  - `/` → Frontend React SPA
+  - `/api`, `/health`, `/metrics`, `/ws`, `/docs`, `/swagger` → Go Backend
+  - `/worker` → Node.js TypeScript Worker
+- **Traefik Live Dashboard**: Accessible on port `8086/dashboard/` showing router metrics and service health.
+
+### 8. 🛵 Real-Time Goroutine WebSockets & Delivery Rider Radar
+- **WebSocket Gateway (`/ws/orders/:id/track`)**: Pure-Go goroutine streaming real-time courier GPS coordinates across Dhaka milestones (Mirpur Hub → Mirpur 10 → Agargaon → Bijoy Sarani → Local Area → Doorstep).
+- **Live Delivery Radar UI**: Embedded in customer order details with live pulse indicator, dynamic Dijkstra ETA countdown, speed speedometer, and milestone checkpoints.
+
+### 9. 📖 Interactive Swagger / OpenAPI 3.0 Documentation & TypeScript Types
+- **Interactive Swagger UI**: Accessible at `http://localhost:8085/docs` and `http://localhost:8081/docs`.
+- **OpenAPI 3.0 JSON Specification**: Available at `/api/docs/openapi.json`.
+- **Frontend TypeScript Architecture**: Added `tsconfig.json` and strict type definitions in `frontend/src/types/` (`product.d.ts`, `order.d.ts`, `user.d.ts`, `telemetry.d.ts`, `index.d.ts`).
+
+### 10. ☁️ AWS EC2 Infrastructure-as-Code & Production Automation
+- **Terraform IaC (`infra/terraform/`)**: Fully provisioned AWS VPC, Public Subnet, Internet Gateway, Security Groups (Ports 22, 80, 443, 8085, 8086, 3000), Ubuntu 24.04 EC2 instance, and Elastic IP.
+- **Production User Data**: Automates Docker, Docker Compose, sysctl memory configuration, and firewall rules on boot.
+- **Deployment Script (`deploy/ec2-setup.sh`)**: 1-click bash automation script creating a production systemd service (`kather_baksho.service`) for automatic container startup on server reboot.
 
 ---
 
@@ -138,48 +128,14 @@ cd backend
 go test -v ./...
 ```
 
-**Results:**
-```
-=== RUN   TestCompareModelsEndpoint
---- PASS: TestCompareModelsEndpoint (0.00s)
-=== RUN   TestRedisGracefulDegradationWhenNil
---- PASS: TestRedisGracefulDegradationWhenNil (0.00s)
-=== RUN   TestPrometheusMetricsExposition
---- PASS: TestPrometheusMetricsExposition (0.00s)
-=== RUN   TestTokenBucketLimiterAllow
---- PASS: TestTokenBucketLimiterAllow (1.10s)
-=== RUN   TestRateLimiterMiddlewareHTTP
---- PASS: TestRateLimiterMiddlewareHTTP (0.00s)
-=== RUN   TestRequestIDMiddlewareGenerated
---- PASS: TestRequestIDMiddlewareGenerated (0.00s)
-=== RUN   TestRequestIDMiddlewarePropagated
---- PASS: TestRequestIDMiddlewarePropagated (0.00s)
-=== RUN   TestLocalBotanicalExpertDiagnosisYellowLeaves
---- PASS: TestLocalBotanicalExpertDiagnosisYellowLeaves (0.00s)
-=== RUN   TestLocalBotanicalExpertDiagnosisPests
---- PASS: TestLocalBotanicalExpertDiagnosisPests (0.00s)
-=== RUN   TestLocalBotanicalExpertChat
---- PASS: TestLocalBotanicalExpertChat (0.00s)
-=== RUN   TestCircuitBreakerStateTransitions
---- PASS: TestCircuitBreakerStateTransitions (0.06s)
-=== RUN   TestCircuitBreakerFallback
---- PASS: TestCircuitBreakerFallback (0.00s)
-PASS
-ok  	kather_baksho/controllers	0.011s
-ok  	kather_baksho/database	(cached)
-ok  	kather_baksho/middleware	(cached)
-ok  	kather_baksho/services	(cached)
-ok  	kather_baksho/utils	(cached)
-```
-
-### 2. Full End-to-End Regression Suite (44 Tests)
-To run the automated integration test suite across all services:
+### 2. Full End-to-End Regression Suite (54 Tests)
+To run the automated integration test suite across all 8 microservices and databases:
 
 ```bash
 python3 tests/e2e_test.py
 ```
 
-**Results:**
+**Results (100% Passing):**
 ```
 Starting E2E test suite...
 [✓] Health / Get Products
@@ -226,27 +182,19 @@ Starting E2E test suite...
 [✓] Node.js & TypeScript Direct PDF Generation
 [✓] Go Backend PDF Invoice Proxy
 [✓] Go Backend Analytics Executive Report PDF
+[✓] MongoDB Tri-Database Readiness Probe
+[✓] MongoDB IoT Telemetry Ingestion & Alerting
+[✓] MongoDB Monitored Plants Snapshot
+[✓] MongoDB IoT Telemetry Time-Series History
+[✓] Traefik Ingress Routing (Frontend, API & Worker)
+[✓] Traefik Live Dashboard & Telemetry API
+[✓] WebSocket Real-Time Order & Rider Tracking
+[✓] OpenAPI 3.0 Specification & Interactive Swagger UI
+[✓] Frontend TypeScript Type Declarations & Config
+[✓] AWS EC2 Infrastructure-as-Code & Deployment Orchestration
 
-Summary: 44 tests run, 44 passed, 0 failed.
+Summary: 54 tests run, 54 passed, 0 failed.
 ```
-
----
-
-## 🗺️ Application Routes
-
-| Path | Description | Access |
-| :--- | :--- | :--- |
-| `/` | Storefront, hero banner, category filters, featured plants | Public |
-| `/shop` | Full catalog with advanced filters (sunlight, water, pet-friendly) | Public |
-| `/algorithms` | **Algorithm Studio** (Dijkstra routing, Box Packing, ML benchmark) | Public / Customer |
-| `/cart` | Shopping cart, Green Points redemption, coupon application, gift wrap | Customer |
-| `/orders` | Order history, invoice download, live status tracking | Customer |
-| `/admin` | Back-office dashboard, inventory, orders, CMS, analytics, DB backup | Admin / Staff |
-| `/community` | Plant parent community, Q&A, photo showcases | Customer |
-| `/care` | Plant care schedules, watering reminders, growth journal | Customer |
-| `/subscriptions` | Weekly, monthly, and quarterly botanical box subscriptions | Customer |
-| `/consultations` | Book 1-on-1 virtual or on-site plant doctor consultations | Customer |
-| `/corporate` | Bulk corporate plant gifting and office greening quotes | Customer / Corporate |
 
 ---
 
@@ -254,29 +202,45 @@ Summary: 44 tests run, 44 passed, 0 failed.
 
 ```
 kather_baksho/
-├── backend/                        # Go 1.25 REST API
-│   ├── controllers/                # Handlers (Cart, Products, Orders, AI, ML, Health)
+├── backend/                        # Go 1.22+ REST & WebSocket API
+│   ├── controllers/                # Handlers (Cart, Products, Orders, AI, ML, IoT, WS, Docs)
 │   ├── routes/                     # Gin route groups
 │   ├── middleware/                 # RateLimiter, StructuredLogger, Metrics, Idempotency, Auth
-│   ├── database/                   # GORM connection (SQLite/PostgreSQL) & Redis cache client
+│   ├── database/                   # SQLite/Postgres GORM, Redis client, MongoDB driver
+│   ├── models/                     # GORM entities & MongoDB telemetry BSON models
 │   ├── services/                   # AI Plant Doctor (Gemini + Local heuristic fallback)
 │   ├── utils/                      # Circuit breaker, JWT, Password hashing
 │   ├── cmd/                        # Database seeders & admin user CLI tools
 │   ├── main.go                     # Entrypoint & middleware chaining
 │   └── Dockerfile                  # Multi-stage Alpine container build
-├── frontend/                       # React 18 + Vite SPA
+├── frontend/                       # React 18 + Vite SPA + TypeScript Definitions
 │   ├── src/
 │   │   ├── api/                    # Axios API clients with 401 interceptors
-│   │   ├── components/             # Reusable UI widgets & AIPlantDoctorModal
+│   │   ├── components/             # SmartGardenMonitor, LiveDeliveryRadar, AIPlantDoctorModal
 │   │   ├── context/                # AuthContext & CartContext
-│   │   ├── pages/                  # Storefront, Admin, Cart, AlgorithmVisualizer
-│   │   └── App.jsx                 # Routing, layout shell & global FAB triggers
+│   │   ├── pages/                  # Storefront, Admin, Cart, Care, AlgorithmVisualizer
+│   │   ├── types/                  # Strict TypeScript declarations (product, order, user, telemetry)
+│   │   └── App.jsx                 # Routing, layout shell & global triggers
+│   ├── tsconfig.json               # TypeScript compiler options
 │   ├── nginx.conf                  # Production SPA reverse proxy
 │   └── Dockerfile                  # Multi-stage Nginx container build
+├── services/
+│   └── worker-ts/                  # Node.js & TypeScript Microservice (Port 8083)
+│       ├── src/                    # Express routes & PDFKit vector document renderers
+│       ├── tsconfig.json           # Strict TypeScript configuration
+│       └── Dockerfile              # Multi-stage Alpine container build
 ├── monitoring/
+│   ├── traefik/                    # Traefik v3.1 static & dynamic routing rules
 │   ├── prometheus/prometheus.yml   # Prometheus scrape configuration
 │   └── grafana/provisioning/       # Pre-configured Grafana datasource & dashboard
-├── docker-compose.yml              # Multi-container orchestration (App + Redis + Observability)
+├── infra/
+│   └── terraform/                  # AWS EC2, VPC, Subnet, Security Groups & User Data IaC
+├── deploy/
+│   └── ec2-setup.sh                # 1-Click production Ubuntu / EC2 deploy automation
+├── tests/
+│   └── e2e_test.py                 # Comprehensive 54-test automated E2E test suite
+├── docker-compose.yml              # 8-Container orchestration stack
+├── run.sh                          # Local developer quickstart script
 └── README.md                       # ← Main documentation
 ```
 

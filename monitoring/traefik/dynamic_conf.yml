@@ -1,0 +1,46 @@
+http:
+  routers:
+    frontend:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - "web"
+      service: "frontend-svc"
+      priority: 1
+
+    backend:
+      rule: "PathPrefix(`/api`) || PathPrefix(`/health`) || PathPrefix(`/metrics`) || PathPrefix(`/ws`) || PathPrefix(`/docs`) || PathPrefix(`/swagger`)"
+      entryPoints:
+        - "web"
+      service: "backend-svc"
+      priority: 10
+
+    worker:
+      rule: "PathPrefix(`/worker`)"
+      entryPoints:
+        - "web"
+      middlewares:
+        - "worker-strip"
+      service: "worker-svc"
+      priority: 20
+
+  middlewares:
+    worker-strip:
+      stripPrefix:
+        prefixes:
+          - "/worker"
+
+  services:
+    frontend-svc:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
+
+    backend-svc:
+      loadBalancer:
+        servers:
+          - url: "http://backend:8081"
+
+    worker-svc:
+      loadBalancer:
+        servers:
+          - url: "http://worker-ts:8083"

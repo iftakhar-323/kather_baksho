@@ -23,6 +23,7 @@ func main() {
 
 	database.ConnectDatabase()
 	database.InitRedis()
+	database.ConnectMongoDB()
 	if err := database.DB.AutoMigrate(
 		&models.Product{},
 		&models.User{},
@@ -154,6 +155,9 @@ func main() {
 	routes.AddressRoutes(router)
 	routes.ReviewRoutes(router)
 	routes.CategoryRoutes(router)
+	routes.TelemetryRoutes(router)
+	routes.WebSocketRoutes(router)
+	routes.DocsRoutes(router)
 
 	port := os.Getenv("PORT")
 	if port == "" {

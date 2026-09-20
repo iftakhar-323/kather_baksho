@@ -13,6 +13,7 @@ import { useTranslation } from "../i18n/I18nProvider";
 import Reminders from "./Reminders";
 import PageHeader from "../components/PageHeader";
 import Segmented from "../components/Segmented";
+import SmartGardenMonitor from "../components/SmartGardenMonitor";
 
 function fmtDate(s) {
   if (!s) return "";
@@ -156,11 +157,18 @@ export default function Care() {
         onChange={setTab}
         options={[
           { value: "dashboard", label: t("care.dashboard.tabCalendar") },
+          { value: "iot", label: "🌱 IoT Sensor Monitor" },
           { value: "journal", label: t("care.dashboard.tabJournal") },
           { value: "schedules", label: t("care.dashboard.tabSchedules") },
           { value: "reminders", label: t("reminders.head") },
         ]}
       />
+
+      {tab === "iot" && (
+        <div className="mb-8">
+          <SmartGardenMonitor />
+        </div>
+      )}
 
       {tab === "reminders" && <Reminders embedded />}
 

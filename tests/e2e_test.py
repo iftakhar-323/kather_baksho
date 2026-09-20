@@ -529,6 +529,174 @@ def test_go_analytics_report_pdf():
     assert r.headers.get("x-generated-by") == "kather_baksho-worker-ts"
     assert r.content.startswith(b"%PDF"), "Must return valid PDF magic bytes"
 
+# 45. MongoDB Tri-Database Observability (SQLite + Redis + MongoDB)
+def test_mongodb_readiness_probe():
+    r = s.get("http://localhost:8081/health/ready")
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("nosql_database", {}).get("provider") == "mongodb"
+    assert data.get("nosql_database", {}).get("status") == "connected", "MongoDB must be connected"
+
+# 46. MongoDB IoT Telemetry Ingestion & Auto-Diagnosis
+def test_iot_telemetry_ingestion():
+    payload = {
+        "plant_id": 1,
+        "plant_name": "Monstera Deliciosa",
+        "location": "Living Room Test Pot",
+        "soil_moisture_pct": 19.5,
+        "ambient_temp_c": 26.5,
+        "humidity_pct": 55.0,
+        "light_lux": 650.0,
+        "battery_pct": 98.0
+    }
+    r = s.post(f"{BASE_URL}/iot/telemetry", json=payload)
+    assert r.status_code == 201, f"Ingest failed: {r.status_code} {r.text}"
+    data = r.json()
+    assert data.get("database") == "mongodb"
+    assert data.get("telemetry", {}).get("status") == "Needs Water"
+
+# 47. MongoDB Monitored Plants Snapshot
+def test_iot_monitored_plants():
+    r = s.get(f"{BASE_URL}/iot/plants")
+    assert r.status_code == 200, f"Get plants failed: {r.status_code}"
+    data = r.json()
+    assert "plants" in data
+    assert len(data["plants"]) > 0
+
+# 48. MongoDB IoT Telemetry Time-Series History
+def test_iot_telemetry_history():
+    r = s.get(f"{BASE_URL}/iot/telemetry/1?limit=10")
+    assert r.status_code == 200, f"History query failed: {r.status_code}"
+    data = r.json()
+    assert data.get("plant_id") == 1
+    assert "history" in data
+    assert len(data["history"]) > 0
+
+# 49. Traefik Cloud-Native Ingress & Reverse Proxy Routing
+def test_traefik_api_gateway_routing():
+    r_fe = requests.get("http://localhost:8085/", timeout=5)
+    assert r_fe.status_code == 200, f"Traefik frontend failed: {r_fe.status_code}"
+
+    r_be = requests.get("http://localhost:8085/api/products/", timeout=5)
+    assert r_be.status_code == 200, f"Traefik backend failed: {r_be.status_code}"
+    assert "items" in r_be.json() or isinstance(r_be.json(), list)
+
+    r_worker = requests.get("http://localhost:8085/worker/health", timeout=5)
+    assert r_worker.status_code == 200, f"Traefik worker failed: {r_worker.status_code}"
+    assert r_worker.json().get("service") == "kather_baksho-worker-ts"
+
+# 50. Traefik Live Telemetry & Dashboard Exposure
+def test_traefik_dashboard():
+    r_dash = requests.get("http://localhost:8086/dashboard/", timeout=5)
+    assert r_dash.status_code == 200, f"Traefik dashboard failed: {r_dash.status_code}"
+    r_api = requests.get("http://localhost:8086/api/rawdata", timeout=5)
+    assert r_api.status_code == 200
+    assert "routers" in r_api.json()
+
+# 51. WebSocket Real-Time Order & Delivery Rider Tracking
+def test_websocket_order_tracking():
+    import socket
+    # Test direct WebSocket handshake on backend port 8081
+    s_be = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s_be.settimeout(5.0)
+    s_be.connect(("localhost", 8081))
+    req = (
+        "GET /ws/orders/1/track HTTP/1.1\r\n"
+        "Host: localhost:8081\r\n"
+        "Upgrade: websocket\r\n"
+        "Connection: Upgrade\r\n"
+        "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        "Sec-WebSocket-Version: 13\r\n\r\n"
+    )
+    s_be.sendall(req.encode())
+    resp = s_be.recv(4096)
+    assert b"101 Switching Protocols" in resp, f"Direct WS upgrade failed: {resp[:100]}"
+    frame = s_be.recv(4096)
+    assert b"connected" in frame or b"gps_update" in frame, f"Direct frame not received: {frame[:100]}"
+    s_be.close()
+
+    # Test WebSocket handshake through Traefik Gateway on port 8085
+    s_tr = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s_tr.settimeout(5.0)
+    s_tr.connect(("localhost", 8085))
+    req_tr = (
+        "GET /ws/orders/1/track HTTP/1.1\r\n"
+        "Host: localhost:8085\r\n"
+        "Upgrade: websocket\r\n"
+        "Connection: Upgrade\r\n"
+        "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+        "Sec-WebSocket-Version: 13\r\n\r\n"
+    )
+    s_tr.sendall(req_tr.encode())
+    resp_tr = s_tr.recv(4096)
+    assert b"101 Switching Protocols" in resp_tr, f"Traefik WS upgrade failed: {resp_tr[:100]}"
+    frame_tr = s_tr.recv(4096)
+    assert b"connected" in frame_tr or b"gps_update" in frame_tr, f"Traefik frame not received: {frame_tr[:100]}"
+    s_tr.close()
+
+# 52. OpenAPI 3.0 Specification & Interactive Swagger UI
+def test_openapi_swagger_docs():
+    # Direct Go Backend
+    r_spec = requests.get("http://localhost:8081/api/docs/openapi.json", timeout=5)
+    assert r_spec.status_code == 200, f"OpenAPI spec failed: {r_spec.status_code}"
+    spec = r_spec.json()
+    assert spec.get("openapi") == "3.0.3"
+    assert "paths" in spec
+    assert "/api/products/" in spec["paths"]
+    assert "/api/iot/telemetry" in spec["paths"]
+
+    r_ui = requests.get("http://localhost:8081/docs", timeout=5)
+    assert r_ui.status_code == 200, f"Docs HTML failed: {r_ui.status_code}"
+    assert "SwaggerUIBundle" in r_ui.text
+
+    # Via Traefik Ingress Gateway
+    r_tr_spec = requests.get("http://localhost:8085/api/docs/openapi.json", timeout=5)
+    assert r_tr_spec.status_code == 200, f"Traefik OpenAPI spec failed: {r_tr_spec.status_code}"
+
+    r_tr_ui = requests.get("http://localhost:8085/docs", timeout=5)
+    assert r_tr_ui.status_code == 200, f"Traefik Docs UI failed: {r_tr_ui.status_code}"
+
+# 53. Frontend TypeScript Type Declarations & Config
+def test_frontend_typescript_types():
+    import json
+    import os
+    assert os.path.exists("frontend/tsconfig.json"), "tsconfig.json missing"
+    with open("frontend/tsconfig.json", "r") as f:
+        tsconfig = json.load(f)
+    assert "compilerOptions" in tsconfig
+    assert tsconfig["compilerOptions"].get("strict") is True
+
+    expected_files = ["index.d.ts", "product.d.ts", "order.d.ts", "user.d.ts", "telemetry.d.ts"]
+    for fname in expected_files:
+        path = os.path.join("frontend/src/types", fname)
+        assert os.path.exists(path), f"Missing type declaration: {fname}"
+        with open(path, "r") as f:
+            content = f.read()
+        assert len(content) > 50, f"Empty type declaration: {fname}"
+
+# 54. AWS EC2 Infrastructure-as-Code & Deployment Orchestration
+def test_ec2_iac_artifacts():
+    import os
+    tf_files = [
+        "infra/terraform/main.tf",
+        "infra/terraform/provider.tf",
+        "infra/terraform/variables.tf",
+        "infra/terraform/outputs.tf",
+        "infra/terraform/user_data.sh",
+        "infra/terraform/terraform.tfvars.example"
+    ]
+    for tf in tf_files:
+        assert os.path.exists(tf), f"Terraform artifact missing: {tf}"
+        with open(tf, "r") as f:
+            content = f.read()
+        assert len(content) > 20, f"Empty terraform file: {tf}"
+
+    assert os.path.exists("deploy/ec2-setup.sh"), "deploy/ec2-setup.sh missing"
+    with open("deploy/ec2-setup.sh", "r") as f:
+        deploy_sh = f.read()
+    assert "docker compose" in deploy_sh
+    assert "systemctl enable kather_baksho.service" in deploy_sh
+
 tests = [
     ("Health / Get Products", test_get_products),
     ("Login Admin", test_login_admin),
@@ -573,7 +741,17 @@ tests = [
     ("Node.js & TypeScript Worker Health Probe", test_worker_health),
     ("Node.js & TypeScript Direct PDF Generation", test_worker_direct_invoice),
     ("Go Backend PDF Invoice Proxy", test_go_pdf_invoice_proxy),
-    ("Go Backend Analytics Executive Report PDF", test_go_analytics_report_pdf)
+    ("Go Backend Analytics Executive Report PDF", test_go_analytics_report_pdf),
+    ("MongoDB Tri-Database Readiness Probe", test_mongodb_readiness_probe),
+    ("MongoDB IoT Telemetry Ingestion & Alerting", test_iot_telemetry_ingestion),
+    ("MongoDB Monitored Plants Snapshot", test_iot_monitored_plants),
+    ("MongoDB IoT Telemetry Time-Series History", test_iot_telemetry_history),
+    ("Traefik Ingress Routing (Frontend, API & Worker)", test_traefik_api_gateway_routing),
+    ("Traefik Live Dashboard & Telemetry API", test_traefik_dashboard),
+    ("WebSocket Real-Time Order & Rider Tracking", test_websocket_order_tracking),
+    ("OpenAPI 3.0 Specification & Interactive Swagger UI", test_openapi_swagger_docs),
+    ("Frontend TypeScript Type Declarations & Config", test_frontend_typescript_types),
+    ("AWS EC2 Infrastructure-as-Code & Deployment Orchestration", test_ec2_iac_artifacts)
 ]
 
 print("Starting E2E test suite...")

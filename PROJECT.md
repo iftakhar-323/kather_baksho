@@ -160,17 +160,17 @@ Admin login: see `DUMMY_USERS.md` (deleted — recreate by promoting a user via 
 
 | Concern              | Status         | How it works today                                  |
 |----------------------|----------------|-----------------------------------------------------|
-| Payments             | ⏭️ deferred    | Cart shows total; "place order" succeeds without gateway |
-| Image storage        | ⏭️ deferred    | Emoji placeholders 🌿 🪵 🧴 on cards + detail       |
-| SMTP / email         | ✅ wired      | `backend/mailer/` → Brevo API (300 emails/day, free) |
-| OAuth (Google/FB)    | ⏭️ deferred    | Email + password only                               |
-| SMS / push           | ⏭️ deferred    | No service                                         |
-| Maps / live tracking | ⏭️ deferred    | Static "Dispatched" status in Orders                |
-| Analytics charts     | ⏳ pending     | Backend `/analytics/*` exists; admin tab UI pending |
-| Search               | ✅ internal    | Client-side filter on `/products` response          |
-| Recommendations      | ✅ internal    | `gift_controller.go` rule engine + `FeaturedCollections.jsx` client filter |
-| Theme / prefs        | ✅ internal    | `localStorage` (`kb:*`)                             |
-| Compare / Recent / Save-for-later | ✅ internal | `localStorage` (`kb:*`)                    |
+| Payments             | ✅ simulated   | Mock checkout session + cryptographic HMAC callback |
+| Invoices & Reports   | ✅ wired       | Node.js & TypeScript microservice vector PDF engine |
+| IoT Smart Telemetry  | ✅ wired       | MongoDB 7.0 polyglot document & time-series storage |
+| API Gateway & Ingress| ✅ wired       | Traefik v3.1 reverse proxy + live telemetry dashboard |
+| Maps / live tracking | ✅ wired       | Goroutine WebSockets + Live Courier GPS Radar       |
+| API Documentation    | ✅ wired       | OpenAPI 3.0 specification + Interactive Swagger UI  |
+| Observability        | ✅ wired       | Prometheus metrics exporter + Grafana Dashboards    |
+| Caching              | ✅ wired       | Redis in-memory read-through cache & invalidation   |
+| SMTP / email         | ✅ wired       | `backend/mailer/` → Brevo API (optional)            |
+| Search & Filter      | ✅ internal    | Redis cached + server & client search filters       |
+| Cloud IaC & Deploy   | ✅ wired       | AWS EC2 Terraform scripts + standalone systemd bash |
 
 Everything functional today is **just code** — Go on the server, React + CSS on the client, SQLite for persistence, JWT for auth, `localStorage` for UI state. No keys, no tokens, no webhooks, no cloud buckets.
 

@@ -17,6 +17,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-kather_baksho_secret}
       - DB_NAME=${DB_NAME:-kather_baksho}
       - REDIS_ADDR=redis:6379
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=kather_baksho_iot
       - WORKER_TS_URL=http://worker-ts:8083
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
@@ -28,12 +30,20 @@ services:
         condition: service_healthy
       worker-ts:
         condition: service_healthy
+      mongo:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`) || PathPrefix(`/health`) || PathPrefix(`/metrics`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.priority=10"
+      - "traefik.http.services.backend.loadbalancer.server.port=8081"
 
   worker-ts:
     build:
@@ -52,6 +62,14 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.worker.rule=PathPrefix(`/worker`)"
+      - "traefik.http.routers.worker.entrypoints=web"
+      - "traefik.http.routers.worker.priority=20"
+      - "traefik.http.middlewares.worker-stripprefix.stripprefix.prefixes=/worker"
+      - "traefik.http.routers.worker.middlewares=worker-stripprefix"
+      - "traefik.http.services.worker.loadbalancer.server.port=8083"
 
   frontend:
     build:
@@ -64,6 +82,26 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  traefik:
+    image: traefik:v3.1
+    container_name: kather_baksho-traefik
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+      - "8086:8080"
+    volumes:
+      - ./monitoring/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./monitoring/traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
+    depends_on:
+      - backend
+      - frontend
 
   redis:
     image: redis:7-alpine
@@ -127,10 +165,27 @@ services:
     depends_on:
       - prometheus
 
+  mongo:
+    image: mongo:7.0
+    container_name: kather_baksho-mongo
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 volumes:
   sqlite_data:
     driver: local
   redis_data:
+    driver: local
+  mongo_data:
     driver: local
   postgres_data:
     driver: local
