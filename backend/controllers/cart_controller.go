@@ -10,20 +10,20 @@ import (
 	"gorm.io/gorm"
 )
 
-// User-er cart ta khuje ber kore, na thakle notun banay
+// getOrCreateCart retrieves existing active cart or initializes a new one
 func getOrCreateCart(userID uint) models.Cart {
 	var cart models.Cart
 	result := database.DB.Preload("Items.Product").Where("user_id = ?", userID).First(&cart)
 
 	if result.Error != nil {
-		// cart nai, notun banao
+		// Cart does not exist, create a new cart for the user
 		cart = models.Cart{UserID: userID}
 		database.DB.Create(&cart)
 	}
 	return cart
 }
 
-// GET /api/cart - user-er nijer cart dekhbe
+// GET /api/cart - Fetch current user's active cart with populated items
 func GetCart(c *gin.Context) {
 	userID := c.GetUint("user_id")
 	cart := getOrCreateCart(userID)
@@ -35,7 +35,7 @@ type AddToCartInput struct {
 	Quantity  uint `json:"quantity" binding:"required"`
 }
 
-// POST /api/cart/add - product cart e add kora
+// POST /api/cart/add - Add product to user's cart with atomic inventory reservation
 func AddToCart(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
@@ -45,7 +45,7 @@ func AddToCart(c *gin.Context) {
 		return
 	}
 
-	// product ache kina check
+	// Verify product exists
 	var product models.Product
 	if err := database.DB.First(&product, input.ProductID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
@@ -54,7 +54,7 @@ func AddToCart(c *gin.Context) {
 
 	cart := getOrCreateCart(userID)
 
-	// check koro ei product ta age theke cart e koto quantity te ache
+	// Check if product already exists in cart and compute requested quantity
 	var existingItem models.CartItem
 	err := database.DB.Where("cart_id = ? AND product_id = ?", cart.ID, input.ProductID).First(&existingItem).Error
 
@@ -63,7 +63,7 @@ func AddToCart(c *gin.Context) {
 		totalRequested += existingItem.Quantity
 	}
 
-	// stock enough ache kina check (cart e je ase, oita minus kore dekhbo)
+	// Verify available stock considering existing cart reservation
 	available := product.Stock
 	if err == nil {
 		available = product.Stock + existingItem.Quantity
@@ -89,11 +89,11 @@ func AddToCart(c *gin.Context) {
 	}
 
 	if err == nil {
-		// age theke ache, quantity barao
+		// Existing item in cart: increment quantity
 		existingItem.Quantity = totalRequested
 		database.DB.Save(&existingItem)
 	} else {
-		// notun item hisebe add koro
+		// New item: create cart item record
 		newItem := models.CartItem{
 			CartID:    cart.ID,
 			ProductID: input.ProductID,
@@ -110,7 +110,7 @@ type UpdateCartItemInput struct {
 	Quantity uint `json:"quantity" binding:"required"`
 }
 
-// PUT /api/cart/item/:id - quantity update kora
+// PUT /api/cart/item/:id - Update item quantity and adjust reserved inventory
 func UpdateCartItem(c *gin.Context) {
 	itemID := c.Param("id")
 
@@ -132,9 +132,9 @@ func UpdateCartItem(c *gin.Context) {
 		return
 	}
 
-	// notun quantity te koto stock lagbe, ar product er kase koto free ase (current cart qty bad diye)
+	// Calculate required stock delta
 	needed := input.Quantity
-	available := product.Stock + item.Quantity // item je ta reserve kore ase, oita abar add kore dekhbo
+	available := product.Stock + item.Quantity // Include currently reserved quantity in available inventory
 
 	if needed > available {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -144,7 +144,7 @@ func UpdateCartItem(c *gin.Context) {
 		return
 	}
 
-	// stock e delta apply koro atomically
+	// Apply inventory delta atomically
 	delta := int(needed) - int(item.Quantity)
 	if delta > 0 {
 		res := database.DB.Model(&models.Product{}).
@@ -169,7 +169,7 @@ func UpdateCartItem(c *gin.Context) {
 	c.JSON(http.StatusOK, item)
 }
 
-// DELETE /api/cart/item/:id - cart theke item remove kora
+// DELETE /api/cart/item/:id - Remove item from cart and restore reserved inventory
 func RemoveCartItem(c *gin.Context) {
 	itemID := c.Param("id")
 
@@ -179,7 +179,7 @@ func RemoveCartItem(c *gin.Context) {
 		return
 	}
 
-	// reserved stock abar product e ferot dao
+	// Restore reserved stock back to available product inventory
 	database.DB.Model(&models.Product{}).Where("id = ?", item.ProductID).
 		Update("stock", gorm.Expr("stock + ?", item.Quantity))
 

@@ -25,10 +25,10 @@ func OrderPlaced(to, orderID string, total float64) Email {
 		Subject: fmt.Sprintf("Order #%s confirmed", orderID),
 		HTML: fmt.Sprintf(`<div style="font-family:system-ui,sans-serif;max-width:520px;margin:auto">
 			<h2 style="color:#2f7d4f">Thanks for your order! 🌿</h2>
-			<p>Order <b>#%s</b> for <b>৳%.2f</b> is being packed.</p>
+			<p>Order <b>#%s</b> for <b>BDT %.2f</b> is being packed.</p>
 			<p>You'll get another email when it's out for delivery.</p>
 		</div>`, orderID, total),
-		Text: fmt.Sprintf("Order #%s for ৳%.2f confirmed.", orderID, total),
+		Text: fmt.Sprintf("Order #%s for BDT %.2f confirmed.", orderID, total),
 	}
 }
 
@@ -36,7 +36,7 @@ func OrderPlaced(to, orderID string, total float64) Email {
 func PasswordReset(to, link string) Email {
 	return Email{
 		To:      to,
-		Subject: "Reset your KatherBox password",
+		Subject: "Reset your Kather Baksho password",
 		HTML: fmt.Sprintf(`<div style="font-family:system-ui,sans-serif;max-width:520px;margin:auto">
 			<h2 style="color:#2f7d4f">Reset your password</h2>
 			<p>Click the link below to set a new password. It expires in 30 minutes.</p>

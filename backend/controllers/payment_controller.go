@@ -126,7 +126,7 @@ func PaymentCallback(c *gin.Context) {
 		database.DB.Create(&models.OrderEvent{
 			OrderID:   order.ID,
 			Event:     "Payment Received",
-			Note:      fmt.Sprintf("Payment of ৳%.2f verified via session %s", order.TotalPrice, input.SessionID),
+			Note:      fmt.Sprintf("Payment of BDT %.2f verified via session %s", order.TotalPrice, input.SessionID),
 			CreatedBy: order.UserID,
 		})
 

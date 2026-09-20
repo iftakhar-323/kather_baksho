@@ -18,7 +18,7 @@ type Subscription struct {
 	IntervalDays   int     `json:"interval_days"`    // 30, 60, 90
 	NextDelivery   string  `json:"next_delivery"`    // YYYY-MM-DD
 	Status         string  `json:"status"`           // "active" | "paused" | "cancelled"
-	Price          float64 `json:"price"`            // ৳ per delivery
+	Price          float64 `json:"price"`            // BDT per delivery
 	// Extra controls (Sprint D): pausing stores a pause timestamp; renewing
 	// bumps NextDelivery forward by IntervalDays; cancelling is irreversible.
 	PausedAt       string  `json:"paused_at"`        // ISO datetime, "" if not paused

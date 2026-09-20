@@ -19,7 +19,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// "Bearer <token>" format theke shudhu token ta ber kora
+		// Extract raw token from "Bearer <token>" header
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 		token, err := utils.ValidateJWT(tokenString)
@@ -36,7 +36,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// user_id ke context e set kora holo, controller theke pore access kora jabe
+		// Inject authenticated user ID into Gin context for downstream controllers
 		userIDFloat, ok := claims["user_id"].(float64)
 		if !ok {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token payload"})

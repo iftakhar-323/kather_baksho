@@ -20,7 +20,7 @@ var EXPERTS = []Expert{
 type Expert struct {
 	Name      string `json:"name"`
 	Specialty string `json:"specialty"`
-	Rate      int    `json:"rate"` // ৳ per session
+	Rate      int    `json:"rate"` // BDT per session
 }
 
 // GET /api/consultations/experts
@@ -43,7 +43,7 @@ func BookConsultation(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	validExpert := false
 	for _, e := range EXPERTS {
 		if e.Name == input.ExpertName {

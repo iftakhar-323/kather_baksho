@@ -33,7 +33,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// email age theke ache kina check
+	// Check if email is already registered
 	var existingUser models.User
 	if err := database.DB.Where("email = ?", input.Email).First(&existingUser).Error; err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email already registered"})
@@ -126,7 +126,7 @@ func Login(c *gin.Context) {
 	})
 }
 
-// GET /api/auth/me - current user info (token theke ber kore, stale JWT issue er jonno useful)
+// GET /api/auth/me - Current user profile info (fetched from DB to prevent stale JWT claims)
 func Me(c *gin.Context) {
 	userID := c.GetUint("user_id")
 	var user models.User

@@ -26,5 +26,5 @@ type OrderItem struct {
 	ProductID uint    `json:"product_id"`
 	Product   Product `json:"product" gorm:"foreignKey:ProductID"`
 	Quantity  uint    `json:"quantity"`
-	Price     float64 `json:"price"` // order kore somoy jei price chilo, seta save thakbe
+	Price     float64 `json:"price"` // Preserves unit price at the time of purchase
 }

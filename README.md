@@ -1,4 +1,4 @@
-# 🌿 Kather Baksho (কাঠের বাক্স)
+# 🌿 Kather Baksho
 ### Enterprise-Grade, Resilient Full-Stack Botanical E-Commerce & IoT Platform
 
 > **100% Localhost Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite)**, **Node.js & TypeScript 5.5 Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0, MinIO S3)**, **Traefik Cloud-Native Ingress Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **RFC 6238 TOTP 2FA**, and **Chaos Engineering Studio**.
@@ -13,11 +13,11 @@
 ---
 
 ## 📑 Table of Contents
-1. [📌 What is this Project? (এই প্রজেক্টে কী আছে)](#-what-is-this-project)
-2. [💡 What Problems Does it Solve & How Does it Make Life Easy? (কী ইজি হয়)](#-how-it-makes-life-easy)
-3. [⭐ Special & Advanced Implementations (আমি স্পেশাল কী কী ইমপ্লিমেন্ট করছি)](#-special--advanced-implementations)
-4. [🛠️ Tech Stack & Tools (কী কী ব্যবহার করা হয়েছে)](#-tech-stack--tools)
-5. [🎯 Why Are These Implementations Important? (কেন এগুলো গুরুত্বপূর্ণ)](#-why-important)
+1. [📌 What is this Project?](#-what-is-this-project)
+2. [💡 What Problems Does it Solve & How Does it Make Life Easy?](#-how-it-makes-life-easy)
+3. [⭐ Special & Advanced Implementations](#-special--advanced-implementations)
+4. [🛠️ Tech Stack & Tools Used](#-tech-stack--tools)
+5. [🎯 Why Are These Implementations Important?](#-why-important)
 6. [🌐 Local Service Map & Running Ports](#-local-service-map--running-ports)
 7. [🔐 Seeded Accounts & Credentials](#-seeded-accounts--credentials)
 8. [🚀 1-Command Quickstart](#-1-command-quickstart)
@@ -27,9 +27,9 @@
 ---
 
 <a name="-what-is-this-project"></a>
-## 📌 1. What is this Project? (এই প্রজেক্টে কী আছে)
+## 📌 1. What is this Project?
 
-**Kather Baksho (কাঠের বাক্স)** is a high-performance, production-grade e-commerce and botanical care ecosystem designed for plants, gardening supplies, and plant parenting in Bangladesh. 
+**Kather Baksho** is a high-performance, production-grade e-commerce and botanical care ecosystem designed for plants, gardening supplies, and plant parenting. 
 
 Unlike traditional monoliths or boilerplate demo apps, Kather Baksho is an **end-to-end distributed system** engineered to mirror modern Fortune-500 architectures (event-driven messaging, polyglot persistence, object storage, circuit breakers, chaos fault injection, and real-time stream telemetries)—**engineered to run 100% locally without requiring any paid cloud services or domain names**.
 
@@ -44,9 +44,9 @@ Unlike traditional monoliths or boilerplate demo apps, Kather Baksho is an **end
 ---
 
 <a name="-how-it-makes-life-easy"></a>
-## 💡 2. How it Makes Life Easy (কী ইজি হয় ও ব্যবহারকারীর সুবিধা)
+## 💡 2. How it Makes Life Easy & Solves Key Problems
 
-| Audience | What Made Difficult Previously | How Kather Baksho Makes It Effortless |
+| Audience | What Made It Difficult Previously | How Kather Baksho Makes It Effortless |
 | :--- | :--- | :--- |
 | **End Customer** | Slow searches, uncertain delivery times, confusing plant care, manual paper receipts. | **Instant highlighted search** finds items even with typos; **Live Courier Radar** shows delivery progress on a map; **AI Plant Doctor** diagnoses yellow leaves in seconds; **Instant PDF Invoices** download with one click. |
 | **Developer / Contributor** | Setting up 10 external cloud accounts (AWS, MongoDB Atlas, Upstash, S3, Brevo, Datadog), recurring subscription bills, complex local setups. | **1-Command Zero-Cost Localhost Execution**: MinIO simulates S3, local Redis handles streams/caching, local MongoDB handles IoT telemetry, pure-Go TOTP eliminates third-party auth services. One `docker compose up -d` starts everything! |
@@ -55,7 +55,7 @@ Unlike traditional monoliths or boilerplate demo apps, Kather Baksho is an **end
 ---
 
 <a name="-special--advanced-implementations"></a>
-## ⭐ 3. Special & Advanced Implementations (আমি স্পেশাল কী কী ইমপ্লিমেন্ট করছি)
+## ⭐ 3. Special & Advanced Implementations
 
 Here are the enterprise-grade features implemented in this repository:
 
@@ -113,7 +113,7 @@ Here are the enterprise-grade features implemented in this repository:
 ---
 
 <a name="-tech-stack--tools"></a>
-## 🛠️ 4. Tech Stack & Tools (কী কী ব্যবহার করা হয়েছে)
+## 🛠️ 4. Tech Stack & Tools Used
 
 ```mermaid
 flowchart TD
@@ -149,7 +149,7 @@ flowchart TD
 ---
 
 <a name="-why-important"></a>
-## 🎯 5. Why Are These Implementations Important? (কেন এগুলো গুরুত্বপূর্ণ)
+## 🎯 5. Why Are These Implementations Important?
 
 1. **Zero Financial Overhead (100% Local Cost Savings)**:
    - Typical cloud startups spend \$200-\$800/month on AWS S3, Redis Cloud, MongoDB Atlas, Auth0, and Datadog.

@@ -353,11 +353,11 @@ th{background:#f6f6f6}
 <tr><th>Item</th><th>Qty</th><th>Price</th><th>Subtotal</th></tr>
 `, oid, oid, o.CreatedAt.Format("02 Jan 2006"), buyer, shipToLine(o))
 	for _, r := range rows {
-		html += fmt.Sprintf("<tr><td>%s</td><td>%d</td><td>৳%.2f</td><td>৳%.2f</td></tr>",
+		html += fmt.Sprintf("<tr><td>%s</td><td>%d</td><td>BDT %.2f</td><td>BDT %.2f</td></tr>",
 			r.Name, r.Quantity, r.Price, r.Subtotal)
 	}
 	html += fmt.Sprintf(`</table>
-<p class="total">Total: ৳%.2f</p>
+<p class="total">Total: BDT %.2f</p>
 <p class="muted">Status: %s</p>
 <button class="btn" onclick="window.print()">Print / Save as PDF</button>
 </body></html>`, total, o.Status)
@@ -524,12 +524,12 @@ h2{color:#2d6a4f;text-align:center}
 .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dotted #ddd}
 .bt{font-weight:700;font-size:18px;margin-top:12px}
 .muted{color:#888;font-size:12px;text-align:center;margin-top:18px}</style></head><body>
-<h2>KatherBox — Receipt</h2>
+<h2>Kather Baksho — Receipt</h2>
 <p class="muted">Order #%05d · %s</p>
 <div class="row"><span>Customer</span><span>%s</span></div>
-<div class="row bt"><span>Total Paid</span><span>৳%.2f</span></div>
+<div class="row bt"><span>Total Paid</span><span>BDT %.2f</span></div>
 <div class="row"><span>Status</span><span>%s</span></div>
-<p class="muted">Thank you for supporting KatherBox 🌿</p>
+<p class="muted">Thank you for supporting Kather Baksho 🌿</p>
 </body></html>`, oid, oid, o.CreatedAt.Format("02 Jan 2006 15:04"),
 		buyer, o.TotalPrice, o.Status)
 	c.Header("Content-Type", "text/html; charset=utf-8")

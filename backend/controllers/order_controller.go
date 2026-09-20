@@ -27,7 +27,7 @@ type CheckoutInput struct {
 	DeliveryNote    string `json:"delivery_note"`
 }
 
-// POST /api/orders/checkout - cart theke order banabe
+// POST /api/orders/checkout - Creates order from user cart
 func Checkout(c *gin.Context) {
 	userID := c.GetUint("user_id")
 
@@ -80,7 +80,7 @@ func Checkout(c *gin.Context) {
 
 	discount := couponDiscount
 
-	// Green Points redemption: 1 point = ৳1 discount
+	// Green Points redemption: 1 point = 1 BDT discount
 	if input.PointsToRedeem > 0 {
 		var user models.User
 		database.DB.First(&user, userID)
@@ -95,7 +95,7 @@ func Checkout(c *gin.Context) {
 	}
 	finalTotal := totalPrice - discount
 
-	// Gift wrap adds ৳50 to the final total.
+	// Gift wrap adds 50 BDT to the final total.
 	if input.GiftWrap {
 		finalTotal += 50
 	}
@@ -154,7 +154,7 @@ func Checkout(c *gin.Context) {
 	}
 	database.DB.Create(&order)
 
-	// cart khali kore dao (use Unscoped to hard delete so it doesn't linger)
+	// Clear user cart items (use Unscoped to hard delete so items don't linger)
 	database.DB.Unscoped().Where("cart_id = ?", cart.ID).Delete(&models.CartItem{})
 
 	// Green Points: 1 pt per 10 currency units spent (based on total before discount)
@@ -326,7 +326,7 @@ func DeleteOrder(c *gin.Context) {
 		}
 	}
 
-	// order items soho delete koro
+	// Delete order items and parent order record
 	database.DB.Where("order_id = ?", order.ID).Delete(&models.OrderItem{})
 	database.DB.Delete(&order)
 

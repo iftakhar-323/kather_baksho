@@ -10,9 +10,9 @@ import (
 const openAPISpecJSON = `{
   "openapi": "3.0.3",
   "info": {
-    "title": "কাঠের বাক্স (Kather Baksho) Enterprise API",
+    "title": "Kather Baksho Enterprise API",
     "version": "3.0.0",
-    "description": "Production e-commerce, IoT botanical telemetry, AI plant doctor, and microservice ecosystem with Polyglot persistence (SQLite, Redis, MongoDB), Traefik API gateway, and Goroutine WebSockets.",
+    "description": "Production-grade, highly-resilient, event-driven REST and WebSocket API specification for Kather Baksho e-commerce ecosystem with Polyglot persistence (SQLite, Redis, MongoDB), Traefik API gateway, and Goroutine WebSockets.",
     "contact": {
       "name": "Kather Baksho Engineering Team",
       "email": "dev@katherbaksho.local"
@@ -234,7 +234,7 @@ func ServeSwaggerUI(c *gin.Context) {
 </head>
 <body>
   <div class="custom-header">
-    <h1>🌱 কাঠের বাক্স (Kather Baksho) <span>API Explorer</span></h1>
+    <h1>🌱 Kather Baksho <span>API Explorer</span></h1>
     <div style="display: flex; gap: 16px; align-items: center;">
       <span class="badge">OpenAPI 3.0</span>
       <a href="/api/docs/openapi.json" target="_blank">Download OpenAPI JSON ↗</a>
