@@ -9,6 +9,7 @@ import (
 	"kather_baksho/catalog_service/controllers"
 	"kather_baksho/catalog_service/database"
 	"kather_baksho/catalog_service/middleware"
+	"kather_baksho/catalog_service/models"
 	"kather_baksho/catalog_service/services"
 
 	"github.com/gin-contrib/cors"
@@ -20,6 +21,15 @@ func main() {
 
 	// 1. Initialize databases & storage
 	database.ConnectDatabase()
+	if err := database.DB.AutoMigrate(
+		&models.Product{},
+		&models.Category{},
+		&models.Review{},
+		&models.WishlistItem{},
+		&models.PageView{},
+	); err != nil {
+		log.Fatalf("[Catalog-Service] Auto-migrate failed: %v", err)
+	}
 	database.InitRedis()
 	database.InitFTS()
 	services.InitStorage()

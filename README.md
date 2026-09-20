@@ -206,25 +206,24 @@ flowchart TD
 
 When the stack is running, all services are accessible on your local machine:
 
-| Component | Local URL / Port | Technology | Purpose | Default Auth |
-| :--- | :--- | :--- | :--- | :--- |
-| **Traefik Gateway (Primary Entry)** | [http://localhost:8085](http://localhost:8085) | Traefik v3.1 | Primary edge router for all frontend, API, worker & WebSockets | Direct |
-| **Traefik Dashboard** | [http://localhost:8086/dashboard/](http://localhost:8086/dashboard/) | Traefik UI | Live routing table, middleware inspection & traffic counters | Direct |
-| **Storefront Web App** | [http://localhost:8082](http://localhost:8082) | React 18 SPA | Storefront, Admin Panel, AI Plant Doctor & Chaos Studio | Public |
-| **Catalog & Search Microservice** | [http://localhost:8087](http://localhost:8087) | Go 1.22 Gin | Products, Categories, FTS5 Search, MinIO Media, Wishlist | Public / Admin |
-| **Auth & 2FA Microservice** | [http://localhost:8084](http://localhost:8084) | Go 1.22 Gin | User Registration, Login, RFC 6238 TOTP 2FA, Addresses | Public / JWT |
-| **Community & Care Microservice** | [http://localhost:8088](http://localhost:8088) | Go 1.22 Gin | Community Forums, Care Journals, Subscriptions, Consultations | Public / JWT |
-| **Backend Core Engine** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Core Orders, Checkout, Flash Sale Mutex, WS Radar | JWT / Session |
-| **IoT & AI Microservice** | [http://localhost:8089](http://localhost:8089) | Go 1.22 Gin | Autonomous plant sensor telemetry, AI doctor & ML comparisons | Public / JWT |
-| **Interactive Swagger UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | OpenAPI 3.0 | Complete interactive API explorer with parameter schemas | Direct |
-| **TypeScript Worker Microservice** | [http://localhost:8083](http://localhost:8083) | Node.js + TS | Microservice for PDF invoice and analytics report generation | Inter-service |
-| **MinIO S3 API** | [http://localhost:9005](http://localhost:9005) | MinIO S3 | AWS S3-compatible object storage API | `kather_baksho_admin` / `kather_baksho_s3_secret` |
-| **MinIO S3 Web Console** | [http://localhost:9006](http://localhost:9006) | MinIO Console | Visual browser for media buckets and upload inspection | `kather_baksho_admin` / `kather_baksho_s3_secret` |
-| **MongoDB IoT Datastore** | `localhost:27019` | MongoDB 7.0 | Sensor readings, time-series moisture and lux telemetry | Direct |
-| **Redis Cache & Streams Bus** | `localhost:6380` | Redis 7 Alpine | In-memory read-through cache & Redis Streams event queue | Direct |
-| **Prometheus Exporter** | [http://localhost:9090](http://localhost:9090) | Prometheus | Automated scraping of `/metrics` (latencies, counts, gauges) | Direct |
-| **Grafana Observability Portal** | [http://localhost:3000](http://localhost:3000) | Grafana 11.2 | Real-time dashboards monitoring throughput, RPS & p99 delay | `admin` / `admin` |
-| **Tri-Database Readiness Probe** | [http://localhost:8081/health/ready](http://localhost:8081/health/ready) | Go Health | Deep health probe verifying SQLite, Redis, and MongoDB | Public |
+| Component | Local URL / Port | Technology | Purpose | Private Datastore | Default Auth |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Traefik Gateway (Primary Entry)** | [http://localhost:8085](http://localhost:8085) | Traefik v3.1 | Primary edge router for all frontend, API, worker & WebSockets | Gateway Config | Direct |
+| **Traefik Dashboard** | [http://localhost:8086/dashboard/](http://localhost:8086/dashboard/) | Traefik UI | Live routing table, middleware inspection & traffic counters | Memory | Direct |
+| **Storefront Web App** | [http://localhost:8082](http://localhost:8082) | React 18 SPA | Storefront, Admin Panel, AI Plant Doctor & Chaos Studio | Static Files | Public |
+| **Order & Fulfillment Microservice** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Orders, Checkout, Cart, Payment, Coupons, WS Radar | `/app/data/orders.db` | JWT / Session |
+| **Identity & 2FA Microservice** | [http://localhost:8084](http://localhost:8084) | Go 1.22 Gin | User Registration, Login, RFC 6238 TOTP 2FA, Addresses | `/app/data/auth.db` | Public / JWT |
+| **Botanical Catalog Microservice** | [http://localhost:8087](http://localhost:8087) | Go 1.22 Gin | Products, Categories, FTS5 Search, MinIO Media, Wishlist | `/app/data/catalog.db` | Public / Admin |
+| **Community & Care Microservice** | [http://localhost:8088](http://localhost:8088) | Go 1.22 Gin | Community Forums, Care Journals, Subscriptions, Consultations | `/app/data/community.db` | Public / JWT |
+| **IoT & AI Intelligence Microservice** | [http://localhost:8089](http://localhost:8089) | Go 1.22 Gin | Autonomous plant sensor telemetry, AI doctor & ML comparisons | MongoDB `kather_baksho_iot` | Public / JWT |
+| **Interactive Swagger UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | OpenAPI 3.0 | Complete interactive API explorer with parameter schemas | Memory | Direct |
+| **TypeScript Worker Microservice** | [http://localhost:8083](http://localhost:8083) | Node.js + TS | Microservice for PDF invoice and analytics report generation | Stateless | Inter-service |
+| **MinIO S3 API** | [http://localhost:9005](http://localhost:9005) | MinIO S3 | AWS S3-compatible object storage API | Object Store | `kather_baksho_admin` / `kather_baksho_s3_secret` |
+| **MinIO S3 Web Console** | [http://localhost:9006](http://localhost:9006) | MinIO Console | Visual browser for media buckets and upload inspection | Object Store | `kather_baksho_admin` / `kather_baksho_s3_secret` |
+| **MongoDB IoT Datastore** | `localhost:27019` | MongoDB 7.0 | Sensor readings, time-series moisture and lux telemetry | MongoDB 7.0 | Direct |
+| **Redis Cache & Streams Bus** | `localhost:6380` | Redis 7 Alpine | In-memory read-through cache & Redis Streams event queue | Redis Memory | Direct |
+| **Prometheus Exporter** | [http://localhost:9090](http://localhost:9090) | Prometheus | Automated scraping of `/metrics` (latencies, counts, gauges) | TSDB | Direct |
+| **Grafana Observability Portal** | [http://localhost:3000](http://localhost:3000) | Grafana 11.2 | Real-time dashboards monitoring throughput, RPS & p99 delay | Grafana DB | `admin` / `admin` |
 
 ---
 
@@ -392,43 +391,38 @@ cd backend && go test -v ./...
 
 ```
 kather_baksho/
-├── backend/                        # High-throughput Go 1.22 REST & WebSocket API
-│   ├── controllers/                # Handlers (Orders, Cart, Chaos, Events, Media, TOTP, Search)
-│   ├── routes/                     # Gin route groupings (Auth, Products, Chaos, Events, IoT)
-│   ├── middleware/                 # RateLimiter, Chaos, Prometheus, Idempotency, Logger, Auth
-│   ├── database/                   # SQLite GORM, Redis Streams, MongoDB 7.0 driver, FTS5
-│   ├── models/                     # Database entities (User with 2FA, Product, Order, IoT BSON)
-│   ├── services/                   # EventBus, MinIO Storage, RFC 6238 TOTP, AI Plant Doctor
-│   ├── utils/                      # CircuitBreaker, JWT with 2FA pending tokens, Password hashing
-│   └── main.go                     # Application wiring, middleware chaining & startup
-├── frontend/                       # React 18 + Vite SPA with TypeScript Types
+├── backend -> services/order-service   # Backward-compatibility symlink for local scripts
+├── frontend/                           # React 18 + Vite SPA with TypeScript Types
 │   ├── src/
-│   │   ├── components/             # SmartGardenMonitor, LiveDeliveryRadar, GlobalSearch
-│   │   ├── pages/                  # Storefront, Admin, Cart, Care, AlgorithmVisualizer (Chaos)
-│   │   ├── types/                  # Strict TypeScript declarations (*.d.ts)
-│   │   └── App.jsx                 # Routing, layout shell & global context providers
-│   ├── tsconfig.json               # TypeScript compiler config
-│   └── nginx.conf                  # Production SPA reverse proxy
+│   │   ├── components/                 # SmartGardenMonitor, LiveDeliveryRadar, GlobalSearch
+│   │   ├── pages/                      # Storefront, Admin, Cart, Care, AlgorithmVisualizer (Chaos)
+│   │   ├── types/                      # Strict TypeScript declarations (*.d.ts)
+│   │   └── App.jsx                     # Routing, layout shell & global context providers
+│   ├── tsconfig.json                   # TypeScript compiler config
+│   └── nginx.conf                      # Production SPA reverse proxy
 ├── services/
-│   ├── auth-service/               # Autonomous Identity, 2FA TOTP & User Management Microservice (Go)
-│   ├── catalog-service/            # Autonomous Botanical Catalog, FTS5 Search & Media Microservice (Go)
-│   ├── community-care-service/     # Autonomous Community, Botanical Care & Subscriptions Microservice (Go)
-│   ├── iot-ai-service/             # Autonomous Botanical Intelligence & IoT Microservice (Go)
-│   └── worker-ts/                  # Document Generation Microservice (Node.js 20, TypeScript 5.5)
-│       └── src/                    # Vector PDF invoice & sales report generators
+│   ├── order-service/                  # Core Orders, Cart, Payment, Coupons, WS Radar (Go)
+│   ├── auth-service/                   # Identity, RFC 6238 TOTP 2FA & User Management (Go)
+│   ├── catalog-service/                # Botanical Catalog, FTS5 Search & MinIO Media (Go)
+│   ├── community-care-service/         # Community Forums, Care Journals & Subscriptions (Go)
+│   ├── iot-ai-service/                 # Botanical Intelligence & IoT Telemetry (Go)
+│   └── worker-ts/                      # Document Generation Microservice (Node.js 20, TypeScript 5.5)
+│       └── src/                        # Vector PDF invoice & sales report generators
 ├── monitoring/
-│   ├── traefik/                    # Traefik v3.1 dynamic routing configuration
-│   ├── prometheus/                 # Prometheus scrape configuration
-│   └── grafana/                    # Pre-provisioned dashboards & datasource
+│   ├── traefik/                        # Traefik v3.1 dynamic routing configuration
+│   ├── prometheus/                     # Prometheus scrape configuration
+│   └── grafana/                        # Pre-provisioned dashboards & datasource
+├── scripts/
+│   └── split_databases.py              # Automated database-per-service isolation tool
 ├── infra/
-│   └── terraform/                  # AWS EC2, VPC, Subnet, Security Groups IaC
+│   └── terraform/                      # AWS EC2, VPC, Subnet, Security Groups IaC
 ├── deploy/
-│   └── ec2-setup.sh                # 1-Click production Ubuntu automation script
+│   └── ec2-setup.sh                    # 1-Click production Ubuntu automation script
 ├── tests/
-│   ├── e2e_test.py                 # Comprehensive 64-test automated E2E test suite
-│   └── stress_test.py              # Flash Sale concurrency benchmark engine
-├── docker-compose.yml              # 13-Container local microservices orchestration stack
-└── README.md                       # ← You are here!
+│   ├── e2e_test.py                     # Comprehensive 64-test automated E2E test suite
+│   └── stress_test.py                  # Flash Sale concurrency benchmark engine
+├── docker-compose.yml                  # 13-Container local microservices orchestration stack
+└── README.md                           # ← You are here!
 
 ```
 

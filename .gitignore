@@ -20,6 +20,7 @@ services/**/iot_ai_service
 services/**/auth_service
 services/**/catalog_service
 services/**/community_care_service
+services/**/order_service
 services/**/*.exe
 
 # OS/Editor

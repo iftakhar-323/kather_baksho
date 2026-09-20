@@ -9,6 +9,7 @@ import (
 	"kather_baksho/community_care_service/controllers"
 	"kather_baksho/community_care_service/database"
 	"kather_baksho/community_care_service/middleware"
+	"kather_baksho/community_care_service/models"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,26 @@ func main() {
 
 	// 1. Initialize database
 	database.ConnectDatabase()
+	if err := database.DB.AutoMigrate(
+		&models.CommunityPost{},
+		&models.CommunityComment{},
+		&models.CommunityLike{},
+		&models.CommunityFollow{},
+		&models.CommunityBookmark{},
+		&models.CommunityGroup{},
+		&models.CommunityGroupMember{},
+		&models.CommunityQuestion{},
+		&models.CommunityAnswer{},
+		&models.GrowthJournal{},
+		&models.CareSchedule{},
+		&models.BlogPost{},
+		&models.Consultation{},
+		&models.Subscription{},
+		&models.SubscriptionDelivery{},
+		&models.Notification{},
+	); err != nil {
+		log.Fatalf("[Community-Care-Service] Auto-migrate failed: %v", err)
+	}
 
 	// 2. Set Gin mode
 	ginMode := os.Getenv("GIN_MODE")

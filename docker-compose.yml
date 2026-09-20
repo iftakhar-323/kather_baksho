@@ -1,16 +1,18 @@
 services:
-  backend:
+  order-service:
     build:
-      context: ./backend
+      context: ./services/order-service
       dockerfile: Dockerfile
-    container_name: kather_baksho-backend
+    container_name: kather_baksho-order
     restart: unless-stopped
     ports:
       - "8081:8081"
     environment:
       - PORT=8081
       - DB_DRIVER=${DB_DRIVER:-sqlite}
-      - DB_PATH=/app/data/kather_baksho.db
+      - DB_PATH=/app/data/orders.db
+      - CATALOG_DB_PATH=/app/data/catalog.db
+      - AUTH_DB_PATH=/app/data/auth.db
       - DB_HOST=${DB_HOST:-postgres}
       - DB_PORT=${DB_PORT:-5432}
       - DB_USER=${DB_USER:-kather_baksho}
@@ -29,6 +31,11 @@ services:
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
     volumes:
       - sqlite_data:/app/data
+    networks:
+      default:
+        aliases:
+          - backend
+          - order-service
     depends_on:
       redis:
         condition: service_healthy
@@ -45,7 +52,7 @@ services:
       community-care-service:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -128,7 +135,7 @@ services:
     environment:
       - PORT=8087
       - DB_DRIVER=sqlite
-      - DB_PATH=/app/data/kather_baksho.db
+      - DB_PATH=/app/data/catalog.db
       - REDIS_ADDR=redis:6379
       - MINIO_ENDPOINT=minio:9000
       - GIN_MODE=release
@@ -165,7 +172,7 @@ services:
     environment:
       - PORT=8084
       - DB_DRIVER=sqlite
-      - DB_PATH=/app/data/kather_baksho.db
+      - DB_PATH=/app/data/auth.db
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -195,7 +202,8 @@ services:
     environment:
       - PORT=8088
       - DB_DRIVER=sqlite
-      - DB_PATH=/app/data/kather_baksho.db
+      - DB_PATH=/app/data/community.db
+      - AUTH_DB_PATH=/app/data/auth.db
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -223,7 +231,7 @@ services:
     ports:
       - "8082:80"
     depends_on:
-      backend:
+      order-service:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
@@ -243,7 +251,7 @@ services:
       - ./monitoring/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - ./monitoring/traefik/dynamic_conf.yml:/etc/traefik/dynamic_conf.yml:ro
     depends_on:
-      - backend
+      - order-service
       - frontend
       - iot-ai-service
       - catalog-service
@@ -293,7 +301,7 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     depends_on:
-      - backend
+      - order-service
 
   grafana:
     image: grafana/grafana:11.2.0

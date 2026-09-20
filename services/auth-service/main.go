@@ -9,6 +9,7 @@ import (
 	"kather_baksho/auth_service/controllers"
 	"kather_baksho/auth_service/database"
 	"kather_baksho/auth_service/middleware"
+	"kather_baksho/auth_service/models"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,13 @@ func main() {
 
 	// 1. Initialize database
 	database.ConnectDatabase()
+	if err := database.DB.AutoMigrate(
+		&models.User{},
+		&models.Address{},
+		&models.EmailVerification{},
+	); err != nil {
+		log.Fatalf("[Auth-Service] Auto-migrate failed: %v", err)
+	}
 
 	// 2. Set Gin mode
 	ginMode := os.Getenv("GIN_MODE")

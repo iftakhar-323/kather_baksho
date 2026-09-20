@@ -7,12 +7,19 @@ http:
       service: "frontend-svc"
       priority: 1
 
-    backend:
+    order:
       rule: "PathPrefix(`/api`) || PathPrefix(`/health`) || PathPrefix(`/metrics`) || PathPrefix(`/ws`) || PathPrefix(`/docs`) || PathPrefix(`/swagger`)"
       entryPoints:
         - "web"
-      service: "backend-svc"
+      service: "order-svc"
       priority: 10
+
+    backend:
+      rule: "PathPrefix(`/api/legacy-backend`)"
+      entryPoints:
+        - "web"
+      service: "order-svc"
+      priority: 5
 
     worker:
       rule: "PathPrefix(`/worker`)"
@@ -63,9 +70,16 @@ http:
         servers:
           - url: "http://frontend:80"
 
+    order-svc:
+      loadBalancer:
+        servers:
+          - url: "http://order-service:8081"
+          - url: "http://backend:8081"
+
     backend-svc:
       loadBalancer:
         servers:
+          - url: "http://order-service:8081"
           - url: "http://backend:8081"
 
     worker-svc:

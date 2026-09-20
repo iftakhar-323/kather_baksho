@@ -111,7 +111,7 @@ def test_cart_operations():
     for p in items:
         if p.get("stock", 0) > 5:
             product_id = p.get("id") or p.get("ID")
-            initial_stock = p.get("stock")
+            initial_stock = s.get(f"{BASE_URL}/products/{product_id}").json().get("stock")
             break
     assert product_id, "No in-stock product found"
 

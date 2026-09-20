@@ -80,7 +80,7 @@ func ConnectDatabase() {
 	// Default: pure-Go SQLite
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "kather_baksho.db"
+		dbPath = "/app/data/orders.db"
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), gormConfig)
@@ -88,14 +88,41 @@ func ConnectDatabase() {
 		log.Fatal("Failed to connect database: ", err)
 	}
 
-	// SQLite tuning: foreign_keys enforces referential integrity; busy_timeout
-	// makes callers wait for a briefly-held write lock instead of failing.
+	// SQLite tuning: busy_timeout makes callers wait for a briefly-held write lock.
+	// Cross-database foreign keys are disabled for decoupled microservices data isolation.
 	for _, pragma := range []string{
-		"PRAGMA foreign_keys = ON",
+		"PRAGMA foreign_keys = OFF",
 		"PRAGMA busy_timeout = 5000",
+		"PRAGMA journal_mode = WAL",
 	} {
 		if err := db.Exec(pragma).Error; err != nil {
 			log.Fatalf("Failed to apply %q: %v", pragma, err)
+		}
+	}
+
+	// Attach catalog.db for zero-overhead product price/inventory lookups during checkout
+	catalogDbPath := os.Getenv("CATALOG_DB_PATH")
+	if catalogDbPath == "" {
+		catalogDbPath = "/app/data/catalog.db"
+	}
+	if _, err := os.Stat(catalogDbPath); err == nil {
+		if err := db.Exec(fmt.Sprintf("ATTACH DATABASE '%s' AS catalog_db", catalogDbPath)).Error; err != nil {
+			log.Printf("[Database] Note on attaching catalog.db: %v", err)
+		} else {
+			log.Printf("[Database] Attached catalog database: %s", catalogDbPath)
+		}
+	}
+
+	// Attach auth.db for customer identity resolution
+	authDbPath := os.Getenv("AUTH_DB_PATH")
+	if authDbPath == "" {
+		authDbPath = "/app/data/auth.db"
+	}
+	if _, err := os.Stat(authDbPath); err == nil {
+		if err := db.Exec(fmt.Sprintf("ATTACH DATABASE '%s' AS auth_db", authDbPath)).Error; err != nil {
+			log.Printf("[Database] Note on attaching auth.db: %v", err)
+		} else {
+			log.Printf("[Database] Attached auth database: %s", authDbPath)
 		}
 	}
 

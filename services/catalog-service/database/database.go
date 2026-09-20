@@ -16,7 +16,7 @@ var DB *gorm.DB
 func ConnectDatabase() {
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "/app/data/kather_baksho.db"
+		dbPath = "/app/data/catalog.db"
 	}
 
 	logLevel := logger.Warn

@@ -12,11 +12,11 @@ import (
 
 var DB *gorm.DB
 
-// ConnectDatabase opens SQLite for catalog-service using pure-Go driver with WAL mode.
+// ConnectDatabase opens SQLite for auth-service using pure-Go driver with WAL mode.
 func ConnectDatabase() {
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "/app/data/kather_baksho.db"
+		dbPath = "/app/data/auth.db"
 	}
 
 	logLevel := logger.Warn
@@ -32,7 +32,7 @@ func ConnectDatabase() {
 
 	db, err := gorm.Open(sqlite.Open(dbPath), gormConfig)
 	if err != nil {
-		log.Fatal("[Catalog-Service] Failed to connect database: ", err)
+		log.Fatal("[Auth-Service] Failed to connect database: ", err)
 	}
 
 	for _, pragma := range []string{
@@ -50,5 +50,5 @@ func ConnectDatabase() {
 	}
 
 	DB = db
-	log.Printf("[Catalog-Service] Connected to SQLite database at %s", dbPath)
+	log.Printf("[Auth-Service] Connected to SQLite database at %s", dbPath)
 }

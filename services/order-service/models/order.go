@@ -24,7 +24,7 @@ type OrderItem struct {
 	gorm.Model
 	OrderID   uint    `json:"order_id"`
 	ProductID uint    `json:"product_id"`
-	Product   Product `json:"product" gorm:"foreignKey:ProductID"`
+	Product   Product `json:"product" gorm:"foreignKey:ProductID;references:ID;<-:false;-:migration"`
 	Quantity  uint    `json:"quantity"`
 	Price     float64 `json:"price"` // Preserves unit price at the time of purchase
 }

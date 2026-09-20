@@ -28,58 +28,31 @@ func main() {
 	services.InitEventBus()
 	services.InitStorage()
 	if err := database.DB.AutoMigrate(
-		&models.Product{},
-		&models.User{},
 		&models.Cart{},
 		&models.CartItem{},
 		&models.Order{},
 		&models.OrderItem{},
-		&models.WishlistItem{},
-		&models.Notification{},
 		&models.Coupon{},
 		&models.CareReminder{},
-		&models.Address{},
-		&models.Subscription{},
-		&models.Consultation{},
 		&models.CorporateQuote{},
-		&models.CommunityPost{},
-		&models.CommunityComment{},
-		&models.CommunityLike{},
-		// Sprint D-I extensions
+		&models.CorporateOrder{},
 		&models.OrderEvent{},
 		&models.ReturnRequest{},
-		&models.SubscriptionDelivery{},
-		&models.GrowthJournal{},
-		&models.CareSchedule{},
-		&models.CommunityFollow{},
-		&models.CommunityBookmark{},
-		&models.CommunityGroup{},
-		&models.CommunityGroupMember{},
-		&models.CommunityQuestion{},
-		&models.CommunityAnswer{},
+		&models.IdempotencyRecord{},
 		&models.Achievement{},
 		&models.UserAchievement{},
 		&models.ReferralCode{},
 		&models.Referral{},
 		&models.MembershipTier{},
 		&models.CouponReward{},
-		&models.CorporateOrder{},
-		&models.BlogPost{},
-		&models.PageView{},
 		&models.GuestOrder{},
 		&models.GiftCard{},
 		&models.ShippingRule{},
 		&models.TaxRule{},
 		&models.UserMembership{},
-		&models.Review{},
-		&models.Category{},
-		&models.EmailVerification{},
-		&models.IdempotencyRecord{},
 	); err != nil {
-		log.Fatalf("auto-migrate failed: %v", err)
+		log.Fatalf("[Order-Service] Auto-migrate failed: %v", err)
 	}
-
-	database.InitFTS()
 
 	router := gin.New()
 	router.Use(gin.Recovery())
