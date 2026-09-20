@@ -4,9 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/auth_service/database"
+	"kather_baksho/auth_service/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,10 +13,6 @@ import (
 // GET /api/admin/users
 // List every user account. Search via ?q= filters by name/email substring.
 func AdminListUsers(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var users []models.User
 	q := c.Query("q")
 	tx := database.DB
@@ -39,10 +34,6 @@ func AdminListUsers(c *gin.Context) {
 // PUT /api/admin/users/:id/role  { role }
 // Promote or demote a user. Body: { role: "customer" | "staff" | "admin" }
 func AdminUpdateUserRole(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

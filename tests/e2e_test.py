@@ -920,6 +920,47 @@ def test_concurrency_flash_sale_benchmark():
     ok = run_flash_sale_benchmark(base_url=BASE_URL, concurrency=20, initial_stock=5)
     assert ok is True, "Flash sale concurrency race condition test failed!"
 
+# 62. Autonomous Catalog, Search & Media Microservice (:8087)
+def test_catalog_microservice():
+    # Direct health probe on microservice port 8087
+    r = requests.get("http://localhost:8087/health", timeout=5)
+    assert r.status_code == 200, f"Catalog direct health probe failed: {r.status_code}"
+    data = r.json()
+    assert data.get("service") == "kather_baksho-catalog"
+    assert data.get("status") == "healthy"
+    assert data.get("database") == "connected"
+    assert data.get("cache") == "connected"
+
+    # Verify Traefik gateway routing to catalog service
+    test_corr_id = "test-corr-catalog-888"
+    r_gw = requests.get("http://localhost:8085/api/products", headers={"X-Correlation-ID": test_corr_id}, timeout=5)
+    assert r_gw.status_code == 200
+    gw_data = r_gw.json()
+    assert "items" in gw_data or isinstance(gw_data, list)
+    assert r_gw.headers.get("X-Correlation-ID") == test_corr_id, "X-Correlation-ID must propagate across gateway to catalog-service"
+
+# 63. Autonomous Identity, 2FA TOTP & User Management Microservice (:8084)
+def test_auth_microservice():
+    # Direct health probe on microservice port 8084
+    r = requests.get("http://localhost:8084/health", timeout=5)
+    assert r.status_code == 200, f"Auth direct health probe failed: {r.status_code}"
+    data = r.json()
+    assert data.get("service") == "kather_baksho-auth"
+    assert data.get("status") == "healthy"
+    assert data.get("database") == "connected"
+
+    # Verify Traefik gateway routing to auth service (direct login through gateway)
+    test_corr_id = "test-corr-auth-777"
+    r_gw = requests.post(
+        "http://localhost:8085/api/auth/login",
+        json={"email": "admin@kather_baksho.com", "password": "Admin@12345"},
+        headers={"X-Correlation-ID": test_corr_id},
+        timeout=5
+    )
+    assert r_gw.status_code == 200
+    assert "token" in r_gw.json()
+    assert r_gw.headers.get("X-Correlation-ID") == test_corr_id, "X-Correlation-ID must propagate across gateway to auth-service"
+
 tests = [
 
     ("Health / Get Products", test_get_products),
@@ -982,7 +1023,9 @@ tests = [
     ("Enterprise RFC 6238 TOTP Two-Factor Authentication", test_enterprise_2fa_totp),
     ("Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)", test_chaos_engineering_resilience),
     ("Dedicated IoT & AI Botanical Intelligence Microservice", test_iot_ai_microservice),
-    ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark)
+    ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark),
+    ("Autonomous Catalog, Search & Media Microservice", test_catalog_microservice),
+    ("Autonomous Identity, 2FA TOTP & User Management Microservice", test_auth_microservice)
 ]
 
 print("Starting E2E test suite...")

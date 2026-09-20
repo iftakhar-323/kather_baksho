@@ -55,11 +55,11 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":     "healthy",
-			"service":    "kather_baksho-iot-ai",
-			"mongodb":    mongoStatus,
-			"redis":      redisStatus,
-			"timestamp":  time.Now().UTC(),
+			"status":    "healthy",
+			"service":   "kather_baksho-iot-ai",
+			"mongodb":   mongoStatus,
+			"redis":     redisStatus,
+			"timestamp": time.Now().UTC(),
 		})
 	})
 

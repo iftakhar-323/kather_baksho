@@ -6,9 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/catalog_service/database"
+	"kather_baksho/catalog_service/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,10 +32,6 @@ func slugifyCategory(s string) string {
 
 // GET /api/categories
 func ListCategories(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	cacheKey := "categories:all"
 	if cached, ok := database.CacheGet(cacheKey); ok {
 		c.Header("X-Cache", "HIT")
@@ -60,10 +55,6 @@ func ListCategories(c *gin.Context) {
 
 // POST /api/admin/categories   (admin)
 func AdminCreateCategory(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	var body struct {
 		Name     string `json:"name"`
 		Slug     string `json:"slug"`
@@ -106,10 +97,6 @@ func AdminCreateCategory(c *gin.Context) {
 
 // PUT /api/admin/categories/:id   (admin)
 func AdminUpdateCategory(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	id := c.Param("id")
 	var cat models.Category
 	if err := database.DB.First(&cat, id).Error; err != nil {
@@ -153,10 +140,6 @@ func AdminUpdateCategory(c *gin.Context) {
 
 // DELETE /api/admin/categories/:id   (admin)
 func AdminDeleteCategory(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	id := c.Param("id")
 	var cat models.Category
 	if err := database.DB.First(&cat, id).Error; err != nil {

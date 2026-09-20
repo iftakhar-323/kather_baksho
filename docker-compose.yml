@@ -21,6 +21,8 @@ services:
       - MONGO_DB_NAME=kather_baksho_iot
       - WORKER_TS_URL=http://worker-ts:8083
       - IOT_AI_SERVICE_URL=http://iot-ai-service:8089
+      - CATALOG_SERVICE_URL=http://catalog-service:8087
+      - AUTH_SERVICE_URL=http://auth-service:8084
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -34,6 +36,10 @@ services:
       mongo:
         condition: service_healthy
       iot-ai-service:
+        condition: service_healthy
+      catalog-service:
+        condition: service_healthy
+      auth-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
@@ -108,6 +114,73 @@ services:
       - "traefik.http.routers.iot-ai.priority=30"
       - "traefik.http.services.iot-ai.loadbalancer.server.port=8089"
 
+  catalog-service:
+    build:
+      context: ./services/catalog-service
+      dockerfile: Dockerfile
+    container_name: kather_baksho-catalog
+    restart: unless-stopped
+    ports:
+      - "8087:8087"
+    environment:
+      - PORT=8087
+      - DB_DRIVER=sqlite
+      - DB_PATH=/app/data/kather_baksho.db
+      - REDIS_ADDR=redis:6379
+      - MINIO_ENDPOINT=minio:9000
+      - GIN_MODE=release
+      - ALLOWED_ORIGINS=*
+      - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+    volumes:
+      - sqlite_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8087/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.catalog.rule=PathPrefix(`/api/products`) || PathPrefix(`/api/categories`) || PathPrefix(`/api/media`) || PathPrefix(`/api/wishlist`) || PathPrefix(`/api/reviews`)"
+      - "traefik.http.routers.catalog.entrypoints=web"
+      - "traefik.http.routers.catalog.priority=25"
+      - "traefik.http.services.catalog.loadbalancer.server.port=8087"
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: kather_baksho-auth
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      - PORT=8084
+      - DB_DRIVER=sqlite
+      - DB_PATH=/app/data/kather_baksho.db
+      - GIN_MODE=release
+      - ALLOWED_ORIGINS=*
+      - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+    volumes:
+      - sqlite_data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8084/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/api/auth`) || PathPrefix(`/api/addresses`)"
+      - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.routers.auth.priority=25"
+      - "traefik.http.services.auth.loadbalancer.server.port=8084"
+
   frontend:
     build:
       context: ./frontend
@@ -140,6 +213,8 @@ services:
       - backend
       - frontend
       - iot-ai-service
+      - catalog-service
+      - auth-service
 
   redis:
     image: redis:7-alpine

@@ -17,6 +17,8 @@ frontend/dist/
 services/**/node_modules/
 services/**/dist/
 services/**/iot_ai_service
+services/**/auth_service
+services/**/catalog_service
 services/**/*.exe
 
 # OS/Editor

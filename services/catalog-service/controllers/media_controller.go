@@ -5,27 +5,18 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"kather_baksho/services"
-	"kather_baksho/utils"
+	"kather_baksho/catalog_service/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 // GetStorageStatus returns MinIO S3 object storage health
 func GetStorageStatus(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	c.JSON(http.StatusOK, services.GetStorageStatus())
 }
 
 // UploadMedia handles multipart file upload to MinIO S3
 func UploadMedia(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded in 'file' form field"})
@@ -58,10 +49,6 @@ func UploadMedia(c *gin.Context) {
 
 // ServeMedia serves or proxies stored media
 func ServeMedia(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	filename := c.Param("filename")
 	cleanName := filepath.Base(filename)
 

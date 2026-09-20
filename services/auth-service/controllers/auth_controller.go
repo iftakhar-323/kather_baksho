@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"kather_baksho/database"
-	"kather_baksho/mailer"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/auth_service/database"
+	"kather_baksho/auth_service/mailer"
+	"kather_baksho/auth_service/models"
+	"kather_baksho/auth_service/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,10 +27,6 @@ type LoginInput struct {
 }
 
 func Register(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -84,10 +80,6 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var input LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -136,10 +128,6 @@ func Login(c *gin.Context) {
 
 // GET /api/auth/me - Current user profile info (fetched from DB to prevent stale JWT claims)
 func Me(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {
@@ -281,12 +269,12 @@ func DeleteAccount(c *gin.Context) {
 	}
 
 	// cascade delete related rows
-	database.DB.Where("user_id = ?", userID).Delete(&models.Address{})
-	database.DB.Where("user_id = ?", userID).Delete(&models.Cart{})
-	database.DB.Where("user_id = ?", userID).Delete(&models.WishlistItem{})
-	database.DB.Where("user_id = ?", userID).Delete(&models.Notification{})
-	database.DB.Where("user_id = ?", userID).Delete(&models.CareReminder{})
-	database.DB.Where("user_id = ?", userID).Delete(&models.Order{})
+	database.DB.Exec("DELETE FROM addresses WHERE user_id = ?", userID)
+	database.DB.Exec("DELETE FROM carts WHERE user_id = ?", userID)
+	database.DB.Exec("DELETE FROM wishlist_items WHERE user_id = ?", userID)
+	database.DB.Exec("DELETE FROM notifications WHERE user_id = ?", userID)
+	database.DB.Exec("DELETE FROM care_reminders WHERE user_id = ?", userID)
+	database.DB.Exec("DELETE FROM orders WHERE user_id = ?", userID)
 
 	if err := database.DB.Delete(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete account"})

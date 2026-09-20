@@ -3,19 +3,14 @@ package controllers
 import (
 	"net/http"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/catalog_service/database"
+	"kather_baksho/catalog_service/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 // GET /api/wishlist - user-er wishlist
 func GetWishlist(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 
 	var items []models.WishlistItem
@@ -30,10 +25,6 @@ type WishlistInput struct {
 
 // POST /api/wishlist/add
 func AddToWishlist(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 
 	var input WishlistInput
@@ -64,10 +55,6 @@ func AddToWishlist(c *gin.Context) {
 
 // DELETE /api/wishlist/:id
 func RemoveFromWishlist(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 	itemID := c.Param("id")
 

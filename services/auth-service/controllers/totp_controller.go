@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/services"
-	"kather_baksho/utils"
+	"kather_baksho/auth_service/database"
+	"kather_baksho/auth_service/models"
+	"kather_baksho/auth_service/services"
+	"kather_baksho/auth_service/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -30,10 +30,6 @@ type DisableTOTPInput struct {
 
 // POST /api/auth/2fa/setup - Start 2FA enrollment: returns secret and otpauth URI
 func SetupTOTP(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {
@@ -67,10 +63,6 @@ func SetupTOTP(c *gin.Context) {
 
 // POST /api/auth/2fa/enable - Complete 2FA enrollment by verifying first OTP code
 func EnableTOTP(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var input EnableTOTPInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -112,10 +104,6 @@ func EnableTOTP(c *gin.Context) {
 
 // POST /api/auth/2fa/verify - Complete login challenge with 6-digit TOTP code or recovery code
 func VerifyTOTP(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var input VerifyTOTPInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -209,10 +197,6 @@ func VerifyTOTP(c *gin.Context) {
 
 // POST /api/auth/2fa/disable - Disable 2FA with password or valid TOTP code
 func DisableTOTP(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	var input DisableTOTPInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -255,10 +239,6 @@ func DisableTOTP(c *gin.Context) {
 
 // GET /api/auth/2fa/status - Get current user 2FA status
 func StatusTOTP(c *gin.Context) {
-	if utils.ProxyToService(c, "AUTH_SERVICE_URL") {
-		return
-	}
-
 	userID := c.GetUint("user_id")
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {

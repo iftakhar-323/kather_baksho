@@ -9,9 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/catalog_service/database"
+	"kather_baksho/catalog_service/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,10 +35,6 @@ import (
 //	sort          — newest | price_asc | price_desc | name_asc | popular (view_count)
 //	page, limit
 func GetProducts(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	cacheKey := "products:query:" + c.Request.URL.RawQuery
 	if c.Request.URL.RawQuery == "" {
 		cacheKey = "products:query:default"
@@ -158,10 +153,6 @@ func GetProducts(c *gin.Context) {
 
 // GET single product
 func GetProduct(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	var product models.Product
 	id := c.Param("id")
 	if err := database.DB.First(&product, id).Error; err != nil {
@@ -173,10 +164,6 @@ func GetProduct(c *gin.Context) {
 
 // POST create product
 func CreateProduct(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	var product models.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -222,10 +209,6 @@ func CreateProduct(c *gin.Context) {
 
 // PUT update product
 func UpdateProduct(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	var product models.Product
 	id := c.Param("id")
 	if err := database.DB.First(&product, id).Error; err != nil {
@@ -246,10 +229,6 @@ func UpdateProduct(c *gin.Context) {
 
 // DELETE product
 func DeleteProduct(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	var product models.Product
 	id := c.Param("id")
 	if err := database.DB.First(&product, id).Error; err != nil {
@@ -386,10 +365,6 @@ func TrackView(c *gin.Context) {
 
 // GET /api/products/slug/:slug — lookup by slug for SEO-friendly URLs.
 func GetProductBySlug(c *gin.Context) {
-	if utils.ProxyToService(c, "CATALOG_SERVICE_URL") {
-		return
-	}
-
 	slug := c.Param("slug")
 	var p models.Product
 	if err := database.DB.Where("slug = ?", slug).First(&p).Error; err != nil {

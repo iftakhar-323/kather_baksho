@@ -12,7 +12,7 @@ COPY . .
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-RUN go build -ldflags="-w -s" -o iot_ai_service main.go
+RUN go build -ldflags="-w -s" -o auth_service main.go
 
 # Step 2: Final runtime stage
 FROM alpine:3.20
@@ -22,14 +22,17 @@ RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
 
 # Copy compiled binary from builder stage
-COPY --from=builder /app/iot_ai_service /app/
+COPY --from=builder /app/auth_service /app/
+
+# Create directory for persistent SQLite DB volume
+RUN mkdir -p /app/data
 
 # Environment defaults
-ENV PORT=8089
+ENV PORT=8084
+ENV DB_PATH=/app/data/kather_baksho.db
 ENV GIN_MODE=release
 
-EXPOSE 8089
+EXPOSE 8084
 
 # Command to run microservice
-CMD ["/app/iot_ai_service"]
-
+CMD ["/app/auth_service"]

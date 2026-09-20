@@ -4,10 +4,10 @@
 > **100% Localhost Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite)**, **Node.js & TypeScript 5.5 Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0, MinIO S3)**, **Traefik Cloud-Native Ingress Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **RFC 6238 TOTP 2FA**, and **Chaos Engineering Studio**.
 
 [![Backend Go Tests](https://img.shields.io/badge/Go%20Unit%20Tests-Passing-brightgreen?style=flat-square&logo=go)](https://github.com/iftakhar-323/kather_baksho)
-[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-61%2F61%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
+[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-63%2F63%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
 [![Go Report](https://img.shields.io/badge/Go%20Backend-Production%20Ready-blue?style=flat-square&logo=go)](https://golang.org)
 [![TypeScript Worker](https://img.shields.io/badge/TypeScript%20Worker-Microservice-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-10%20Containers-blue?style=flat-square&logo=docker)](https://docker.com)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-12%20Containers-blue?style=flat-square&logo=docker)](https://docker.com)
 [![Traefik](https://img.shields.io/badge/API%20Gateway-Traefik%20v3.1-informational?style=flat-square&logo=traefik)](https://traefik.io)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
@@ -111,8 +111,16 @@ Here are the enterprise-grade features implemented in this repository:
 - **Frontend Radar UI**: Live radar screen in customer order details showing animated pulsing checkpoint markers, speedometers, and Dijkstra ETA countdowns.
 
 ### 10. 🔀 Traefik Cloud-Native Ingress Edge Proxy
-- **Unified Gateway**: Traefik v3.1 on port `8085` routes all traffic (`/` to Frontend, `/api` to Go, `/worker` to TS Worker, `/ws` to WebSockets).
+- **Unified Gateway**: Traefik v3.1 on port `8085` routes all traffic (`/` to Frontend, `/api/auth` to Auth Microservice, `/api/products` to Catalog Microservice, `/api/iot` to IoT Microservice, `/worker` to TS Worker, `/ws` to WebSockets).
 - **Live Dashboard**: Real-time traffic inspection on port `8086/dashboard/`.
+
+### 11. 🛍️ Autonomous Botanical Catalog, Search & Media Microservice
+- **Domain Decoupling**: Dedicated microservice running on port `8087` (`services/catalog-service`) handling product inventory, categories, BM25 FTS5 typo-tolerant search, MinIO S3 media upload/serving, and reviews.
+- **Resilient Fallback**: Integrated Strangler Fig reverse proxy pattern in core backend ensures 100% backward compatibility for existing scripts and legacy tests.
+
+### 12. 🔐 Autonomous Identity, 2FA TOTP & User Management Microservice
+- **Domain Decoupling**: Dedicated microservice running on port `8084` (`services/auth-service`) managing user registration, authentication, pure-Go RFC 6238 TOTP 2FA, customer addresses CRUD, and Admin RBAC.
+- **Stateless JWT Claims**: Distributed shared-secret stateless JWT verification eliminates cross-service DB query bottlenecks while keeping user security boundaries airtight.
 
 ---
 
@@ -124,15 +132,20 @@ flowchart TD
     Client["🌐 Client (Web Browser)"] -->|Port 8085| Traefik["🔀 Traefik v3.1 Ingress Gateway"]
     
     Traefik -->|/| Frontend["⚛️ React 18 + Vite (Port 8082)"]
-    Traefik -->|/api, /ws, /health| Backend["🐹 Go Core REST & WS API (Port 8081)"]
-    Traefik -->|/api/iot, /api/ai, /api/ml| IoTMicro["🌿 IoT & AI Plant Doctor Microservice (Port 8089)"]
+    Traefik -->|/api/auth, /api/addresses| AuthMicro["🔐 Auth & 2FA TOTP Microservice (Port 8084)"]
+    Traefik -->|/api/products, /api/categories, /api/media, /api/reviews| CatalogMicro["🛍️ Catalog, Search & Media Microservice (Port 8087)"]
+    Traefik -->|/api/iot, /api/ai, /api/ml| IoTMicro["🌿 IoT & AI Botanical Microservice (Port 8089)"]
     Traefik -->|/worker| Worker["🟦 Node.js + TypeScript 5.5 Worker (Port 8083)"]
+    Traefik -->|/api/orders, /ws, /health| Backend["🐹 Go Core Order & Checkout Engine (Port 8081)"]
     
-    Backend -->|Relational Data| SQLite["📁 SQLite (WAL Mode) + FTS5 Engine"]
-    Backend -->|Cache & Event Stream| Redis["⚡ Redis 7 (Cache + Streams + DLQ)"]
+    Backend -->|Relational Data| SQLite["📁 SQLite (WAL Mode)"]
+    CatalogMicro -->|Search Index & Data| SQLite
+    AuthMicro -->|Identity & Users| SQLite
+    CatalogMicro -->|Redis Cache| Redis["⚡ Redis 7 (Cache + Streams + DLQ)"]
+    CatalogMicro -->|Media Objects| MinIO["🪣 MinIO S3 Object Storage (Port 9005)"]
     IoTMicro -->|IoT Telemetry| Mongo["🍃 MongoDB 7.0 (Time-Series Datastore)"]
     IoTMicro -.->|Alert Events| Redis
-    Backend -->|Media Assets| MinIO["🪣 MinIO S3 Object Storage (Port 9005)"]
+    Backend -->|Cache & Event Stream| Redis
     
     Prometheus["📊 Prometheus (Port 9090)"] -->|Scrapes /metrics| Backend
     Grafana["📈 Grafana 11.2 (Port 3000)"] -->|Queries| Prometheus
@@ -140,12 +153,14 @@ flowchart TD
 
 | Layer | Technology | Purpose in Project |
 | :--- | :--- | :--- |
-| **Backend Core** | **Go 1.22+ (Gin, GORM)** | Core REST API, business logic, WebSocket server, and event bus orchestration. |
+| **Order & Checkout Engine** | **Go 1.22+ (Gin, GORM)** | Core checkout transaction engine, WebSocket rider radar, flash sale atomic locking, and coupons. |
+| **Catalog & Search Service** | **Go 1.22+ Microservice** | Autonomous catalog, BM25 FTS5 search, category management, and MinIO S3 media pipeline. |
+| **Auth & Identity Service** | **Go 1.22+ Microservice** | Autonomous user management, RFC 6238 TOTP 2FA, customer addresses, and Admin RBAC. |
 | **IoT & AI Microservice** | **Go 1.22+ Microservice** | Autonomous plant sensor telemetry ingestion, alert dispatch, AI diagnostics & ML benchmarking. |
 | **Worker Service** | **Node.js 20, TypeScript 5.5, PDFKit** | Vector PDF invoice generation and executive analytics reporting microservice. |
 | **Frontend SPA** | **React 18, Vite, React Router v7** | Modern responsive storefront, admin back-office, and interactive studios. |
-| **API Gateway** | **Traefik v3.1 (Cloud-Native Proxy)** | Unified ingress routing, path rewrites, WebSocket upgrades, and live telemetry. |
-| **Primary Relational DB**| **SQLite (WAL Mode) + FTS5** | Transactional records, full-text search indexing, and foreign key integrity. |
+| **API Gateway** | **Traefik v3.1 (Cloud-Native Proxy)** | Unified ingress routing, correlation ID propagation, WebSocket upgrades, and live telemetry. |
+| **Primary Relational DB**| **SQLite (WAL Mode) + FTS5** | Transactional records, full-text search indexing, and foreign key integrity across microservices. |
 | **Cache & Event Bus** | **Redis 7 (Alpine)** | Read-through caching, rate limiter token buckets, and Redis Streams message bus. |
 | **IoT Telemetry DB** | **MongoDB 7.0 Community** | Polyglot document and time-series datastore for soil, heat, and lux sensors. |
 | **Object Storage** | **MinIO (S3-Compatible)** | Local high-speed media storage replacing AWS S3 for product images. |
@@ -186,7 +201,9 @@ When the stack is running, all services are accessible on your local machine:
 | **Traefik Gateway (Primary Entry)** | [http://localhost:8085](http://localhost:8085) | Traefik v3.1 | Primary edge router for all frontend, API, worker & WebSockets | Direct |
 | **Traefik Dashboard** | [http://localhost:8086/dashboard/](http://localhost:8086/dashboard/) | Traefik UI | Live routing table, middleware inspection & traffic counters | Direct |
 | **Storefront Web App** | [http://localhost:8082](http://localhost:8082) | React 18 SPA | Storefront, Admin Panel, AI Plant Doctor & Chaos Studio | Public |
-| **Backend REST & WS API** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Core REST endpoints, WebSocket courier radar & metrics | JWT / Session |
+| **Catalog & Search Microservice** | [http://localhost:8087](http://localhost:8087) | Go 1.22 Gin | Products, Categories, FTS5 Search, MinIO Media, Wishlist | Public / Admin |
+| **Auth & 2FA Microservice** | [http://localhost:8084](http://localhost:8084) | Go 1.22 Gin | User Registration, Login, RFC 6238 TOTP 2FA, Addresses | Public / JWT |
+| **Backend Core Engine** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Core Orders, Checkout, Flash Sale Mutex, WS Radar | JWT / Session |
 | **IoT & AI Microservice** | [http://localhost:8089](http://localhost:8089) | Go 1.22 Gin | Autonomous plant sensor telemetry, AI doctor & ML comparisons | Public / JWT |
 | **Interactive Swagger UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | OpenAPI 3.0 | Complete interactive API explorer with parameter schemas | Direct |
 | **TypeScript Worker Microservice** | [http://localhost:8083](http://localhost:8083) | Node.js + TS | Microservice for PDF invoice and analytics report generation | Inter-service |
@@ -222,7 +239,7 @@ The system comes pre-seeded with test accounts representing different authorizat
 - Python 3.9+ (for running automated tests).
 
 ### Start the Entire Stack
-Clone the repository and launch all 9 containerized services with a single command:
+Clone the repository and launch all 12 containerized services with a single command:
 
 ```bash
 git clone https://github.com/iftakhar-323/kather_baksho.git
@@ -230,7 +247,7 @@ cd kather_baksho
 docker compose up -d --build
 ```
 
-Within ~30 seconds, all 9 containers will be healthy and accessible at `http://localhost:8085`!
+Within ~30 seconds, all 12 containers will be healthy and accessible at `http://localhost:8085`!
 
 To stop the containers:
 ```bash
@@ -240,10 +257,10 @@ docker compose down
 ---
 
 <a name="-automated-testing--verification"></a>
-## 🧪 9. Automated Testing & Verification Suite (61/61 Tests)
+## 🧪 9. Automated Testing & Verification Suite (63/63 Tests)
 
-### 1. Complete End-to-End Regression Suite (61 Tests)
-Tests all 10 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
+### 1. Complete End-to-End Regression Suite (63 Tests)
+Tests all 12 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
 
 ```bash
 python3 tests/e2e_test.py
@@ -313,9 +330,11 @@ Starting E2E test suite...
 [✓] Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)
 [✓] Dedicated IoT & AI Botanical Intelligence Microservice
 [✓] Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
+[✓] Autonomous Catalog, Search & Media Microservice
+[✓] Autonomous Identity, 2FA TOTP & User Management Microservice
 
 ==================================================
-Summary: 61 tests run, 61 passed, 0 failed. (100% Pass Rate)
+Summary: 63 tests run, 63 passed, 0 failed. (100% Pass Rate)
 ==================================================
 ```
 
@@ -378,6 +397,8 @@ kather_baksho/
 │   ├── tsconfig.json               # TypeScript compiler config
 │   └── nginx.conf                  # Production SPA reverse proxy
 ├── services/
+│   ├── auth-service/               # Autonomous Identity, 2FA TOTP & User Management Microservice (Go)
+│   ├── catalog-service/            # Autonomous Botanical Catalog, FTS5 Search & Media Microservice (Go)
 │   ├── iot-ai-service/             # Autonomous Botanical Intelligence & IoT Microservice (Go)
 │   └── worker-ts/                  # Document Generation Microservice (Node.js 20, TypeScript 5.5)
 │       └── src/                    # Vector PDF invoice & sales report generators
@@ -390,9 +411,9 @@ kather_baksho/
 ├── deploy/
 │   └── ec2-setup.sh                # 1-Click production Ubuntu automation script
 ├── tests/
-│   ├── e2e_test.py                 # Comprehensive 61-test automated E2E test suite
+│   ├── e2e_test.py                 # Comprehensive 63-test automated E2E test suite
 │   └── stress_test.py              # Flash Sale concurrency benchmark engine
-├── docker-compose.yml              # 10-Container local microservices orchestration stack
+├── docker-compose.yml              # 12-Container local microservices orchestration stack
 └── README.md                       # ← You are here!
 ```
 
