@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"katherbox/database"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/models"
 
 	"github.com/gin-gonic/gin"
 )

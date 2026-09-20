@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"katherbox/services"
+	"kather_baksho/services"
 
 	"github.com/gin-gonic/gin"
 )

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"katherbox/database"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/models"
 )
 
 const targetPerTable = 80

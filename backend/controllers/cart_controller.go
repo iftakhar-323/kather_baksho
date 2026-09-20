@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"katherbox/database"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

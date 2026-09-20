@@ -17,3 +17,4 @@ echo "  🏥 Health Readiness   :  http://localhost:8081/health/ready"
 echo "================================================================="
 echo "  ✨ Open in browser: http://localhost:8082"
 echo "================================================================="
+

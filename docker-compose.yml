@@ -3,25 +3,23 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: katherbox-backend
+    container_name: kather_baksho-backend
     restart: unless-stopped
     ports:
       - "8081:8081"
     environment:
       - PORT=8081
       - DB_DRIVER=${DB_DRIVER:-sqlite}
-      - DB_PATH=/app/data/katherbox.db
+      - DB_PATH=/app/data/kather_baksho.db
       - DB_HOST=${DB_HOST:-postgres}
       - DB_PORT=${DB_PORT:-5432}
-      - DB_USER=${DB_USER:-katherbox}
-      - DB_PASSWORD=${DB_PASSWORD:-katherbox_secret}
-      - DB_NAME=${DB_NAME:-katherbox}
+      - DB_USER=${DB_USER:-kather_baksho}
+      - DB_PASSWORD=${DB_PASSWORD:-kather_baksho_secret}
+      - DB_NAME=${DB_NAME:-kather_baksho}
       - REDIS_ADDR=redis:6379
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
-      # Change this for any real deployment — this default only exists so
-      # `docker compose up` works out of the box for local/demo use.
-      - JWT_SECRET=${JWT_SECRET:-katherbox_docker_default_change_me}
+      - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
     volumes:
       - sqlite_data:/app/data
     depends_on:
@@ -38,7 +36,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: katherbox-frontend
+    container_name: kather_baksho-frontend
     restart: unless-stopped
     ports:
       - "8082:80"
@@ -48,7 +46,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: katherbox-redis
+    container_name: kather_baksho-redis
     restart: unless-stopped
     ports:
       - "6380:6379"
@@ -62,22 +60,22 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: katherbox-postgres
+    container_name: kather_baksho-postgres
     restart: unless-stopped
     profiles:
       - postgres
     ports:
       - "5433:5432"
     environment:
-      - POSTGRES_USER=katherbox
-      - POSTGRES_PASSWORD=katherbox_secret
-      - POSTGRES_DB=katherbox
+      - POSTGRES_USER=kather_baksho
+      - POSTGRES_PASSWORD=kather_baksho_secret
+      - POSTGRES_DB=kather_baksho
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   prometheus:
     image: prom/prometheus:v2.54.1
-    container_name: katherbox-prometheus
+    container_name: kather_baksho-prometheus
     restart: unless-stopped
     ports:
       - "9090:9090"
@@ -94,7 +92,7 @@ services:
 
   grafana:
     image: grafana/grafana:11.2.0
-    container_name: katherbox-grafana
+    container_name: kather_baksho-grafana
     restart: unless-stopped
     ports:
       - "3000:3000"

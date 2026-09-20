@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"time"
 
-	"katherbox/database"
-	"katherbox/utils"
+	"kather_baksho/database"
+	"kather_baksho/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ var appStartTime = time.Now()
 func HealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":    "UP",
-		"service":   "katherbox-backend",
+		"service":   "kather_baksho-backend",
 		"version":   "1.0.0",
 		"uptime":    time.Since(appStartTime).Round(time.Second).String(),
 		"timestamp": time.Now().UTC().Format(time.RFC3339),

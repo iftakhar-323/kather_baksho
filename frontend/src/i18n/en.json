@@ -1,6 +1,6 @@
 {
   "brand": {
-    "name": "KatherBox",
+    "name": "Kather Baksho",
     "tagline": "Hand-curated indoor plants, subscriptions, expert consultations and corporate gifting — grown with love in Dhaka."
   },
   "nav": {
@@ -246,7 +246,7 @@
     "loginSuccess": "Logged in.",
     "logoutSuccess": "Logged out.",
     "subtitleLogin": "Welcome back — sign in to your account.",
-    "subtitleRegister": "Join KatherBox to start your green journey.",
+    "subtitleRegister": "Join Kather Baksho to start your green journey.",
     "emailPlaceholder": "you@example.com",
     "passwordPlaceholder": "••••••••",
     "loginFailed": "Login failed",
@@ -295,7 +295,7 @@
     "shopNow": "Shop now",
     "exploreCatalog": "Explore the catalog",
     "featuredCollections": "Featured collections",
-    "statsTitle": "Why KatherBox",
+    "statsTitle": "Why Kather Baksho",
     "statsPlants": "Plants & planters in stock",
     "statsCustomers": "Happy plant parents",
     "statsCities": "Cities we deliver to",
@@ -307,7 +307,7 @@
     "heroSubtitleFull": "Curated plants, handcrafted planters and gentle care essentials — delivered to your doorstep in Dhaka and beyond.",
     "heroKicker": "Hand-curated, delivered fresh",
     "heroCtaGift": "🎁 Find a gift",
-    "trustStripLabel": "Why shop with KatherBox",
+    "trustStripLabel": "Why shop with Kather Baksho",
     "trust1Title": "Secure checkout",
     "trust1Sub": "SSL-encrypted payments",
     "trust1Badge": "PCI · DSS",
@@ -580,7 +580,7 @@
     "backToBlog": "← Back to journal",
     "empty": "No posts yet.",
     "head": "📚 Blog & Care Guides",
-    "subhead": "Plant care tips, success stories and encyclopaedia entries from the KatherBox community.",
+    "subhead": "Plant care tips, success stories and encyclopaedia entries from the Kather Baksho community.",
     "searchPlaceholder": "Search posts…",
     "all": "All",
     "loading": "Loading…",
@@ -944,10 +944,10 @@
     "contactFormSubmit": "Send message",
     "pages": {
       "about": {
-        "title": "About KatherBox",
+        "title": "About Kather Baksho",
         "intro": "Hand-curated indoor plants, subscriptions, expert consultations and corporate gifting — grown with love in Dhaka.",
         "sections": [
-          { "h": "Our story", "p": "KatherBox began as a small stall at Dhanmondi Lake. Today we ship 200+ plant species to homes and offices across Bangladesh, supported by a growing team of horticulturists, designers and engineers." },
+          { "h": "Our story", "p": "Kather Baksho began as a small stall at Dhanmondi Lake. Today we ship 200+ plant species to homes and offices across Bangladesh, supported by a growing team of horticulturists, designers and engineers." },
           { "h": "What we believe", "p": "Plants change rooms — and rooms change people. Every plant we sell is nursery-fresh, ethically sourced, and backed by our 7-day plant guarantee." },
           { "h": "By the numbers", "p": "1,100+ plant SKUs · 4.9★ from 8,200 reviews · 24-hour delivery in Dhaka · 7-day plant guarantee · 95% plastic-free packaging." },
           { "h": "Sustainability", "p": "We use compostable coir pots, kraft sleeves, and zero air-freight. 1% of every order funds urban greening projects in Dhaka schools." }
@@ -957,10 +957,10 @@
         "title": "Contact us",
         "intro": "We respond to every message within 24 hours, Mon–Sat.",
         "sections": [
-          { "h": "Email", "p": "hello@katherbox.com · support@katherbox.com" },
+          { "h": "Email", "p": "hello@kather_baksho.com · support@kather_baksho.com" },
           { "h": "Phone & WhatsApp", "p": "+880 1700 000 000 (10am–8pm BST)" },
           { "h": "Studio", "p": "House 12, Road 7, Dhanmondi, Dhaka 1205, Bangladesh" },
-          { "h": "Press & partnerships", "p": "press@katherbox.com" },
+          { "h": "Press & partnerships", "p": "press@kather_baksho.com" },
           { "h": "Send a message", "p": "Use the form below and we'll route your note to the right person." }
         ],
         "form": true
@@ -974,7 +974,7 @@
           { "h": "What if my plant arrives unhealthy?", "p": "Send a photo within 48 hours and we'll either replace it from the next batch or refund 100%. No paperwork, no forms." },
           { "h": "Can I cancel my subscription?", "p": "Anytime — pause, skip a month, change frequency, or cancel from the Boxes tab. No commitment." },
           { "h": "Do you offer corporate gifting?", "p": "Yes — visit the Corporate tab for bulk pricing, branded sleeves, employee gift requests, and invoice billing." },
-          { "h": "Are you on social media?", "p": "Yes — Instagram @katherbox, Facebook /katherbox, TikTok @katherbox. Plant care videos every week." }
+          { "h": "Are you on social media?", "p": "Yes — Instagram @kather_baksho, Facebook /kather_baksho, TikTok @kather_baksho. Plant care videos every week." }
         ]
       },
       "privacy": {
@@ -985,14 +985,14 @@
           { "h": "What we collect", "p": "Account info (name, email, phone), shipping addresses, order history, plant care logs, and basic analytics (page views, anonymous IDs)." },
           { "h": "Why we need it", "p": "To fulfill orders, send watering reminders, ship boxes, run the points program, and prevent fraud." },
           { "h": "Who we share with", "p": "Couriers (just name/phone/address for the boxes they deliver), payment processors (PCI scope, never see raw cards), and no one else." },
-          { "h": "Your rights", "p": "View, edit, export, or delete your data any time from My Account → Edit Profile, or email privacy@katherbox.com." },
+          { "h": "Your rights", "p": "View, edit, export, or delete your data any time from My Account → Edit Profile, or email privacy@kather_baksho.com." },
           { "h": "Cookies", "p": "We use first-party cookies for session/auth only. No third-party trackers." },
           { "h": "Changes", "p": "We email every user before any material change takes effect." }
         ]
       },
       "terms": {
         "title": "Terms & Conditions",
-        "intro": "By using katherbox.com you agree to these terms.",
+        "intro": "By using kather_baksho.com you agree to these terms.",
         "sections": [
           { "h": "Eligibility", "p": "You must be 18+ or have a parent/guardian make purchases on your behalf." },
           { "h": "Account", "p": "Keep your password safe — you're responsible for activity on your account. Lost a password? Use the Forgot Password link on the login page." },
@@ -1000,7 +1000,7 @@
           { "h": "Cancellations & refunds", "p": "See our Refund Policy — most unfulfilled orders can be cancelled within 12 hours of placement." },
           { "h": "Plant health guarantee", "p": "Plants are living things. We guarantee delivery health for 7 days. After that we provide ongoing care support." },
           { "h": "Subscriptions", "p": "Recurring boxes are billed at signup and then monthly until paused or cancelled. Skip a month anytime." },
-          { "h": "Limitation of liability", "p": "KatherBox is not liable for plant damage caused by neglect, environmental factors outside our care guides, or unauthorized repottings." }
+          { "h": "Limitation of liability", "p": "Kather Baksho is not liable for plant damage caused by neglect, environmental factors outside our care guides, or unauthorized repottings." }
         ]
       },
       "shipping": {
@@ -1025,7 +1025,7 @@
           { "h": "Changed your mind", "p": "Non-plant items (pots, accessories, subscriptions not yet started) can be returned within 14 days in original condition. Buyer pays return shipping." },
           { "h": "Subscriptions", "p": "Cancel anytime. Already-shipped boxes are non-refundable; future boxes are fully refundable until they're packed." },
           { "h": "Processing time", "p": "Approved refunds are processed within 5 business days back to the original payment method." },
-          { "h": "How to start", "p": "Email refunds@katherbox.com with your order number + a photo. We respond within 24 hours." }
+          { "h": "How to start", "p": "Email refunds@kather_baksho.com with your order number + a photo. We respond within 24 hours." }
         ]
       }
     }

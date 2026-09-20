@@ -13,7 +13,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "id": 1,
-      "title": "KatherBox Traffic & Performance",
+      "title": "Kather_Baksho Traffic & Performance",
       "type": "row"
     },
     {
@@ -113,12 +113,12 @@
   "refresh": "5s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["katherbox", "ecommerce"],
+  "tags": ["kather_baksho", "ecommerce"],
   "time": { "from": "now-15m", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
-  "title": "KatherBox Observability Dashboard",
-  "uid": "katherbox-main-dashboard",
+  "title": "Kather_Baksho Observability Dashboard",
+  "uid": "kather_baksho-main-dashboard",
   "version": 1
 }
 

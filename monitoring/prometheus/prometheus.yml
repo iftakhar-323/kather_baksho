@@ -3,7 +3,7 @@ global:
   evaluation_interval: 5s
 
 scrape_configs:
-  - job_name: 'katherbox-backend'
+  - job_name: 'kather_baksho-backend'
     metrics_path: '/metrics'
     static_configs:
       - targets: ['backend:8081']

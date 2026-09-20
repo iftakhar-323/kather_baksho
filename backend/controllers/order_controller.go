@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"katherbox/database"
-	"katherbox/mailer"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/mailer"
+	"kather_baksho/models"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

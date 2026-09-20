@@ -13,7 +13,7 @@ COPY . .
 # Pure-Go SQLite driver (github.com/glebarez/sqlite) — no C toolchain needed.
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-RUN go build -ldflags="-w -s" -o katherbox main.go
+RUN go build -ldflags="-w -s" -o kather_baksho main.go
 
 # Build seed tools (optional helper binaries)
 RUN go build -ldflags="-w -s" -o seedusers ./cmd/resetusers
@@ -32,10 +32,10 @@ WORKDIR /app
 RUN mkdir -p /app/data
 
 # Copy the initial SQLite database
-COPY katherbox.db /app/data/katherbox.db
+COPY kather_baksho.db /app/data/kather_baksho.db
 
 # Copy compiled binaries from builder stage
-COPY --from=builder /app/katherbox /app/
+COPY --from=builder /app/kather_baksho /app/
 COPY --from=builder /app/seedusers /app/
 COPY --from=builder /app/seedproducts /app/
 COPY --from=builder /app/seeddummy /app/
@@ -43,10 +43,10 @@ COPY --from=builder /app/productimages /app/
 
 # Environment defaults
 ENV PORT=8081
-ENV DB_PATH=/app/data/katherbox.db
+ENV DB_PATH=/app/data/kather_baksho.db
 ENV GIN_MODE=release
 
 EXPOSE 8081
 
 # Command to run backend
-CMD ["/app/katherbox"]
+CMD ["/app/kather_baksho"]

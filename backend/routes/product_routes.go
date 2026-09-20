@@ -1,8 +1,8 @@
 package routes
 
 import (
-"katherbox/controllers"
-"katherbox/middleware"
+"kather_baksho/controllers"
+"kather_baksho/middleware"
 
 "github.com/gin-gonic/gin"
 )

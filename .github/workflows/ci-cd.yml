@@ -1,4 +1,4 @@
-name: KatherBox CI/CD Pipeline
+name: Kather Baksho CI/CD Pipeline
 
 on:
   push:

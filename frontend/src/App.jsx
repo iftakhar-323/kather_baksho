@@ -213,7 +213,7 @@ function Footer() {
         <div className="footer-col">
           <h4>{t("footer.contact")}</h4>
           <div className="footer-contact">
-            <div className="row">📧 hello@katherbox.com</div>
+            <div className="row">📧 hello@kather_baksho.com</div>
             <div className="row">📞 +880 1700 000 000</div>
             <div className="row">📍 House 12, Road 7, Dhanmondi, Dhaka</div>
           </div>
@@ -596,14 +596,30 @@ function MainApp() {
   // expose navigate globally so deeply nested components (e.g. ProductCard)
   // can navigate without prop-drilling through the entire tree.
   useEffect(() => {
-    window.__katherboxSetView = (key) => navigate(pathFor(key));
-    window.__katherboxOpenOrder = (order) => {
+    const setView = (key) => navigate(pathFor(key));
+    const openOrder = (order) => {
       setOrderCtx(order);
       navigate("/orders/" + (order?.id ?? order?.ID));
     };
-    window.__katherboxOpenQuickView = (id) => setQuickViewId(id);
-    window.__katherboxOpenAiDoctor = () => setShowAiDoctor(true);
+    const openQuickView = (id) => setQuickViewId(id);
+    const openAiDoctor = () => setShowAiDoctor(true);
+
+    window.__kather_bakshoSetView = setView;
+    window.__kather_bakshoOpenOrder = openOrder;
+    window.__kather_bakshoOpenQuickView = openQuickView;
+    window.__kather_bakshoOpenAiDoctor = openAiDoctor;
+
+    // Backwards-compatible aliases
+    window.__katherboxSetView = setView;
+    window.__katherboxOpenOrder = openOrder;
+    window.__katherboxOpenQuickView = openQuickView;
+    window.__katherboxOpenAiDoctor = openAiDoctor;
+
     return () => {
+      delete window.__kather_bakshoSetView;
+      delete window.__kather_bakshoOpenOrder;
+      delete window.__kather_bakshoOpenQuickView;
+      delete window.__kather_bakshoOpenAiDoctor;
       delete window.__katherboxSetView;
       delete window.__katherboxOpenOrder;
       delete window.__katherboxOpenQuickView;

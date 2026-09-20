@@ -1,4 +1,4 @@
-# 🚀 Setup Guide — install KatherBox on a new machine
+# 🚀 Setup Guide — install Kather Baksho on a new machine
 
 Follow this end-to-end and you'll have the full app running locally in **under 2 minutes** with Docker, or under 10 minutes with manual setup.
 
@@ -131,7 +131,7 @@ Expected output:
   ➜  Local:   http://localhost:5173/
 ```
 
-Open <http://localhost:5173> in your browser. You should see the KatherBox storefront.
+Open <http://localhost:5173> in your browser. You should see the Kather Baksho storefront.
 
 ---
 
@@ -141,8 +141,8 @@ Pick any demo account:
 
 | Email                 | Password         | Where it lands                          |
 |-----------------------|------------------|-----------------------------------------|
-| `admin@katherbox.com` | `Admin@12345`    | `/admin` — full back-office workspace    |
-| `staff@katherbox.com` | `Staff@12345`    | `/admin` — Orders + Returns only (fulfilment) |
+| `admin@kather_baksho.com` | `Admin@12345`    | `/admin` — full back-office workspace    |
+| `staff@kather_baksho.com` | `Staff@12345`    | `/admin` — Orders + Returns only (fulfilment) |
 | `customer@test.com`   | `Customer@12345` | `/` with full demo data                 |
 
 The customer account already has 32 orders, 4 subscriptions, 5 wishlist items, 5 reviews, 3 addresses, 4 journal entries, 2 community posts, and a Gold loyalty tier — perfect for poking every screen.
@@ -169,7 +169,7 @@ The backend stays on `:8081`.
 |---|---|
 | Backend entry point | `backend/main.go` |
 | Backend port | `8081` |
-| SQLite DB | `backend/katherbox.db` (auto-created) |
+| SQLite DB | `backend/kather_baksho.db` (auto-created) |
 | Frontend entry point | `frontend/src/main.jsx` + `App.jsx` |
 | Frontend port | `5173` (dev), `4173` (preview) |
 | Reset passwords | `backend/cmd/resetusers/main.go` |
@@ -185,7 +185,7 @@ If you want to wipe everything and start over:
 ```bash
 cd backend
 # 1. Stop the backend (Ctrl+C in its terminal)
-rm -f katherbox.db
+rm -f kather_baksho.db
 # 2. Restart it (re-creates schema)
 go run main.go
 # 3. Re-add demo accounts and data

@@ -80,7 +80,7 @@ func ConnectDatabase() {
 	// Default: pure-Go SQLite
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
-		dbPath = "katherbox.db"
+		dbPath = "kather_baksho.db"
 	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), gormConfig)

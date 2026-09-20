@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"katherbox/database"
+	"kather_baksho/database"
 
 	"github.com/gin-gonic/gin"
 )

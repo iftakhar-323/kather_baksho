@@ -6,10 +6,10 @@ import { useEffect } from "react";
 // print-to-PDF via an @media print stylesheet (see index.css "DEMO PASS").
 
 const COMPANY = {
-  name: "KatherBox",
+  name: "Kather Baksho",
   tagline: "Plants, planters & plant care",
   address: "House 42, Road 7, Dhanmondi, Dhaka 1205, Bangladesh",
-  email: "hello@katherbox.com",
+  email: "hello@kather_baksho.com",
   phone: "+880 1700 000000",
 };
 

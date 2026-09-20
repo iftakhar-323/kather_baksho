@@ -1,4 +1,4 @@
-# KatherBox — Project Summary
+# Kather Baksho — Project Summary
 
 > One file that captures everything built so far and answers the key question:
 > **Do any features depend on external APIs or third-party services? → NO.**
@@ -15,7 +15,7 @@ Transactional email → Brevo (free tier, optional `BREVO_API_KEY`).
 |----------|-----------------------------------------------------------|
 | Backend  | Go 1.21+ · Gin · GORM · SQLite · JWT (HS256) · bcrypt     |
 | Frontend | React 18 · Vite · Axios · plain CSS (no Tailwind/MUI)     |
-| Storage  | SQLite file (`backend/katherbox.db`) + `localStorage` (UI) |
+| Storage  | SQLite file (`backend/kather_baksho.db`) + `localStorage` (UI) |
 
 ---
 

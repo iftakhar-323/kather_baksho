@@ -35,7 +35,7 @@ def test_get_products():
 admin_token = None
 def test_login_admin():
     global admin_token
-    r = admin_s.post(f"{BASE_URL}/auth/login", json={"email": "admin@katherbox.com", "password": "Admin@12345"})
+    r = admin_s.post(f"{BASE_URL}/auth/login", json={"email": "admin@kather_baksho.com", "password": "Admin@12345"})
     assert r.status_code == 200, f"Status {r.status_code}: {r.text}"
     data = r.json()
     assert "token" in data, "No token returned"
@@ -46,7 +46,7 @@ def test_login_admin():
 staff_token = None
 def test_login_staff():
     global staff_token
-    r = staff_s.post(f"{BASE_URL}/auth/login", json={"email": "staff@katherbox.com", "password": "Staff@12345"})
+    r = staff_s.post(f"{BASE_URL}/auth/login", json={"email": "staff@kather_baksho.com", "password": "Staff@12345"})
     assert r.status_code == 200, f"Status {r.status_code}: {r.text}"
     data = r.json()
     assert "token" in data, "No token returned"
@@ -55,7 +55,7 @@ def test_login_staff():
 
 # 4. Register new user
 user_s = requests.Session()
-test_email = f"e2etest_{int(time.time())}@katherbox.com"
+test_email = f"e2etest_{int(time.time())}@kather_baksho.com"
 def test_register_user():
     r = user_s.post(f"{BASE_URL}/auth/register", json={
         "name": "E2E User",
@@ -347,7 +347,7 @@ def test_frontend_routes():
 # 29. SQLite DB PRAGMA Integrity Check
 def test_db_health():
     import sqlite3
-    conn = sqlite3.connect("backend/katherbox.db")
+    conn = sqlite3.connect("backend/kather_baksho.db")
     cur = conn.cursor()
     cur.execute("PRAGMA integrity_check;")
     row = cur.fetchone()

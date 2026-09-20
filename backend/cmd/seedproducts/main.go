@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
-	"katherbox/database"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/models"
 )
 
 // Small attribute pools so every product carries believable metadata

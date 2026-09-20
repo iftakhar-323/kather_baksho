@@ -27,9 +27,9 @@ cd kather_baksho
 | :--- | :--- | :--- | :--- |
 | **Frontend Web App** | [http://localhost:8082](http://localhost:8082) | Storefront, Customer Portal, Admin Panel, AI Doctor & Algorithm Studio | Public / Demo User |
 | **Algorithm Studio** | [http://localhost:8082/algorithms](http://localhost:8082/algorithms) | Interactive Dijkstra Routing & Bin Packing Visualizer | Direct Navigation |
-| **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics & Caching | `admin@katherbox.com` / `Admin@12345` |
+| **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics & Caching | `admin@kather_baksho.com` / `Admin@12345` |
 | **Prometheus Telemetry** | [http://localhost:9090](http://localhost:9090) | Scrapes backend `/metrics` every 5 seconds | Direct Access |
-| **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | Pre-provisioned KatherBox Observability Dashboard | `admin` / `admin` |
+| **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | Pre-provisioned Kather_Baksho Observability Dashboard | `admin` / `admin` |
 | **Redis Cache** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & prefix invalidation | Passwordless local |
 | **Readiness Probe** | [http://localhost:8081/health/ready](http://localhost:8081/health/ready) | Deep system health (DB, Redis, Memory, Goroutines, Circuit Breakers) | Public API |
 
@@ -39,8 +39,8 @@ cd kather_baksho
 
 | Role | Email | Password | Pre-loaded Features |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@katherbox.com` | `Admin@12345` | Complete `/admin` back-office, catalog management, order approvals, analytics |
-| **Staff Member** | `staff@katherbox.com` | `Staff@12345` | Fulfilment dashboard (Orders & Returns management) |
+| **Super Admin** | `admin@kather_baksho.com` | `Admin@12345` | Complete `/admin` back-office, catalog management, order approvals, analytics |
+| **Staff Member** | `staff@kather_baksho.com` | `Staff@12345` | Fulfilment dashboard (Orders & Returns management) |
 | **Customer** | `customer@test.com` | `Customer@12345` | Seeded with 32 orders, subscriptions, wishlist, reviews, care journal, Gold loyalty |
 | **Customer (Alt)** | `iftakhar@gmail.com` | `Customer@12345` | Pre-configured customer profile |
 
@@ -68,7 +68,7 @@ Every component below was engineered, tested, and verified:
   - `http_request_duration_seconds` (histogram with p50, p90, p99 percentiles).
   - `http_requests_in_flight` (gauge tracking concurrent requests).
 - **Auto-Provisioned Prometheus**: Pre-configured `monitoring/prometheus/prometheus.yml` actively scraping `backend:8081/metrics` every 5 seconds.
-- **Auto-Provisioned Grafana**: Containerized Grafana instance with pre-loaded Prometheus datasource and a custom `KatherBox System Dashboard` (`monitoring/grafana/provisioning/dashboards/katherbox_dashboard.json`) charting throughput, latencies, and error rates.
+- **Auto-Provisioned Grafana**: Containerized Grafana instance with pre-loaded Prometheus datasource and a custom `Kather_Baksho System Dashboard` (`monitoring/grafana/provisioning/dashboards/kather_baksho_dashboard.json`) charting throughput, latencies, and error rates.
 
 ### 3. ⚡ Phase 3: High Concurrency, Inventory Locking & Payment Idempotency
 - **Atomic Stock Reservation**: Eliminated inventory overselling and race conditions by enforcing conditional SQL updates (`UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?`) and verifying affected row counts inside transactional blocks.

@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"katherbox/database"
-	"katherbox/models"
-	"katherbox/utils"
+	"kather_baksho/database"
+	"kather_baksho/models"
+	"kather_baksho/utils"
 )
 
 const seedPassword = "Test@12345"

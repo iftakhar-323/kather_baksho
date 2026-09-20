@@ -1,13 +1,12 @@
 apiVersion: 1
 
 providers:
-  - name: 'KatherBox Dashboards'
+  - name: 'Kather_Baksho Dashboards'
     orgId: 1
-    folder: 'KatherBox'
+    folder: 'Kather_Baksho'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
     allowUiUpdates: true
     options:
       path: /etc/grafana/provisioning/dashboards
-

@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	"katherbox/database"
-	"katherbox/mailer"
-	"katherbox/models"
-	"katherbox/utils"
+	"kather_baksho/database"
+	"kather_baksho/mailer"
+	"kather_baksho/models"
+	"kather_baksho/utils"
 
 	"github.com/gin-gonic/gin"
 )

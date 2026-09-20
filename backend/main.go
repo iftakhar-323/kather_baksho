@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"katherbox/database"
-	"katherbox/middleware"
-	"katherbox/models"
-	"katherbox/routes"
+	"kather_baksho/database"
+	"kather_baksho/middleware"
+	"kather_baksho/models"
+	"kather_baksho/routes"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

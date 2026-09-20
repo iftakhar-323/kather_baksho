@@ -1,8 +1,8 @@
 # 🗄️ Database (SQLite)
 
-KatherBox uses a **single SQLite file** for everything: products, users, orders, subscriptions, reviews, blog posts, community, loyalty, journals, etc.
+Kather Baksho uses a **single SQLite file** for everything: products, users, orders, subscriptions, reviews, blog posts, community, loyalty, journals, etc.
 
-- **Path:** `backend/katherbox.db` (auto-created on first run)
+- **Path:** `backend/kather_baksho.db` (auto-created on first run)
 - **Driver:** `gorm.io/driver/sqlite` v1.6
 - **Migrations:** automatic via GORM `AutoMigrate` on backend startup
 - **No external DB server needed**
@@ -14,10 +14,10 @@ KatherBox uses a **single SQLite file** for everything: products, users, orders,
 `backend/database/database.go` opens it relative to the working directory:
 
 ```go
-gorm.Open(sqlite.Open("katherbox.db"), &gorm.Config{})
+gorm.Open(sqlite.Open("kather_baksho.db"), &gorm.Config{})
 ```
 
-So when you run `go run main.go` from `backend/`, the DB is `backend/katherbox.db`. If you `cd ..` first, you'll create a stray `katherbox.db` in the project root. Always run from `backend/`.
+So when you run `go run main.go` from `backend/`, the DB is `backend/kather_baksho.db`. If you `cd ..` first, you'll create a stray `kather_baksho.db` in the project root. Always run from `backend/`.
 
 ---
 
@@ -27,7 +27,7 @@ So when you run `go run main.go` from `backend/`, the DB is `backend/katherbox.d
 
 ```bash
 sudo apt install -y sqlite3     # one-time
-sqlite3 backend/katherbox.db    # opens an interactive shell
+sqlite3 backend/kather_baksho.db    # opens an interactive shell
 ```
 
 Inside the shell:
@@ -44,14 +44,14 @@ SELECT id, name, email, role FROM users;
 
 ```bash
 pip install litecli
-litecli backend/katherbox.db
+litecli backend/kather_baksho.db
 ```
 
 Tab-completion, syntax highlighting, history.
 
 ### Option C — DB Browser for SQLite (GUI)
 
-<https://sqlitebrowser.org/> — point it at `backend/katherbox.db`.
+<https://sqlitebrowser.org/> — point it at `backend/kather_baksho.db`.
 
 ### Option D — VS Code extension
 
@@ -102,7 +102,7 @@ For exact columns run `.schema <table>` in `sqlite3`.
 ### Reset everything
 ```bash
 cd backend
-rm -f katherbox.db
+rm -f kather_baksho.db
 go run main.go                  # re-creates an empty schema
 go run ./cmd/resetusers/        # demo accounts
 go run ./cmd/seedproducts/      # products
@@ -184,7 +184,7 @@ To recreate this account on a fresh DB:
 
 ```bash
 cd backend
-rm -f katherbox.db
+rm -f kather_baksho.db
 go run main.go                                # creates schema
 go run ./cmd/resetusers/                      # resets password + role
 go run ./cmd/seedproducts/
@@ -200,19 +200,19 @@ go run ./cmd/topup-customer/                  # (optional) wishlist/reviews/jour
 
 ### Backup
 ```bash
-sqlite3 backend/katherbox.db ".backup '/tmp/kb-$(date +%F).db'"
+sqlite3 backend/kather_baksho.db ".backup '/tmp/kb-$(date +%F).db'"
 ```
 
 Or just copy the file:
 ```bash
-cp backend/katherbox.db ~/backup/katherbox-2026-07-07.db
+cp backend/kather_baksho.db ~/backup/kather_baksho-2026-07-07.db
 ```
 
 **Stop the backend first** for a clean copy. SQLite is safe to copy while live for most cases, but a `.backup` is the canonical way.
 
 ### Restore
 ```bash
-cp ~/backup/katherbox-2026-07-07.db backend/katherbox.db
+cp ~/backup/kather_baksho-2026-07-07.db backend/kather_baksho.db
 # then restart the backend
 ```
 
@@ -237,6 +237,6 @@ To see GORM's auto-migrate history, the schema lives in the SQL definitions them
 |---|---|---|
 | `database is locked` | Two backends pointed at the same file | Kill all `go run main.go` and restart one |
 | Schema missing after fresh checkout | You haven't run the backend yet | `cd backend && go run main.go` |
-| `password column null` after register | Migration ran before `password` column added | Delete `katherbox.db` and re-run |
+| `password column null` after register | Migration ran before `password` column added | Delete `kather_baksho.db` and re-run |
 | Foreign-key errors on delete | GORM uses soft-delete; not actually freed | Hard-delete via `Unscoped().Delete(...)` |
 | Stale data after editing seeders | Old rows still there | `DELETE FROM <table>` and re-seed |

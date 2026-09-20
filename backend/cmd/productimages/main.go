@@ -12,8 +12,8 @@ import (
 	"os"
 	"strings"
 
-	"katherbox/database"
-	"katherbox/models"
+	"kather_baksho/database"
+	"kather_baksho/models"
 )
 
 func main() {

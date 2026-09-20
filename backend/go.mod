@@ -1,4 +1,4 @@
-module katherbox
+module kather_baksho
 
 go 1.25.0
 

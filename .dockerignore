@@ -15,8 +15,10 @@
 
 # Go / Backend binaries & DB
 **/*.db
+!kather_baksho.db
 !katherbox.db
 **/*.db-journal
+**/kather_baksho
 **/katherbox
 **/seedusers
 **/seedproducts

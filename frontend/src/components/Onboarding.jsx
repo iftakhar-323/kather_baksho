@@ -4,7 +4,7 @@ import { OnbStore } from "../utils/kb";
 const STEPS = [
   {
     emoji: "🌿",
-    title: "Welcome to KatherBox",
+    title: "Welcome to Kather Baksho",
     body: "Hand-curated plants, handcrafted planters and gentle care essentials — delivered in Dhaka and beyond.",
   },
   {

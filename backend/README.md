@@ -25,7 +25,7 @@ All deps are in `go.mod`. **No external services required** — DB is a single S
 backend/
 ├── main.go               # Gin bootstrap, route mounting, CORS
 ├── go.mod
-├── katherbox.db          # SQLite file (auto-created on first run)
+├── kather_baksho.db          # SQLite file (auto-created on first run)
 │
 ├── controllers/          # 26 HTTP handlers
 │   ├── auth_controller.go        # register / login / me / forgot / reset
@@ -103,7 +103,7 @@ No `.env` is required. Defaults are baked in:
 | Setting      | Value                                     | Source                          |
 |--------------|-------------------------------------------|---------------------------------|
 | Port         | `8081`                                    | `main.go`                       |
-| DB file      | `backend/katherbox.db` (relative)         | `database/database.go`          |
+| DB file      | `backend/kather_baksho.db` (relative)         | `database/database.go`          |
 | JWT secret   | `KATHERBOX_DEV_SECRET` (hard-coded dev)   | `utils/jwt.go`                  |
 | JWT expiry   | 30 days                                   | `utils/jwt.go`                  |
 | bcrypt cost  | `bcrypt.DefaultCost`                      | `utils/hash.go`                 |
@@ -161,7 +161,7 @@ Authorization: Bearer <jwt>
 
 ```bash
 # Make / reset admin
-go run ./cmd/makeadmin/        # → admin@katherbox.com / Admin@12345
+go run ./cmd/makeadmin/        # → admin@kather_baksho.com / Admin@12345
 
 # Reset every demo account's password + role
 go run ./cmd/resetusers/       # idempotent; safe to re-run
@@ -204,10 +204,10 @@ node scripts/seed-demo.mjs            # needs Node >= 22
 node scripts/seed-demo.mjs --users 120 --orders 300
 ```
 
-Tops up `katherbox.db` with ~90 users, ~220 dated orders (+ items),
+Tops up `kather_baksho.db` with ~90 users, ~220 dated orders (+ items),
 ~180 reviews, address book, reminders and notifications — no build step.
-Seeded customers log in with `<name>@katherbox.demo` / `Customer@12345`.
-A `katherbox.db.bak-preseed` copy is left next to it the first time.
+Seeded customers log in with `<name>@kather_baksho.demo` / `Customer@12345`.
+A `kather_baksho.db.bak-preseed` copy is left next to it the first time.
 
 ---
 
@@ -217,9 +217,9 @@ Set by `cmd/resetusers/`:
 
 | Email | Password | Role |
 |---|---|---|
-| `admin@katherbox.com` | `Admin@12345` | admin |
+| `admin@kather_baksho.com` | `Admin@12345` | admin |
 | `admin@demo.com` | `Admin@12345` | admin |
-| `staff@katherbox.com` | `Staff@12345` | staff |
+| `staff@kather_baksho.com` | `Staff@12345` | staff |
 | `customer@test.com` | `Customer@12345` | customer |
 | `iftakhar@gmail.com` | `Customer@12345` | customer |
 | `cust1@test.com` | `Customer@12345` | customer |
@@ -250,14 +250,14 @@ CORS is permissive in dev (any origin, all common methods). Adjust `main.go` for
 **Reset everything from scratch**
 ```bash
 cd backend
-rm -f katherbox.db katherbox.db-wal katherbox.db-shm   # wipe DB
+rm -f kather_baksho.db kather_baksho.db-wal kather_baksho.db-shm   # wipe DB
 go run main.go &            # re-creates schema via auto-migrate, then Ctrl-C
 ./seed.sh                   # makeadmin + products + users + dummy + orders
 ```
 
 or step by step:
 ```bash
-go run ./cmd/makeadmin/     # admin@katherbox.com / Admin@12345
+go run ./cmd/makeadmin/     # admin@kather_baksho.com / Admin@12345
 go run ./cmd/seedproducts/  # ~120 products
 go run ./cmd/seedusers/     # ~65 accounts (password: Test@12345)
 go run ./cmd/seeddummy/     # orders/reviews/returns/subs/addresses/…
@@ -272,7 +272,7 @@ curl http://localhost:8081/api/products | head -c 200
 ```bash
 curl -X POST http://localhost:8081/api/auth/login \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@katherbox.com","password":"Admin@12345"}'
+  -d '{"email":"admin@kather_baksho.com","password":"Admin@12345"}'
 ```
 
 For database inspection, see [`../DATABASE.md`](../DATABASE.md).
