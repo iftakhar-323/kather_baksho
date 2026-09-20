@@ -78,6 +78,7 @@ func main() {
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.StructuredLogger())
 	router.Use(middleware.RateLimiter())
+	router.Use(middleware.PrometheusMetricsMiddleware())
 
 	allowedOrigins := []string{
 		"http://localhost:5173",
@@ -111,6 +112,10 @@ func main() {
 	}
 
 	router.Use(cors.New(corsConfig))
+
+	// Prometheus Metrics endpoint
+	router.GET("/metrics", middleware.PrometheusHandler())
+	router.GET("/api/metrics", middleware.PrometheusHandler())
 
 	routes.HealthRoutes(router)
 
