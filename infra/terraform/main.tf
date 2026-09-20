@@ -178,3 +178,4 @@ resource "aws_eip" "app_eip" {
     Name = "kather_baksho-eip-${var.environment}"
   }
 }
+

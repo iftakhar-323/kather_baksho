@@ -27,3 +27,4 @@ output "ssh_connection_command" {
   description = "SSH administrative login command"
   value       = "ssh -i ~/.ssh/id_rsa ubuntu@${aws_eip.app_eip.public_ip}"
 }
+

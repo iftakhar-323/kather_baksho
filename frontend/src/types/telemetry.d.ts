@@ -27,3 +27,4 @@ export interface IoTTelemetryResponse {
   history: PlantTelemetry[];
   count: number;
 }
+

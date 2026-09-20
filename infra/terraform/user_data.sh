@@ -44,3 +44,4 @@ ufw allow 3000/tcp
 echo "y" | ufw enable || true
 
 echo "Kather Baksho EC2 Host initialization complete."
+

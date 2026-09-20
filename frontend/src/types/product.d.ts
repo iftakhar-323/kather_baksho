@@ -38,3 +38,4 @@ export interface PaginatedProducts {
   limit: number;
   totalPages: number;
 }
+
