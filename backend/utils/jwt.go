@@ -24,7 +24,7 @@ func jwtSecret() []byte {
 				log.Fatal("JWT_SECRET env var must be set when GIN_MODE=release")
 			}
 			log.Println("WARNING: JWT_SECRET not set — using an insecure development default. Set JWT_SECRET before deploying.")
-			secret = "katherbox_secret_key_change_this_later"
+			secret = "kather_baksho_secret_key_change_this_later"
 		}
 		jwtSecretBytes = []byte(secret)
 	})
@@ -37,6 +37,19 @@ func GenerateJWT(userID uint, email string, role string) (string, error) {
 		"email":   email,
 		"role":    role,
 		"exp":     time.Now().Add(time.Hour * 72).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret())
+}
+
+// Generate2FAPendingToken creates a short-lived token (10 minutes) for 2FA verification step
+func Generate2FAPendingToken(userID uint, email string) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": userID,
+		"email":   email,
+		"role":    "2fa_pending",
+		"exp":     time.Now().Add(time.Minute * 10).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

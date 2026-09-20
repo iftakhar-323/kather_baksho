@@ -697,7 +697,215 @@ def test_ec2_iac_artifacts():
     assert "docker compose" in deploy_sh
     assert "systemctl enable kather_baksho.service" in deploy_sh
 
+# 55. Redis Streams Event-Driven Architecture & Message Bus
+def test_redis_streams_event_bus():
+    r_stats = s.get(f"{BASE_URL}/events/stats")
+    assert r_stats.status_code == 200, f"Event stats failed: {r_stats.status_code}"
+    stats = r_stats.json()
+    assert stats.get("status") == "healthy"
+    assert stats.get("stream") == "kb:events:stream"
+    assert stats.get("group") == "kb_workers"
+
+    payload = {
+        "type": "telemetry.alert",
+        "payload": {
+            "plant_id": 101,
+            "botanical_status": "Simulated Needs Water Alert"
+        }
+    }
+    r_pub = s.post(f"{BASE_URL}/events/publish", json=payload)
+    assert r_pub.status_code == 201, f"Event publish failed: {r_pub.status_code}"
+    pub_res = r_pub.json()
+    assert pub_res.get("success") is True
+    assert "event_id" in pub_res
+
+# 56. SQLite Full-Text Search (FTS) & Highlight Snippets
+def test_fts_fulltext_search():
+    r = s.get(f"{BASE_URL}/products/search?q=Succulent")
+    assert r.status_code == 200, f"Search failed: {r.status_code}"
+    data = r.json()
+    assert data.get("query") == "Succulent"
+    assert data.get("count") > 0
+    assert "results" in data
+    first = data["results"][0]
+    assert "<mark>" in first.get("highlight", "") or "Succulent" in first.get("name", "")
+
+# 57. Local MinIO S3 Object Storage & Media Pipeline
+def test_minio_s3_storage():
+    r_status = s.get(f"{BASE_URL}/media/status")
+    assert r_status.status_code == 200, f"Media status failed: {r_status.status_code}"
+    status_data = r_status.json()
+    assert status_data.get("status") == "healthy"
+    assert status_data.get("bucket") == "kather-baksho-media"
+
+    files = {"file": ("plant_botanical.png", b"binary_test_image_bytes_45678", "image/png")}
+    r_up = s.post(f"{BASE_URL}/media/upload", files=files)
+    assert r_up.status_code == 201, f"Media upload failed: {r_up.status_code}"
+    up_data = r_up.json()
+    assert up_data.get("success") is True
+    assert "url" in up_data
+
+    file_url = f"http://localhost:8081{up_data['url']}"
+    r_get = s.get(file_url)
+    assert r_get.status_code == 200, f"Media retrieval failed: {r_get.status_code}"
+    assert r_get.content == b"binary_test_image_bytes_45678"
+
+# 58. Enterprise RFC 6238 TOTP Two-Factor Authentication
+def test_enterprise_2fa_totp():
+    import base64
+    import hashlib
+    import hmac
+    import struct
+    import time
+
+    def get_totp_token(secret):
+        secret = secret.upper().strip()
+        padding = (8 - len(secret) % 8) % 8
+        key = base64.b32decode(secret + '=' * padding)
+        counter = int(time.time() // 30)
+        msg = struct.pack(">Q", counter)
+        h = hmac.new(key, msg, hashlib.sha1).digest()
+        offset = h[-1] & 0x0F
+        truncated = struct.unpack(">I", h[offset:offset + 4])[0] & 0x7FFFFFFF
+        code = truncated % 1000000
+        return f"{code:06d}"
+
+    # 1. Register a fresh user
+    user_email = f"totp_user_{int(time.time())}@example.com"
+    r_reg = requests.post(f"{BASE_URL}/auth/register", json={
+        "name": "TOTP Tester",
+        "email": user_email,
+        "password": "Password123!"
+    })
+    assert r_reg.status_code == 201
+    user_tok = r_reg.json()["token"]
+    u_headers = {"Authorization": f"Bearer {user_tok}"}
+
+    # 2. Start 2FA setup
+    r_setup = requests.post(f"{BASE_URL}/auth/2fa/setup", headers=u_headers)
+    assert r_setup.status_code == 200, f"2FA setup failed: {r_setup.text}"
+    setup_data = r_setup.json()
+    secret = setup_data.get("secret")
+    assert secret and len(secret) >= 16
+    assert "otpauth://" in setup_data.get("otpauth_uri", "")
+
+    # 3. Calculate TOTP code and enable 2FA
+    code = get_totp_token(secret)
+    r_enable = requests.post(f"{BASE_URL}/auth/2fa/enable", json={"code": code}, headers=u_headers)
+    assert r_enable.status_code == 200, f"2FA enable failed: {r_enable.text}"
+    enable_data = r_enable.json()
+    assert enable_data.get("totp_enabled") is True
+    recovery_codes = enable_data.get("recovery_codes", [])
+    assert len(recovery_codes) == 8
+
+    # 4. Check /me shows totp_enabled == True
+    r_me = requests.get(f"{BASE_URL}/auth/me", headers=u_headers)
+    assert r_me.status_code == 200
+    assert r_me.json().get("totp_enabled") is True
+
+    # 5. Login again with password -> must return requires_2fa: true and temp_token
+    r_login = requests.post(f"{BASE_URL}/auth/login", json={
+        "email": user_email,
+        "password": "Password123!"
+    })
+    assert r_login.status_code == 200
+    login_data = r_login.json()
+    assert login_data.get("requires_2fa") is True
+    temp_token = login_data.get("temp_token")
+    assert temp_token is not None
+
+    # 6. Verify temp_token CANNOT access protected /me endpoint
+    r_bad_me = requests.get(f"{BASE_URL}/auth/me", headers={"Authorization": f"Bearer {temp_token}"})
+    assert r_bad_me.status_code == 401, "temp_token should not access protected endpoints"
+
+    # 7. Complete 2FA challenge with TOTP code
+    verify_code = get_totp_token(secret)
+    r_verify = requests.post(f"{BASE_URL}/auth/2fa/verify", json={
+        "temp_token": temp_token,
+        "code": verify_code
+    })
+    assert r_verify.status_code == 200, f"2FA challenge failed: {r_verify.text}"
+    final_token = r_verify.json().get("token")
+    assert final_token is not None
+
+    # 8. Full token now accesses protected /me
+    r_ok_me = requests.get(f"{BASE_URL}/auth/me", headers={"Authorization": f"Bearer {final_token}"})
+    assert r_ok_me.status_code == 200
+
+    # 9. Test Recovery Code fallback login
+    r_login2 = requests.post(f"{BASE_URL}/auth/login", json={
+        "email": user_email,
+        "password": "Password123!"
+    })
+    temp_token2 = r_login2.json()["temp_token"]
+    r_rc_verify = requests.post(f"{BASE_URL}/auth/2fa/verify", json={
+        "temp_token": temp_token2,
+        "recovery_code": recovery_codes[0]
+    })
+    assert r_rc_verify.status_code == 200, "Recovery code verification failed"
+
+    # 10. Disable 2FA with password
+    r_disable = requests.post(f"{BASE_URL}/auth/2fa/disable", json={"password": "Password123!"}, headers={"Authorization": f"Bearer {final_token}"})
+    assert r_disable.status_code == 200
+    assert r_disable.json().get("totp_enabled") is False
+
+# 59. Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)
+def test_chaos_engineering_resilience():
+    # 1. Fetch default configuration
+    r_cfg = s.get(f"{BASE_URL}/chaos/config")
+    assert r_cfg.status_code == 200
+    cfg = r_cfg.json()
+    assert cfg.get("enabled") is False
+
+    # 2. Configure targeted chaos on /api/chaos/probe
+    r_update = s.post(f"{BASE_URL}/chaos/config", json={
+        "enabled": True,
+        "latency_ms": 100,
+        "error_rate_percent": 100,
+        "target_prefixes": ["/api/chaos/probe"]
+    })
+    assert r_update.status_code == 200
+    assert r_update.json()["config"]["enabled"] is True
+
+    # 3. Request to targeted route triggers injected chaos fault (503)
+    r_fault = s.get(f"{BASE_URL}/chaos/probe")
+    assert r_fault.status_code == 503
+    assert r_fault.json().get("chaos_fault") is True
+
+    # 4. Request to untargeted route (/api/products) bypasses error injection
+    r_safe = s.get(f"{BASE_URL}/products?limit=1")
+    assert r_safe.status_code == 200
+
+    # 5. Trip Circuit Breaker manually
+    r_trip = s.post(f"{BASE_URL}/chaos/trip-breaker", json={"name": "test-resilience-breaker"})
+    assert r_trip.status_code == 200
+    assert r_trip.json().get("state") == "OPEN"
+
+    # 6. Check stats reflects delayed count, injected failures, and open breaker
+    r_stats = s.get(f"{BASE_URL}/chaos/stats")
+    assert r_stats.status_code == 200
+    stats = r_stats.json()
+    assert stats.get("injected_failures", 0) >= 1
+    assert stats.get("circuit_breakers", {}).get("test-resilience-breaker") == "OPEN"
+
+    # 7. Reset all chaos & circuit breakers to healthy baseline
+    r_reset = s.post(f"{BASE_URL}/chaos/reset")
+    assert r_reset.status_code == 200
+    reset_data = r_reset.json()
+    assert reset_data["config"]["enabled"] is False
+    assert reset_data["stats"]["circuit_breakers"].get("test-resilience-breaker") == "CLOSED"
+
+# 60. Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
+def test_concurrency_flash_sale_benchmark():
+    try:
+        from stress_test import run_flash_sale_benchmark
+    except ImportError:
+        from tests.stress_test import run_flash_sale_benchmark
+    ok = run_flash_sale_benchmark(base_url=BASE_URL, concurrency=20, initial_stock=5)
+    assert ok is True, "Flash sale concurrency race condition test failed!"
+
 tests = [
+
     ("Health / Get Products", test_get_products),
     ("Login Admin", test_login_admin),
     ("Login Staff", test_login_staff),
@@ -751,7 +959,13 @@ tests = [
     ("WebSocket Real-Time Order & Rider Tracking", test_websocket_order_tracking),
     ("OpenAPI 3.0 Specification & Interactive Swagger UI", test_openapi_swagger_docs),
     ("Frontend TypeScript Type Declarations & Config", test_frontend_typescript_types),
-    ("AWS EC2 Infrastructure-as-Code & Deployment Orchestration", test_ec2_iac_artifacts)
+    ("AWS EC2 Infrastructure-as-Code & Deployment Orchestration", test_ec2_iac_artifacts),
+    ("Redis Streams Event-Driven Architecture & Message Bus", test_redis_streams_event_bus),
+    ("SQLite Full-Text Search (FTS) & Highlight Snippets", test_fts_fulltext_search),
+    ("Local MinIO S3 Object Storage & Media Pipeline", test_minio_s3_storage),
+    ("Enterprise RFC 6238 TOTP Two-Factor Authentication", test_enterprise_2fa_totp),
+    ("Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)", test_chaos_engineering_resilience),
+    ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark)
 ]
 
 print("Starting E2E test suite...")

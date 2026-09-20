@@ -38,8 +38,8 @@ export default function GlobalSearch() {
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const { data } = await API.get(`/products?q=${encodeURIComponent(query)}`);
-        setResults(data.products?.slice(0, 5) || []);
+        const { data } = await API.get(`/products/search?q=${encodeURIComponent(query)}&limit=6`);
+        setResults(data.results || []);
       } catch (err) {
         console.error("Search error", err);
       } finally {
@@ -85,14 +85,17 @@ export default function GlobalSearch() {
                 const emoji = cat === "plant" ? "🌿" : cat === "care" ? "🧴" : "🏺";
                 return (
                   <button
-                    key={p.ID}
+                    key={p.id || p.ID}
                     className="nav-search-item"
-                    onClick={() => handleResultClick(p.ID)}
+                    onClick={() => handleResultClick(p.id || p.ID)}
                   >
                     <div className="nav-search-thumb">{emoji}</div>
                     <div className="nav-search-info">
-                      <div className="nav-search-name">{p.name}</div>
-                      <div className="nav-search-cat">{cat}</div>
+                      <div
+                        className="nav-search-name"
+                        dangerouslySetInnerHTML={{ __html: p.highlight || p.name }}
+                      />
+                      <div className="nav-search-cat">{cat} {p.snippet ? `· ${p.snippet}` : ""}</div>
                     </div>
                     <div className="nav-search-price">{fmtBDT(p.price)}</div>
                   </button>

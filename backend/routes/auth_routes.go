@@ -30,5 +30,12 @@ func AuthRoutes(router *gin.Engine) {
 		// Email verification (Sprint F1)
 		authGroup.POST("/verify", controllers.VerifyEmail)               // public
 		authGroup.POST("/resend-verification", controllers.ResendVerification) // public
+
+		// 2FA TOTP (Phase 16)
+		authGroup.POST("/2fa/setup", middleware.AuthMiddleware(), controllers.SetupTOTP)
+		authGroup.POST("/2fa/enable", middleware.AuthMiddleware(), controllers.EnableTOTP)
+		authGroup.POST("/2fa/verify", controllers.VerifyTOTP) // public: uses temp_token
+		authGroup.POST("/2fa/disable", middleware.AuthMiddleware(), controllers.DisableTOTP)
+		authGroup.GET("/2fa/status", middleware.AuthMiddleware(), controllers.StatusTOTP)
 	}
 }

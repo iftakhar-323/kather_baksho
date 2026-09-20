@@ -106,6 +106,25 @@ func GetAllCircuitBreakers() map[string]string {
 	return res
 }
 
+// ResetAllCircuitBreakers resets all registered circuit breakers back to Closed state
+func ResetAllCircuitBreakers() {
+	registryMu.RLock()
+	defer registryMu.RUnlock()
+	for _, cb := range registry {
+		cb.Reset()
+	}
+}
+
+// Reset clears failure counts and transitions back to StateClosed
+func (cb *CircuitBreaker) Reset() {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.state = StateClosed
+	cb.consecutiveFailures = 0
+	cb.consecutiveSuccesses = 0
+	cb.lastStateChange = time.Now()
+}
+
 // State returns the active state, transitioning from Open to Half-Open if timeout has expired.
 func (cb *CircuitBreaker) State() CircuitState {
 	cb.mu.Lock()

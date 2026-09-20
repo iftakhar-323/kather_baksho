@@ -4,8 +4,8 @@
 > **100% Local Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite + React Router v7)**, **Node.js & TypeScript Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0)**, **Traefik v3.1 Cloud-Native API Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **Payment Idempotency**, **OpenAPI 3.0 / Swagger UI**, **AI Plant Doctor**, **Algorithm Visualizers**, and **AWS EC2 Infrastructure-as-Code (Terraform)**.
 
 [![Backend Tests](https://img.shields.io/badge/Go%20Unit%20Tests-Passing-brightgreen)](https://github.com/iftakhar-323/kather_baksho)
-[![E2E Tests](https://img.shields.io/badge/E2E%20Regression-54%2F54%20Passing-success)](https://github.com/iftakhar-323/kather_baksho)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-8%20Services%20Active-blue)](https://github.com/iftakhar-323/kather_baksho)
+[![E2E Tests](https://img.shields.io/badge/E2E%20Regression-60%2F60%20Passing-success)](https://github.com/iftakhar-323/kather_baksho)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-9%20Services%20Active-blue)](https://github.com/iftakhar-323/kather_baksho)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0.3-teal)](http://localhost:8085/docs)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)](https://github.com/iftakhar-323/kather_baksho)
 
@@ -13,7 +13,7 @@
 
 ## 🚀 1-Command Quickstart (100% Localhost)
 
-Run the complete multi-service stack (Frontend, Backend, TypeScript Worker, MongoDB, Redis, Traefik, Prometheus, Grafana) with one command:
+Run the complete multi-service stack (Frontend, Backend, TypeScript Worker, MongoDB, Redis, MinIO, Traefik, Prometheus, Grafana) with one command:
 
 ```bash
 git clone https://github.com/iftakhar-323/kather_baksho.git
@@ -34,8 +34,10 @@ docker compose up -d --build
 | **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics, Mongo & Redis Caching | `admin@kather_baksho.com` / `Admin@12345` |
 | **Real-Time WebSocket Courier Radar** | `ws://localhost:8085/ws/orders/:id/track` | Goroutine WebSocket streaming live courier GPS coordinates across Dhaka | Direct Stream |
 | **Node.js & TypeScript Worker** | [http://localhost:8083](http://localhost:8083) | Microservice for enterprise vector PDF invoices and analytics reports | Inter-service / Direct |
+| **MinIO S3 Object Storage API** | [http://localhost:9005](http://localhost:9005) | Local AWS S3-compatible media datastore & asset pipeline | `kather_baksho_admin` / `kather_baksho_s3_secret` |
+| **MinIO S3 Web Console** | [http://localhost:9006](http://localhost:9006) | Web visual browser for buckets, media assets, and storage policies | `kather_baksho_admin` / `kather_baksho_s3_secret` |
 | **MongoDB 7.0 IoT Datastore** | `localhost:27019` (Internal `27017`) | Polyglot document & time-series database storing botanical sensor telemetry | Direct Access |
-| **Redis Cache** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & prefix invalidation | Passwordless local |
+| **Redis Cache & Streams Bus** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & Redis Streams event message queue | Passwordless local |
 | **Prometheus Telemetry** | [http://localhost:9090](http://localhost:9090) | Scrapes backend `/metrics` every 5 seconds | Direct Access |
 | **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | Pre-provisioned Kather_Baksho Observability Dashboard | `admin` / `admin` |
 | **Tri-Database Readiness Probe** | [http://localhost:8081/health/ready](http://localhost:8081/health/ready) | Deep health probe validating SQLite WAL, Redis PONG, and MongoDB 7.0 ping | Public API |
@@ -116,6 +118,39 @@ Every component below was engineered, tested, and verified:
 - **Production User Data**: Automates Docker, Docker Compose, sysctl memory configuration, and firewall rules on boot.
 - **Deployment Script (`deploy/ec2-setup.sh`)**: 1-click bash automation script creating a production systemd service (`kather_baksho.service`) for automatic container startup on server reboot.
 
+### 11. 📨 Event-Driven Architecture & Message Bus (Redis Streams + DLQ)
+- **Redis Streams Message Bus (`kb:events:stream`)**: Decentralized event publishing (`XADD`) with consumer groups (`kb_workers`) and parallel background worker daemons.
+- **Automatic Retries & Dead-Letter Queue (DLQ)**: Retries transient processing errors up to 3 times before routing unrecoverable payloads into `kb:events:dlq` with detailed failure diagnostics.
+- **Asynchronous Domain Events**: Automatically emits `order.created`, `inventory.low`, and `payment.processed` domain events decoupled from HTTP handlers.
+- **Telemetry & Monitoring**: Live stream and DLQ inspection via `GET /api/events/stats`.
+
+### 12. 🔍 SQLite FTS5 Full-Text Search Engine & Typo-Tolerant Snippets
+- **Zero-Dependency Search Engine**: Uses SQLite FTS5 virtual tables (`products_fts`) with Porter stemming and tokenization.
+- **Dynamic Content Highlighting**: Automatically generates highlighted `<mark>` snippet tags around matching terms in product names and descriptions.
+- **Typo-Tolerant Prefix Matching**: Seamlessly matches partial terms (e.g. `succ` → `Succulent`, `monst` → `Monstera Deliciosa`).
+- **Interactive Global Search UI**: Unified auto-completing search modal accessible across all storefront pages.
+
+### 13. 🗄️ Local MinIO S3-Compatible Object Storage & Media Pipeline
+- **Local S3 Object Datastore**: Containerized MinIO instance (`kather_baksho-minio`) exposing standard AWS S3 APIs on port `9005` and a visual Web Management Console on port `9006`.
+- **Media Upload Pipeline**: Secure multipart media uploads (`POST /api/media/upload`) with SHA256 deduplication, automatic bucket auto-provisioning (`kather-baksho-media`), and in-memory fallback cache.
+- **Direct S3 Retrieval**: Public binary image streaming via `GET /api/media/file/:filename`.
+
+### 14. 🔑 Enterprise RFC 6238 TOTP Two-Factor Authentication
+- **Pure Go TOTP Implementation**: Zero external dependencies, fully conforming to RFC 6238 and RFC 4226. Compatible with Google Authenticator, Authy, and 1Password.
+- **Step-Up Login Challenge**: Login returns a short-lived `temp_token` (`role: 2fa_pending`) requiring OTP code verification before issuing a full-access JWT.
+- **Time-Drift Resilience**: Window skew tolerance (±30s) compensating for user mobile clock drift.
+- **One-Time Emergency Recovery Codes**: Issues 8 cryptographically secure human-friendly recovery codes (`XXXX-XXXX`) for account recovery if the authenticator device is lost.
+
+### 15. 💥 Chaos Engineering & Interactive Resilience Studio
+- **Configurable Fault Injection Middleware**: Real-time thread-safe fault injection simulating network latency (0-2000ms), error rates (0-50% HTTP 503), and targeted endpoint blast radiuses.
+- **Interactive Resilience Visualizer**: Dedicated studio inside `/algorithms` with live fault sliders, total request telemetry, delayed request counters, and manual circuit breaker tripping.
+- **Circuit Breaker Health Monitor**: Real-time visual status cards showing `CLOSED` (Healthy), `OPEN` (Tripped), and `HALF-OPEN` states with 1-click emergency baseline restoration (`POST /api/chaos/reset`).
+
+### 16. ⚡ Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
+- **Flash Sale Concurrency Simulator (`tests/stress_test.py`)**: Multi-threaded race condition engine testing concurrent checkouts competing for limited stock.
+- **ACID Inventory Guarantee**: Enforces conditional atomic SQL decrements (`WHERE id = ? AND stock >= ?`) guaranteeing zero overselling under heavy concurrency.
+- **Statistical Performance Dashboard**: Computes requests/sec (RPS) and latency distributions (min, p50, p95, p99, max).
+
 ---
 
 ## 🧪 Automated Testing & Verification
@@ -128,14 +163,21 @@ cd backend
 go test -v ./...
 ```
 
-### 2. Full End-to-End Regression Suite (54 Tests)
-To run the automated integration test suite across all 8 microservices and databases:
+### 2. Full End-to-End Regression Suite (60 Tests)
+To run the automated integration test suite across all 9 microservices, storage engines, and databases:
 
 ```bash
 python3 tests/e2e_test.py
 ```
 
-**Results (100% Passing):**
+### 3. Concurrency & Flash Sale Stress Benchmark
+To run high-concurrency race condition simulations:
+
+```bash
+python3 tests/stress_test.py --concurrency 50 --stock 5
+```
+
+**Results (100% Passing - 60/60 Tests):**
 ```
 Starting E2E test suite...
 [✓] Health / Get Products
@@ -192,8 +234,14 @@ Starting E2E test suite...
 [✓] OpenAPI 3.0 Specification & Interactive Swagger UI
 [✓] Frontend TypeScript Type Declarations & Config
 [✓] AWS EC2 Infrastructure-as-Code & Deployment Orchestration
+[✓] Redis Streams Event-Driven Architecture & Message Bus
+[✓] SQLite Full-Text Search (FTS) & Highlight Snippets
+[✓] Local MinIO S3 Object Storage & Media Pipeline
+[✓] Enterprise RFC 6238 TOTP Two-Factor Authentication
+[✓] Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)
+[✓] Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
 
-Summary: 54 tests run, 54 passed, 0 failed.
+Summary: 60 tests run, 60 passed, 0 failed.
 ```
 
 ---

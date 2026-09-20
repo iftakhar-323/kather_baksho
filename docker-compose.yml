@@ -177,8 +177,25 @@ services:
       test: ["CMD-SHELL", "mongosh --quiet --eval \"db.adminCommand('ping').ok\" || exit 1"]
       interval: 10s
       timeout: 5s
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: kather_baksho-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=kather_baksho_admin
+      - MINIO_ROOT_PASSWORD=kather_baksho_s3_secret
+    ports:
+      - "9005:9000"
+      - "9006:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 5s
 
 volumes:
   sqlite_data:
@@ -192,4 +209,6 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
+    driver: local
+  minio_data:
     driver: local

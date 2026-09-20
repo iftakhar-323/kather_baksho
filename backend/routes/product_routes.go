@@ -19,6 +19,7 @@ productGroup.GET("/best-selling", controllers.BestSelling)
 productGroup.GET("/most-viewed", controllers.MostViewed)
 productGroup.GET("/brands", controllers.ListBrands)
 productGroup.GET("/categories", controllers.CategoryTree)
+productGroup.GET("/search", controllers.SearchProducts)
 
 // Single
 productGroup.GET("/:id", controllers.GetProduct)

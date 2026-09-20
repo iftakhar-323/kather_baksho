@@ -20,6 +20,11 @@ type User struct {
 	// AvatarURL is an optional profile-picture link. When empty the frontend
 	// renders a deterministic generated avatar from the name/email.
 	AvatarURL string `json:"avatar_url" gorm:"default:''"`
+
+	// ===== 2FA TOTP (Phase 16) =====
+	TOTPSecret        string `json:"-" gorm:"default:''"`
+	TOTPEnabled       bool   `json:"totp_enabled" gorm:"default:false"`
+	TOTPRecoveryCodes string `json:"-" gorm:"default:''"` // Comma-separated recovery codes
 }
 
 // Address is a saved delivery address for a user.

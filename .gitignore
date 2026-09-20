@@ -24,3 +24,7 @@ services/**/dist/
 .claude/
 
 backend/seeddummy
+
+# Python
+__pycache__/
+*.pyc

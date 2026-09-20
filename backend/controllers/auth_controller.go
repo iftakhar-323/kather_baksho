@@ -97,16 +97,31 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if user.TOTPEnabled {
+		tempToken, err := utils.Generate2FAPendingToken(user.ID, user.Email)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to issue 2FA challenge"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"requires_2fa": true,
+			"temp_token":   tempToken,
+			"message":      "Two-factor authentication required",
+		})
+		return
+	}
+
 	token, _ := utils.GenerateJWT(user.ID, user.Email, user.Role)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
 		"token":   token,
 		"user": gin.H{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-			"role":  user.Role,
+			"id":           user.ID,
+			"name":         user.Name,
+			"email":        user.Email,
+			"role":         user.Role,
+			"totp_enabled": user.TOTPEnabled,
 		},
 	})
 }
@@ -129,6 +144,7 @@ func Me(c *gin.Context) {
 		"role":           user.Role,
 		"points":         user.Points,
 		"email_verified": user.EmailVerified,
+		"totp_enabled":   user.TOTPEnabled,
 	})
 }
 

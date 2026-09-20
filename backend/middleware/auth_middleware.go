@@ -43,6 +43,13 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
+		if role, ok := claims["role"].(string); ok && role == "2fa_pending" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Two-factor authentication required. Please verify your 2FA code."})
+			c.Abort()
+			return
+		}
+
 		c.Set("user_id", uint(userIDFloat))
 		c.Set("email", claims["email"])
 		c.Set("role", claims["role"])

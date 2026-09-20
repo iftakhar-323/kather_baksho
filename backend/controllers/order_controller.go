@@ -8,6 +8,7 @@ import (
 	"kather_baksho/database"
 	"kather_baksho/mailer"
 	"kather_baksho/models"
+	"kather_baksho/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -193,6 +194,14 @@ func Checkout(c *gin.Context) {
 	if err := database.DB.Select("email").First(&u, userID).Error; err == nil && u.Email != "" {
 		_ = mailer.Send(mailer.OrderPlaced(u.Email, uintToStr(order.ID), finalTotal))
 	}
+
+	// Publish asynchronous 'order.created' event to Redis Streams message bus
+	_, _ = services.PublishEvent("order.created", map[string]interface{}{
+		"order_id":    order.ID,
+		"user_id":     userID,
+		"total_price": finalTotal,
+		"items_count": len(order.Items),
+	})
 
 	c.JSON(http.StatusCreated, gin.H{
 		"order":          order,

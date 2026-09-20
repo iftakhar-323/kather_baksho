@@ -10,6 +10,7 @@ import (
 	"kather_baksho/middleware"
 	"kather_baksho/models"
 	"kather_baksho/routes"
+	"kather_baksho/services"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,8 @@ func main() {
 	database.ConnectDatabase()
 	database.InitRedis()
 	database.ConnectMongoDB()
+	services.InitEventBus()
+	services.InitStorage()
 	if err := database.DB.AutoMigrate(
 		&models.Product{},
 		&models.User{},
@@ -76,6 +79,8 @@ func main() {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
 
+	database.InitFTS()
+
 	router := gin.New()
 	router.Use(gin.Recovery())
 	router.Use(middleware.RequestIDMiddleware())
@@ -83,6 +88,7 @@ func main() {
 	router.Use(middleware.RateLimiter())
 	router.Use(middleware.PrometheusMetricsMiddleware())
 	router.Use(middleware.IdempotencyMiddleware())
+	router.Use(middleware.ChaosMiddleware())
 
 	allowedOrigins := []string{
 		"http://localhost:5173",
@@ -158,6 +164,9 @@ func main() {
 	routes.TelemetryRoutes(router)
 	routes.WebSocketRoutes(router)
 	routes.DocsRoutes(router)
+	routes.EventRoutes(router)
+	routes.MediaRoutes(router)
+	routes.ChaosRoutes(router)
 
 	port := os.Getenv("PORT")
 	if port == "" {

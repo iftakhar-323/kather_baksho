@@ -53,6 +53,22 @@ export default function AlgorithmVisualizer() {
   const [mlData, setMlData] = useState(null);
   const [mlLoading, setMlLoading] = useState(false);
 
+  // --- Chaos Engineering State ---
+  const [chaosConfig, setChaosConfig] = useState({
+    enabled: false,
+    latency_ms: 0,
+    error_rate_percent: 0,
+    target_prefixes: [],
+  });
+  const [chaosStats, setChaosStats] = useState({
+    total_requests: 0,
+    delayed_requests: 0,
+    injected_failures: 0,
+    circuit_breakers: {},
+  });
+  const [chaosLoading, setChaosLoading] = useState(false);
+  const [simResults, setSimResults] = useState([]);
+
   // --- Dijkstra Algorithm ---
   const runDijkstra = () => {
     setAnimating(true);
@@ -214,9 +230,88 @@ export default function AlgorithmVisualizer() {
     }
   };
 
+  const fetchChaosData = async () => {
+    try {
+      const [cfgRes, statRes] = await Promise.all([
+        API.get("/chaos/config"),
+        API.get("/chaos/stats"),
+      ]);
+      setChaosConfig(cfgRes.data);
+      setChaosStats(statRes.data);
+    } catch (err) {
+      console.error("Failed to load chaos configuration", err);
+    }
+  };
+
+  const handleUpdateChaos = async (newConfig) => {
+    setChaosLoading(true);
+    try {
+      const res = await API.post("/chaos/config", newConfig);
+      setChaosConfig(res.data.config);
+      await fetchChaosData();
+    } catch (err) {
+      alert("Failed to update chaos configuration: " + err.message);
+    } finally {
+      setChaosLoading(false);
+    }
+  };
+
+  const handleResetChaos = async () => {
+    setChaosLoading(true);
+    try {
+      const res = await API.post("/chaos/reset");
+      setChaosConfig(res.data.config);
+      setChaosStats(res.data.stats);
+      setSimResults([]);
+      alert("Baseline restored! All injected faults and circuit breakers have been reset.");
+    } catch (err) {
+      alert("Failed to reset chaos: " + err.message);
+    } finally {
+      setChaosLoading(false);
+    }
+  };
+
+  const handleTripBreaker = async (name) => {
+    try {
+      await API.post("/chaos/trip-breaker", { name });
+      await fetchChaosData();
+    } catch (err) {
+      alert("Failed to trip breaker: " + err.message);
+    }
+  };
+
+  const runChaosSimulation = async () => {
+    setSimResults([]);
+    const results = [];
+    for (let i = 1; i <= 10; i++) {
+      const start = performance.now();
+      try {
+        const res = await API.get("/products?limit=1");
+        const duration = Math.round(performance.now() - start);
+        results.push({ id: i, status: res.status, duration, ok: true });
+      } catch (err) {
+        const duration = Math.round(performance.now() - start);
+        results.push({
+          id: i,
+          status: err.response?.status || 503,
+          duration,
+          ok: false,
+          error: err.response?.data?.error || err.message,
+        });
+      }
+      setSimResults([...results]);
+    }
+    await fetchChaosData();
+  };
+
   useEffect(() => {
     if (activeTab === "ml" && !mlData) {
       fetchMlComparison();
+    }
+    if (activeTab === "chaos") {
+      fetchChaosData();
+      const interval = setInterval(fetchChaosData, 3000);
+      return () => clearInterval(interval);
     }
   }, [activeTab]);
 
@@ -228,7 +323,7 @@ export default function AlgorithmVisualizer() {
           ⚡ Engineering & Algorithm Studio
         </h1>
         <p style={{ color: "#64748b", margin: 0, fontSize: "15px" }}>
-          Interactive visualization of supply chain optimization, nursery bin-packing, and machine learning telemetry.
+          Interactive visualization of supply chain optimization, nursery bin-packing, resilience testing, and machine learning telemetry.
         </p>
       </div>
 
@@ -238,6 +333,7 @@ export default function AlgorithmVisualizer() {
           { id: "route", label: "🗺️ Delivery Route (Dijkstra / TSP)" },
           { id: "binpacking", label: "📦 Nursery Box Packing (Bin Packing)" },
           { id: "ml", label: "🧠 ML Model Benchmarking (MobileNet vs ResNet)" },
+          { id: "chaos", label: "💥 Chaos & Resilience Studio (Fault Injection)" },
         ].map((t) => (
           <button
             key={t.id}
@@ -600,6 +696,228 @@ export default function AlgorithmVisualizer() {
                 <p style={{ margin: "4px 0 0 0", color: "#334155" }}>
                   {mlData.latency_speedup}. {mlData.recommendation}
                 </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── TAB 4: Chaos & Resilience Studio ── */}
+      {activeTab === "chaos" && (
+        <div style={{ background: "#ffffff", padding: "24px", borderRadius: "16px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div>
+              <h2 style={{ fontSize: "20px", fontWeight: "700", color: "#0f172a", margin: "0 0 6px 0" }}>
+                💥 Chaos Engineering & Circuit Breaker Studio
+              </h2>
+              <p style={{ color: "#64748b", margin: 0, fontSize: "14px" }}>
+                Inject controlled network latency, server fault spikes, and test automatic Circuit Breaker tripping without breaking production.
+              </p>
+            </div>
+            <button
+              onClick={handleResetChaos}
+              style={{
+                padding: "8px 16px",
+                background: "#f1f5f9",
+                color: "#0f172a",
+                border: "1px solid #cbd5e1",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
+            >
+              🔄 Reset to Healthy Baseline
+            </button>
+          </div>
+
+          {/* Master Switch & Live Counters */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
+            <div style={{ padding: "16px", borderRadius: "10px", background: chaosConfig.enabled ? "#fee2e2" : "#f0fdf4", border: chaosConfig.enabled ? "1px solid #f87171" : "1px solid #86efac" }}>
+              <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>CHAOS ENGINE STATUS</div>
+              <div style={{ fontSize: "18px", fontWeight: "800", color: chaosConfig.enabled ? "#dc2626" : "#16a34a", margin: "6px 0" }}>
+                {chaosConfig.enabled ? "🔥 ACTIVE FAULT" : "🛡️ INACTIVE (SAFE)"}
+              </div>
+              <button
+                onClick={() => handleUpdateChaos({ ...chaosConfig, enabled: !chaosConfig.enabled })}
+                style={{
+                  width: "100%",
+                  padding: "6px 10px",
+                  background: chaosConfig.enabled ? "#dc2626" : "#16a34a",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                }}
+              >
+                {chaosConfig.enabled ? "Disarm Chaos" : "Arm / Enable Chaos"}
+              </button>
+            </div>
+
+            <div style={{ padding: "16px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>TOTAL REQUESTS</div>
+              <div style={{ fontSize: "24px", fontWeight: "800", color: "#0f172a", marginTop: "8px" }}>
+                {chaosStats.total_requests}
+              </div>
+            </div>
+
+            <div style={{ padding: "16px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>DELAYED (LATENCY)</div>
+              <div style={{ fontSize: "24px", fontWeight: "800", color: "#d97706", marginTop: "8px" }}>
+                {chaosStats.delayed_requests}
+              </div>
+            </div>
+
+            <div style={{ padding: "16px", borderRadius: "10px", background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "600" }}>INJECTED FAILURES</div>
+              <div style={{ fontSize: "24px", fontWeight: "800", color: "#dc2626", marginTop: "8px" }}>
+                {chaosStats.injected_failures}
+              </div>
+            </div>
+          </div>
+
+          {/* Fault Sliders */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "24px", background: "#f8fafc", padding: "20px", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <div>
+              <label style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
+                <span>Artificial Latency Delay:</span>
+                <span style={{ color: "#d97706", fontWeight: "700" }}>{chaosConfig.latency_ms} ms</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="2000"
+                step="50"
+                value={chaosConfig.latency_ms}
+                onChange={(e) => setChaosConfig({ ...chaosConfig, latency_ms: parseInt(e.target.value) })}
+                style={{ width: "100%", cursor: "pointer" }}
+              />
+              <div style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
+                Simulates cellular 3G network jitter and slow third-party responses.
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
+                <span>Error Injection Probability:</span>
+                <span style={{ color: "#dc2626", fontWeight: "700" }}>{chaosConfig.error_rate_percent}%</span>
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="50"
+                step="5"
+                value={chaosConfig.error_rate_percent}
+                onChange={(e) => setChaosConfig({ ...chaosConfig, error_rate_percent: parseInt(e.target.value) })}
+                style={{ width: "100%", cursor: "pointer" }}
+              />
+              <div style={{ fontSize: "12px", color: "#64748b", marginTop: "4px" }}>
+                Randomly throws HTTP 503 Service Unavailable to test client retry logic.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
+            <button
+              onClick={() => handleUpdateChaos(chaosConfig)}
+              disabled={chaosLoading}
+              style={{
+                padding: "10px 20px",
+                background: "#0f172a",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              {chaosLoading ? "Applying..." : "Save Fault Parameters"}
+            </button>
+            <button
+              onClick={runChaosSimulation}
+              style={{
+                padding: "10px 20px",
+                background: "#2563eb",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              🚀 Fire 10 Simulated Requests
+            </button>
+          </div>
+
+          {/* Circuit Breakers Health Grid */}
+          <div style={{ marginBottom: "24px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b", marginBottom: "12px" }}>
+              🔌 Circuit Breakers State Monitor
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
+              {Object.entries(chaosStats.circuit_breakers || {}).map(([name, state]) => (
+                <div
+                  key={name}
+                  style={{
+                    padding: "14px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    background: state === "CLOSED" ? "#f0fdf4" : state === "OPEN" ? "#fef2f2" : "#fefce8",
+                  }}
+                >
+                  <div style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", marginBottom: "4px" }}>{name}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: "800",
+                        color: state === "CLOSED" ? "#16a34a" : state === "OPEN" ? "#dc2626" : "#ca8a04",
+                      }}
+                    >
+                      {state === "CLOSED" ? "● CLOSED (HEALTHY)" : state === "OPEN" ? "■ OPEN (TRIPPED)" : "▲ HALF-OPEN"}
+                    </span>
+                    <button
+                      onClick={() => handleTripBreaker(name)}
+                      style={{
+                        padding: "2px 6px",
+                        fontSize: "11px",
+                        background: "#fff",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Trip
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Simulation Output */}
+          {simResults.length > 0 && (
+            <div style={{ padding: "16px", background: "#f8fafc", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <div style={{ fontSize: "14px", fontWeight: "700", marginBottom: "10px" }}>Simulated Request Stream:</div>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                {simResults.map((r) => (
+                  <div
+                    key={r.id}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      background: r.ok ? "#dcfce7" : "#fee2e2",
+                      color: r.ok ? "#15803d" : "#dc2626",
+                      border: r.ok ? "1px solid #86efac" : "1px solid #f87171",
+                    }}
+                  >
+                    #{r.id} {r.status} ({r.duration}ms)
+                  </div>
+                ))}
               </div>
             </div>
           )}
