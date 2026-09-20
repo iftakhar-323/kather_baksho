@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"katherbox/database"
+	"katherbox/middleware"
 	"katherbox/models"
 	"katherbox/routes"
 
@@ -72,7 +73,11 @@ func main() {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
 
-	router := gin.Default()
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.Use(middleware.RequestIDMiddleware())
+	router.Use(middleware.StructuredLogger())
+	router.Use(middleware.RateLimiter())
 
 	allowedOrigins := []string{
 		"http://localhost:5173",
@@ -92,8 +97,8 @@ func main() {
 
 	corsConfig := cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID"},
+		ExposeHeaders:    []string{"Content-Length", "X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}
@@ -106,6 +111,8 @@ func main() {
 	}
 
 	router.Use(cors.New(corsConfig))
+
+	routes.HealthRoutes(router)
 
 	routes.ProductRoutes(router)
 	routes.AuthRoutes(router)
