@@ -22,6 +22,7 @@ func main() {
 	_ = godotenv.Load()
 
 	database.ConnectDatabase()
+	database.InitRedis()
 	if err := database.DB.AutoMigrate(
 		&models.Product{},
 		&models.User{},

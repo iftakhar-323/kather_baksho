@@ -11,6 +11,7 @@ func ProductRoutes(router *gin.Engine) {
 productGroup := router.Group("/api/products")
 {
 // List + filter + sort
+productGroup.GET("", controllers.GetProducts)
 productGroup.GET("/", controllers.GetProducts)
 productGroup.GET("/autocomplete", controllers.Autocomplete)
 productGroup.GET("/suggest", controllers.SuggestProducts)
@@ -29,6 +30,7 @@ productGroup.GET("/fbt/:id", controllers.GetFBT)
 productGroup.POST("/:id/view", controllers.TrackView)
 
 // Admin CRUD
+productGroup.POST("", middleware.AuthMiddleware(), middleware.AdminMiddleware(), controllers.CreateProduct)
 productGroup.POST("/", middleware.AuthMiddleware(), middleware.AdminMiddleware(), controllers.CreateProduct)
 productGroup.PUT("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), controllers.UpdateProduct)
 productGroup.DELETE("/:id", middleware.AuthMiddleware(), middleware.AdminMiddleware(), controllers.DeleteProduct)

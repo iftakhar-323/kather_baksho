@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
 	"katherbox/database"
 	"katherbox/models"
@@ -30,11 +32,24 @@ func slugifyCategory(s string) string {
 
 // GET /api/categories
 func ListCategories(c *gin.Context) {
+	cacheKey := "categories:all"
+	if cached, ok := database.CacheGet(cacheKey); ok {
+		c.Header("X-Cache", "HIT")
+		c.Data(http.StatusOK, "application/json; charset=utf-8", []byte(cached))
+		return
+	}
+
 	var cats []models.Category
 	database.DB.Order("position asc, name asc").Find(&cats)
 	if cats == nil {
 		cats = []models.Category{}
 	}
+
+	if jsonBytes, err := json.Marshal(cats); err == nil {
+		database.CacheSet(cacheKey, string(jsonBytes), 5*time.Minute)
+	}
+
+	c.Header("X-Cache", "MISS")
 	c.JSON(http.StatusOK, cats)
 }
 
@@ -76,6 +91,7 @@ func AdminCreateCategory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	database.InvalidateCachePrefix("categories:")
 	c.JSON(http.StatusCreated, cat)
 }
 
@@ -118,6 +134,7 @@ func AdminUpdateCategory(c *gin.Context) {
 		cat.Active = *body.Active
 	}
 	database.DB.Save(&cat)
+	database.InvalidateCachePrefix("categories:")
 	c.JSON(http.StatusOK, cat)
 }
 
@@ -130,5 +147,6 @@ func AdminDeleteCategory(c *gin.Context) {
 		return
 	}
 	database.DB.Delete(&cat)
+	database.InvalidateCachePrefix("categories:")
 	c.JSON(http.StatusOK, gin.H{"deleted": true})
 }

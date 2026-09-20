@@ -69,6 +69,19 @@ func ReadinessCheck(c *gin.Context) {
 		"circuit_breakers": utils.GetAllCircuitBreakers(),
 	}
 
+	var redisStatus = "disabled"
+	if database.RedisClient != nil {
+		if err := database.RedisPing(); err != nil {
+			redisStatus = "unreachable: " + err.Error()
+		} else {
+			redisStatus = "connected"
+		}
+	}
+	stats["cache"] = gin.H{
+		"provider": "redis",
+		"status":   redisStatus,
+	}
+
 	if dbStatus != "connected" {
 		c.JSON(http.StatusServiceUnavailable, stats)
 		return

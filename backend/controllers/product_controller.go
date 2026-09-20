@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -34,6 +35,16 @@ import (
 //	sort          — newest | price_asc | price_desc | name_asc | popular (view_count)
 //	page, limit
 func GetProducts(c *gin.Context) {
+	cacheKey := "products:query:" + c.Request.URL.RawQuery
+	if c.Request.URL.RawQuery == "" {
+		cacheKey = "products:query:default"
+	}
+	if cached, ok := database.CacheGet(cacheKey); ok {
+		c.Header("X-Cache", "HIT")
+		c.Data(http.StatusOK, "application/json; charset=utf-8", []byte(cached))
+		return
+	}
+
 	var products []models.Product
 	q := database.DB.Model(&models.Product{})
 
@@ -124,13 +135,20 @@ func GetProducts(c *gin.Context) {
 
 	q.Limit(limit).Offset((page - 1) * limit).Find(&products)
 
-	c.JSON(http.StatusOK, gin.H{
+	resp := gin.H{
 		"items":       products,
 		"page":        page,
 		"limit":       limit,
 		"total":       total,
 		"total_pages": int((total + int64(limit) - 1) / int64(limit)),
-	})
+	}
+
+	if jsonBytes, err := json.Marshal(resp); err == nil {
+		database.CacheSet(cacheKey, string(jsonBytes), 2*time.Minute)
+	}
+
+	c.Header("X-Cache", "MISS")
+	c.JSON(http.StatusOK, resp)
 }
 
 // GET single product
@@ -185,6 +203,7 @@ func CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product: " + err.Error()})
 		return
 	}
+	database.InvalidateCachePrefix("products:")
 	c.JSON(http.StatusCreated, product)
 }
 
@@ -200,11 +219,11 @@ func UpdateProduct(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	database.DB.Save(&product)
 	if err := database.DB.Save(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product: " + err.Error()})
 		return
 	}
+	database.InvalidateCachePrefix("products:")
 	c.JSON(http.StatusOK, product)
 }
 
@@ -216,11 +235,11 @@ func DeleteProduct(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
-	database.DB.Delete(&product)
 	if err := database.DB.Delete(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product: " + err.Error()})
 		return
 	}
+	database.InvalidateCachePrefix("products:")
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted"})
 }
 
