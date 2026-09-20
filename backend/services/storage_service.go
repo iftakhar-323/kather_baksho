@@ -107,11 +107,11 @@ func GetStorageStatus() map[string]interface{} {
 	localMediaMu.RUnlock()
 
 	return map[string]interface{}{
-		"status":          status,
-		"service":         "MinIO S3 Compatible Object Storage",
-		"endpoint":        endpoint,
-		"bucket":          MinioBucket,
-		"console_url":     "http://localhost:9006",
+		"status":           status,
+		"service":          "MinIO S3 Compatible Object Storage",
+		"endpoint":         endpoint,
+		"bucket":           MinioBucket,
+		"console_url":      "http://localhost:9006",
 		"uploaded_objects": cachedCount,
 	}
 }

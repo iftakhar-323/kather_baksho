@@ -53,11 +53,11 @@ func SetupTOTP(c *gin.Context) {
 	otpauthURI := services.GenerateTOTPURI(secret, user.Email)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":    "Scan QR code or enter secret manually into Google Authenticator or Authy",
-		"secret":     secret,
+		"message":     "Scan QR code or enter secret manually into Google Authenticator or Authy",
+		"secret":      secret,
 		"otpauth_uri": otpauthURI,
-		"email":      user.Email,
-		"issuer":     "KatherBaksho",
+		"email":       user.Email,
+		"issuer":      "KatherBaksho",
 	})
 }
 
