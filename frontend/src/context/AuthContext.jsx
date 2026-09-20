@@ -9,24 +9,36 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
+    }
 
-    // If we have a token, refresh user info from the server on mount.
-    // This keeps the navbar/role badge in sync after admin promotion or profile edits.
-    if (token && !storedUser) {
+    // Always validate token against server on mount
+    if (token) {
       getMe()
         .then((res) => {
           const u = res.data;
           localStorage.setItem("user", JSON.stringify(u));
           setUser(u);
         })
-        .catch(() => {
-          // token invalid — clear it silently
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setUser(null);
+        .catch((err) => {
+          if (err.response?.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setUser(null);
+          }
         });
     }
+
+    const handleAuthLogout = () => {
+      setUser(null);
+    };
+    window.addEventListener("auth:logout", handleAuthLogout);
+    return () => window.removeEventListener("auth:logout", handleAuthLogout);
   }, []);
 
   const login = (userData, token) => {

@@ -147,6 +147,14 @@ export default function Cart({ onOrderPlaced }) {
       <div className="empty">
         <div className="emoji">⚠️</div>
         <h3 className="text-danger">{error}</h3>
+        <button
+          className="btn btn-primary mt-16"
+          onClick={() => {
+            window.__katherboxSetView?.("login") || (window.location.href = "/login");
+          }}
+        >
+          {t("cart.loginPromptAction") || "Sign In"}
+        </button>
       </div>
     );
   }
