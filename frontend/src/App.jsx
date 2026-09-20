@@ -53,6 +53,7 @@ const Care = lazy(() => import("./pages/Care"));
 const OrderDetail = lazy(() => import("./pages/OrderDetail"));
 const GiftCards = lazy(() => import("./pages/GiftCards"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const AlgorithmVisualizer = lazy(() => import("./pages/AlgorithmVisualizer"));
 import GlobalSearch from "./components/GlobalSearch";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LangToggle from "./components/LangToggle";
@@ -70,6 +71,7 @@ const PRIMARY_NAV_ITEMS = [
 // Overflow items — surfaced through a single "More" dropdown so the bar stays
 // tidy. Admin link is appended dynamically when the user has admin role.
 const MORE_NAV_ITEMS = [
+  { key: "algorithms",    tKey: "nav.algorithms",    emoji: "⚡" },
   { key: "subscriptions", tKey: "nav.subscriptions", emoji: "📦" },
   { key: "consultations", tKey: "nav.consultations", emoji: "🌱" },
   { key: "care",          tKey: "nav.care",          emoji: "🌿" },
@@ -93,7 +95,7 @@ const CUSTOMER_ONLY = new Set([
   "cart", "orders", "order-detail", "wishlist",
   "seasonal", "subscriptions", "consultations", "corporate",
   "community", "loyalty", "blog", "care",
-  "gift-cards", "dashboard",
+  "gift-cards", "dashboard", "algorithms",
 ]);
 
 // View → path. Unknown keys fall back to "/".
@@ -675,6 +677,7 @@ function MainApp() {
           <Route path="/care"          element={<CustomerOnly isAdmin={isAdmin}><Care /></CustomerOnly>} />
           <Route path="/gift-cards"    element={<CustomerOnly isAdmin={isAdmin}><GiftCards /></CustomerOnly>} />
           <Route path="/dashboard"    element={<CustomerOnly isAdmin={isAdmin}><Dashboard /></CustomerOnly>} />
+          <Route path="/algorithms"   element={<CustomerOnly isAdmin={isAdmin}><AlgorithmVisualizer /></CustomerOnly>} />
 
           {/* Merged pages — old bookmarked URLs redirect into the new tabs */}
           <Route path="/reminders"   element={<Navigate to="/care" replace />} />
