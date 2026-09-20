@@ -895,7 +895,23 @@ def test_chaos_engineering_resilience():
     assert reset_data["config"]["enabled"] is False
     assert reset_data["stats"]["circuit_breakers"].get("test-resilience-breaker") == "CLOSED"
 
-# 60. Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
+# 60. Dedicated IoT & AI Botanical Intelligence Microservice Direct Probe
+def test_iot_ai_microservice():
+    r = requests.get("http://localhost:8089/health", timeout=5)
+    assert r.status_code == 200, f"IoT-AI direct health probe failed: {r.status_code}"
+    data = r.json()
+    assert data.get("service") == "kather_baksho-iot-ai"
+    assert data.get("status") == "healthy"
+    assert data.get("mongodb") == "connected"
+    assert data.get("redis") == "connected"
+
+    # Verify Traefik routes to the dedicated microservice with correlation ID propagation
+    test_corr_id = "test-corr-trace-999"
+    r_corr = requests.get("http://localhost:8085/api/iot/plants", headers={"X-Correlation-ID": test_corr_id}, timeout=5)
+    assert r_corr.status_code == 200
+    assert r_corr.headers.get("X-Correlation-ID") == test_corr_id, "X-Correlation-ID must propagate across gateway"
+
+# 61. Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
 def test_concurrency_flash_sale_benchmark():
     try:
         from stress_test import run_flash_sale_benchmark
@@ -965,6 +981,7 @@ tests = [
     ("Local MinIO S3 Object Storage & Media Pipeline", test_minio_s3_storage),
     ("Enterprise RFC 6238 TOTP Two-Factor Authentication", test_enterprise_2fa_totp),
     ("Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)", test_chaos_engineering_resilience),
+    ("Dedicated IoT & AI Botanical Intelligence Microservice", test_iot_ai_microservice),
     ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark)
 ]
 

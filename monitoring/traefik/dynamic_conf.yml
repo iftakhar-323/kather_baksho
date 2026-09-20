@@ -23,6 +23,13 @@ http:
       service: "worker-svc"
       priority: 20
 
+    iot-ai:
+      rule: "PathPrefix(`/api/iot`) || PathPrefix(`/api/ai`) || PathPrefix(`/api/ml`)"
+      entryPoints:
+        - "web"
+      service: "iot-ai-svc"
+      priority: 30
+
   middlewares:
     worker-strip:
       stripPrefix:
@@ -44,3 +51,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://worker-ts:8083"
+
+    iot-ai-svc:
+      loadBalancer:
+        servers:
+          - url: "http://iot-ai-service:8089"

@@ -7,16 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/iot_ai_service/database"
+	"kather_baksho/iot_ai_service/models"
+	"kather_baksho/iot_ai_service/services"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// In-memory fallback dataset in case MongoDB is temporarily starting or offline
 var fallbackMonitoredPlants = []models.PlantTelemetry{
 	{
 		PlantID:         1,
@@ -75,10 +74,6 @@ var fallbackMonitoredPlants = []models.PlantTelemetry{
 // IngestPlantTelemetry receives an IoT sensor payload and saves it into MongoDB.
 // POST /api/iot/telemetry
 func IngestPlantTelemetry(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	var payload models.PlantTelemetry
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid telemetry payload: " + err.Error()})
@@ -121,6 +116,11 @@ func IngestPlantTelemetry(c *gin.Context) {
 		}
 	}
 
+	// Emit event to Redis Stream if an alert status is triggered
+	if payload.Status != "Optimal" {
+		services.PublishTelemetryAlert(payload.PlantID, payload.PlantName, payload.Status, payload.AlertMessage)
+	}
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message":   "IoT telemetry recorded successfully",
 		"telemetry": payload,
@@ -128,13 +128,9 @@ func IngestPlantTelemetry(c *gin.Context) {
 	})
 }
 
-// GetPlantTelemetry returns the latest snapshot of all monitored plants.
+// GetMonitoredPlants returns the latest snapshot of all monitored plants.
 // GET /api/iot/plants
 func GetMonitoredPlants(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	if database.MongoDB == nil {
 		c.Header("X-Mongo-Fallback", "active")
 		c.JSON(http.StatusOK, gin.H{
@@ -150,7 +146,6 @@ func GetMonitoredPlants(c *gin.Context) {
 
 	coll := database.MongoDB.Collection("plant_telemetry")
 
-	// Get latest entry for distinct plant_ids
 	plantIDs := []uint{1, 2, 3, 4}
 	var results []models.PlantTelemetry
 
@@ -167,7 +162,7 @@ func GetMonitoredPlants(c *gin.Context) {
 		c.Header("X-Mongo-Fallback", "seeded_memory")
 		c.JSON(http.StatusOK, gin.H{
 			"plants":    fallbackMonitoredPlants,
-			"source":    "fallback",
+			"source":    "seeded_memory",
 			"timestamp": time.Now().UTC(),
 		})
 		return
@@ -183,10 +178,6 @@ func GetMonitoredPlants(c *gin.Context) {
 // GetPlantTelemetryHistory returns historical time-series data for a specific plant.
 // GET /api/iot/telemetry/:plant_id
 func GetPlantTelemetryHistory(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	pidStr := c.Param("plant_id")
 	pid, err := strconv.Atoi(pidStr)
 	if err != nil {
@@ -203,7 +194,6 @@ func GetPlantTelemetryHistory(c *gin.Context) {
 
 	if database.MongoDB == nil {
 		c.Header("X-Mongo-Fallback", "synthetic_history")
-		// Generate synthetic 24h curve for visualization
 		var history []models.PlantTelemetry
 		baseTime := time.Now().Add(-24 * time.Hour)
 		for i := 0; i < limit; i++ {
@@ -256,10 +246,6 @@ func GetPlantTelemetryHistory(c *gin.Context) {
 // SeedIoTTelemetry populates MongoDB with realistic sensor readings.
 // POST /api/iot/seed
 func SeedIoTTelemetry(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	if database.MongoDB == nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "MongoDB connection not initialized"})
 		return

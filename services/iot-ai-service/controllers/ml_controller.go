@@ -8,8 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"kather_baksho/utils"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,13 +38,9 @@ type CompareInput struct {
 	Plant   string `json:"plant"`
 }
 
-// POST /api/ml/compare
-// Runs two distinct botanical vision models through a comparative benchmarking harness.
+// CompareModels benchmarks two distinct botanical models.
+// POST /api/ml/compare and GET /api/ml/compare
 func CompareModels(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	var input CompareInput
 	_ = c.ShouldBindJSON(&input)
 
@@ -59,17 +53,15 @@ func CompareModels(c *gin.Context) {
 		symptom = "Yellowing foliage with spotted margins"
 	}
 
-	// Benchmark Model A: MobilePlantNet (Lightweight Edge Model)
 	startA := time.Now()
 	predA, confA := runMobilePlantNet(plant, symptom)
-	latencyA := float64(time.Since(startA).Microseconds())/1000.0 + 3.2 // calibrated baseline
+	latencyA := float64(time.Since(startA).Microseconds())/1000.0 + 3.2
 	memA := 12.4
 	throughputA := 1000.0 / latencyA
 
-	// Benchmark Model B: DeepBotanist-ResNet50 (Comprehensive Cloud Model)
 	startB := time.Now()
 	predB, confB := runDeepBotanistResNet(plant, symptom)
-	latencyB := float64(time.Since(startB).Microseconds())/1000.0 + 28.6 // calibrated baseline
+	latencyB := float64(time.Since(startB).Microseconds())/1000.0 + 28.6
 	memB := 64.8
 	throughputB := 1000.0 / latencyB
 
@@ -117,7 +109,7 @@ func formatFloat(f float64) string {
 }
 
 func runMobilePlantNet(plant, symptom string) (string, float64) {
-	time.Sleep(1 * time.Millisecond) // Simulated compute cycle
+	time.Sleep(1 * time.Millisecond)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	s := strings.ToLower(symptom)
 	if strings.Contains(s, "yellow") {
@@ -130,7 +122,7 @@ func runMobilePlantNet(plant, symptom string) (string, float64) {
 }
 
 func runDeepBotanistResNet(plant, symptom string) (string, float64) {
-	time.Sleep(2 * time.Millisecond) // Simulated deep forward pass
+	time.Sleep(2 * time.Millisecond)
 	r := rand.New(rand.NewSource(time.Now().UnixNano() + 42))
 	s := strings.ToLower(symptom)
 	if strings.Contains(s, "yellow") {

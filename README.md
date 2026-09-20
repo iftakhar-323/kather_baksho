@@ -4,24 +4,28 @@
 > **100% Localhost Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite)**, **Node.js & TypeScript 5.5 Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0, MinIO S3)**, **Traefik Cloud-Native Ingress Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **RFC 6238 TOTP 2FA**, and **Chaos Engineering Studio**.
 
 [![Backend Go Tests](https://img.shields.io/badge/Go%20Unit%20Tests-Passing-brightgreen?style=flat-square&logo=go)](https://github.com/iftakhar-323/kather_baksho)
-[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-60%2F60%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-9%20Containers%20Active-blue?style=flat-square&logo=docker)](https://github.com/iftakhar-323/kather_baksho)
-[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0.3%20Swagger-teal?style=flat-square&logo=swagger)](http://localhost:8085/docs)
-[![TypeScript Microservice](https://img.shields.io/badge/TypeScript-5.5-blue?style=flat-square&logo=typescript)](https://github.com/iftakhar-323/kather_baksho)
-[![License](https://img.shields.io/badge/License-MIT-purple?style=flat-square)](LICENSE)
+[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-61%2F61%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
+[![Go Report](https://img.shields.io/badge/Go%20Backend-Production%20Ready-blue?style=flat-square&logo=go)](https://golang.org)
+[![TypeScript Worker](https://img.shields.io/badge/TypeScript%20Worker-Microservice-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-10%20Containers-blue?style=flat-square&logo=docker)](https://docker.com)
+[![Traefik](https://img.shields.io/badge/API%20Gateway-Traefik%20v3.1-informational?style=flat-square&logo=traefik)](https://traefik.io)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
+> A modern, enterprise-grade, cloud-native botanical e-commerce and smart plant care platform designed with a high-throughput **Event-Driven Microservices Architecture**, polyglot persistence, real-time rider tracking, RFC 6238 TOTP two-factor authentication, and chaos engineering resilience. Built for **100% localhost execution** with zero external cloud fees or paid third-party API dependencies.
 
 ---
 
 ## 📑 Table of Contents
-1. [📌 What is this Project?](#-what-is-this-project)
-2. [💡 What Problems Does it Solve & How Does it Make Life Easy?](#-how-it-makes-life-easy)
-3. [⭐ Special & Advanced Implementations](#-special--advanced-implementations)
-4. [🛠️ Tech Stack & Tools Used](#-tech-stack--tools)
+
+1. [📖 What is this Project?](#-what-is-this-project)
+2. [💡 How it Makes Life Easy & Solves Key Problems](#-how-it-makes-life-easy)
+3. [✨ Special & Advanced Implementations](#-special-implementations)
+4. [🛠️ Tech Stack & Tools Used](#-tech-stack--tools-used)
 5. [🎯 Why Are These Implementations Important?](#-why-important)
 6. [🌐 Local Service Map & Running Ports](#-local-service-map--running-ports)
 7. [🔐 Seeded Accounts & Credentials](#-seeded-accounts--credentials)
-8. [🚀 1-Command Quickstart](#-1-command-quickstart)
-9. [🧪 Automated Testing & Verification Suite (60/60 Tests)](#-automated-testing--verification)
+8. [🚀 1-Command Quickstart Guide](#-quickstart-guide)
+9. [🧪 Automated Testing & Verification Suite (61/61 Tests)](#-automated-testing--verification)
 10. [📁 Project Layout](#-project-layout)
 
 ---
@@ -120,12 +124,14 @@ flowchart TD
     Client["🌐 Client (Web Browser)"] -->|Port 8085| Traefik["🔀 Traefik v3.1 Ingress Gateway"]
     
     Traefik -->|/| Frontend["⚛️ React 18 + Vite (Port 8082)"]
-    Traefik -->|/api, /ws, /health| Backend["🐹 Go 1.22 REST & WS API (Port 8081)"]
+    Traefik -->|/api, /ws, /health| Backend["🐹 Go Core REST & WS API (Port 8081)"]
+    Traefik -->|/api/iot, /api/ai, /api/ml| IoTMicro["🌿 IoT & AI Plant Doctor Microservice (Port 8089)"]
     Traefik -->|/worker| Worker["🟦 Node.js + TypeScript 5.5 Worker (Port 8083)"]
     
     Backend -->|Relational Data| SQLite["📁 SQLite (WAL Mode) + FTS5 Engine"]
     Backend -->|Cache & Event Stream| Redis["⚡ Redis 7 (Cache + Streams + DLQ)"]
-    Backend -->|IoT Telemetry| Mongo["🍃 MongoDB 7.0 (Time-Series Datastore)"]
+    IoTMicro -->|IoT Telemetry| Mongo["🍃 MongoDB 7.0 (Time-Series Datastore)"]
+    IoTMicro -.->|Alert Events| Redis
     Backend -->|Media Assets| MinIO["🪣 MinIO S3 Object Storage (Port 9005)"]
     
     Prometheus["📊 Prometheus (Port 9090)"] -->|Scrapes /metrics| Backend
@@ -135,6 +141,7 @@ flowchart TD
 | Layer | Technology | Purpose in Project |
 | :--- | :--- | :--- |
 | **Backend Core** | **Go 1.22+ (Gin, GORM)** | Core REST API, business logic, WebSocket server, and event bus orchestration. |
+| **IoT & AI Microservice** | **Go 1.22+ Microservice** | Autonomous plant sensor telemetry ingestion, alert dispatch, AI diagnostics & ML benchmarking. |
 | **Worker Service** | **Node.js 20, TypeScript 5.5, PDFKit** | Vector PDF invoice generation and executive analytics reporting microservice. |
 | **Frontend SPA** | **React 18, Vite, React Router v7** | Modern responsive storefront, admin back-office, and interactive studios. |
 | **API Gateway** | **Traefik v3.1 (Cloud-Native Proxy)** | Unified ingress routing, path rewrites, WebSocket upgrades, and live telemetry. |
@@ -180,6 +187,7 @@ When the stack is running, all services are accessible on your local machine:
 | **Traefik Dashboard** | [http://localhost:8086/dashboard/](http://localhost:8086/dashboard/) | Traefik UI | Live routing table, middleware inspection & traffic counters | Direct |
 | **Storefront Web App** | [http://localhost:8082](http://localhost:8082) | React 18 SPA | Storefront, Admin Panel, AI Plant Doctor & Chaos Studio | Public |
 | **Backend REST & WS API** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Core REST endpoints, WebSocket courier radar & metrics | JWT / Session |
+| **IoT & AI Microservice** | [http://localhost:8089](http://localhost:8089) | Go 1.22 Gin | Autonomous plant sensor telemetry, AI doctor & ML comparisons | Public / JWT |
 | **Interactive Swagger UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | OpenAPI 3.0 | Complete interactive API explorer with parameter schemas | Direct |
 | **TypeScript Worker Microservice** | [http://localhost:8083](http://localhost:8083) | Node.js + TS | Microservice for PDF invoice and analytics report generation | Inter-service |
 | **MinIO S3 API** | [http://localhost:9005](http://localhost:9005) | MinIO S3 | AWS S3-compatible object storage API | `kather_baksho_admin` / `kather_baksho_s3_secret` |
@@ -232,10 +240,10 @@ docker compose down
 ---
 
 <a name="-automated-testing--verification"></a>
-## 🧪 9. Automated Testing & Verification Suite (60/60 Tests)
+## 🧪 9. Automated Testing & Verification Suite (61/61 Tests)
 
-### 1. Complete End-to-End Regression Suite (60 Tests)
-Tests all 9 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
+### 1. Complete End-to-End Regression Suite (61 Tests)
+Tests all 10 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
 
 ```bash
 python3 tests/e2e_test.py
@@ -303,10 +311,11 @@ Starting E2E test suite...
 [✓] Local MinIO S3 Object Storage & Media Pipeline
 [✓] Enterprise RFC 6238 TOTP Two-Factor Authentication
 [✓] Chaos Engineering & Resilience Studio (Fault Injection & Circuit Breakers)
+[✓] Dedicated IoT & AI Botanical Intelligence Microservice
 [✓] Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
 
 ==================================================
-Summary: 60 tests run, 60 passed, 0 failed. (100% Pass Rate)
+Summary: 61 tests run, 61 passed, 0 failed. (100% Pass Rate)
 ==================================================
 ```
 
@@ -369,7 +378,8 @@ kather_baksho/
 │   ├── tsconfig.json               # TypeScript compiler config
 │   └── nginx.conf                  # Production SPA reverse proxy
 ├── services/
-│   └── worker-ts/                  # Microservice (Node.js 20, TypeScript 5.5, PDFKit)
+│   ├── iot-ai-service/             # Autonomous Botanical Intelligence & IoT Microservice (Go)
+│   └── worker-ts/                  # Document Generation Microservice (Node.js 20, TypeScript 5.5)
 │       └── src/                    # Vector PDF invoice & sales report generators
 ├── monitoring/
 │   ├── traefik/                    # Traefik v3.1 dynamic routing configuration
@@ -380,9 +390,9 @@ kather_baksho/
 ├── deploy/
 │   └── ec2-setup.sh                # 1-Click production Ubuntu automation script
 ├── tests/
-│   ├── e2e_test.py                 # Comprehensive 60-test automated E2E test suite
+│   ├── e2e_test.py                 # Comprehensive 61-test automated E2E test suite
 │   └── stress_test.py              # Flash Sale concurrency benchmark engine
-├── docker-compose.yml              # 9-Container local orchestration stack
+├── docker-compose.yml              # 10-Container local microservices orchestration stack
 └── README.md                       # ← You are here!
 ```
 

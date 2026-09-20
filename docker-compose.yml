@@ -20,6 +20,7 @@ services:
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=kather_baksho_iot
       - WORKER_TS_URL=http://worker-ts:8083
+      - IOT_AI_SERVICE_URL=http://iot-ai-service:8089
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -31,6 +32,8 @@ services:
       worker-ts:
         condition: service_healthy
       mongo:
+        condition: service_healthy
+      iot-ai-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
@@ -71,6 +74,40 @@ services:
       - "traefik.http.routers.worker.middlewares=worker-stripprefix"
       - "traefik.http.services.worker.loadbalancer.server.port=8083"
 
+  iot-ai-service:
+    build:
+      context: ./services/iot-ai-service
+      dockerfile: Dockerfile
+    container_name: kather_baksho-iot-ai
+    restart: unless-stopped
+    ports:
+      - "8089:8089"
+    environment:
+      - PORT=8089
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB_NAME=kather_baksho_iot
+      - REDIS_ADDR=redis:6379
+      - GIN_MODE=release
+      - ALLOWED_ORIGINS=*
+      - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8089/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.iot-ai.rule=PathPrefix(`/api/iot`) || PathPrefix(`/api/ai`) || PathPrefix(`/api/ml`)"
+      - "traefik.http.routers.iot-ai.entrypoints=web"
+      - "traefik.http.routers.iot-ai.priority=30"
+      - "traefik.http.services.iot-ai.loadbalancer.server.port=8089"
+
   frontend:
     build:
       context: ./frontend
@@ -102,6 +139,7 @@ services:
     depends_on:
       - backend
       - frontend
+      - iot-ai-service
 
   redis:
     image: redis:7-alpine

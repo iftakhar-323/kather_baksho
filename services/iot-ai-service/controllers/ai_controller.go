@@ -3,8 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"kather_baksho/services"
-	"kather_baksho/utils"
+	"kather_baksho/iot_ai_service/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,10 +16,6 @@ type DiagnoseInput struct {
 
 // POST /api/ai/diagnose
 func DiagnosePlantSymptoms(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	var input DiagnoseInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Please provide observed symptoms"})
@@ -38,10 +33,6 @@ type ChatInput struct {
 
 // POST /api/ai/chat
 func ChatWithPlantDoctor(c *gin.Context) {
-	if utils.ProxyToService(c, "IOT_AI_SERVICE_URL") {
-		return
-	}
-
 	var input ChatInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Please provide a question"})

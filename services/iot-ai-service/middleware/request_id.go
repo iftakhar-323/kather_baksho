@@ -11,8 +11,7 @@ const RequestIDHeader = "X-Request-ID"
 const CorrelationIDHeader = "X-Correlation-ID"
 const RequestIDKey = "request_id"
 
-// generateRequestID produces a 32-character hexadecimal random request ID.
-func generateRequestID() string {
+func generateID() string {
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		return "req-fallback-id"
@@ -20,7 +19,7 @@ func generateRequestID() string {
 	return hex.EncodeToString(b)
 }
 
-// RequestIDMiddleware extracts or injects unique X-Request-ID and X-Correlation-ID for every incoming request.
+// RequestIDMiddleware extracts or injects a unique X-Request-ID and X-Correlation-ID.
 func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		reqID := c.GetHeader(RequestIDHeader)
@@ -29,7 +28,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 		if reqID == "" && corrID != "" {
 			reqID = corrID
 		} else if reqID == "" {
-			reqID = generateRequestID()
+			reqID = generateID()
 		}
 
 		if corrID == "" {
