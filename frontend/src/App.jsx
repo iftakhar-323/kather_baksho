@@ -44,6 +44,7 @@ import Onboarding from "./components/Onboarding";
 import StatsCounter from "./components/StatsCounter";
 import FeaturedCollections from "./components/FeaturedCollections";
 import QuickView from "./components/QuickView";
+import AIPlantDoctorModal from "./components/AIPlantDoctorModal";
 // Sprint D — no-API feature pages
 const Loyalty = lazy(() => import("./pages/Loyalty"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -582,6 +583,8 @@ function MainApp() {
   const [quickViewId, setQuickViewId] = useState(null);
   // Currently-opened order (used by OrderDetail)
   const [orderCtx, setOrderCtx] = useState(null);
+  // AI Plant Doctor modal state
+  const [showAiDoctor, setShowAiDoctor] = useState(false);
 
   // Staff & admin both get the workspace shell and are kept out of the
   // customer-only pages.
@@ -597,10 +600,12 @@ function MainApp() {
       navigate("/orders/" + (order?.id ?? order?.ID));
     };
     window.__katherboxOpenQuickView = (id) => setQuickViewId(id);
+    window.__katherboxOpenAiDoctor = () => setShowAiDoctor(true);
     return () => {
       delete window.__katherboxSetView;
       delete window.__katherboxOpenOrder;
       delete window.__katherboxOpenQuickView;
+      delete window.__katherboxOpenAiDoctor;
     };
   }, [navigate]);
 
@@ -692,6 +697,41 @@ function MainApp() {
         />
       )}
       {!isAdmin && <CompareDrawer />}
+
+      {!isAdmin && (
+        <button
+          onClick={() => setShowAiDoctor(true)}
+          title="AI Plant Doctor"
+          aria-label="Open AI Plant Doctor"
+          style={{
+            position: "fixed",
+            bottom: "24px",
+            right: "24px",
+            zIndex: 899,
+            background: "linear-gradient(135deg, #16a34a, #15803d)",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "50px",
+            padding: "12px 20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "14px",
+            fontWeight: "700",
+            boxShadow: "0 10px 25px -5px rgba(22, 163, 74, 0.4), 0 8px 10px -6px rgba(22, 163, 74, 0.2)",
+            cursor: "pointer",
+          }}
+        >
+          <span style={{ fontSize: "18px" }}>🩺🌿</span>
+          <span>AI Plant Doctor</span>
+        </button>
+      )}
+
+      <AIPlantDoctorModal
+        isOpen={showAiDoctor}
+        onClose={() => setShowAiDoctor(false)}
+      />
+
       <Footer />
     </div>
   );

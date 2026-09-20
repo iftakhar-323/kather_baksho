@@ -126,6 +126,7 @@ func main() {
 	routes.CartRoutes(router)
 	routes.OrderRoutes(router)
 	routes.PaymentRoutes(router)
+	routes.AIRoutes(router)
 	routes.WishlistRoutes(router)
 	routes.NotificationRoutes(router)
 	routes.CouponRoutes(router)
