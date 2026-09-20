@@ -17,6 +17,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD:-kather_baksho_secret}
       - DB_NAME=${DB_NAME:-kather_baksho}
       - REDIS_ADDR=redis:6379
+      - WORKER_TS_URL=http://worker-ts:8083
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -25,8 +26,28 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      worker-ts:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  worker-ts:
+    build:
+      context: ./services/worker-ts
+      dockerfile: Dockerfile
+    container_name: kather_baksho-worker-ts
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - PORT=8083
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8083/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 3

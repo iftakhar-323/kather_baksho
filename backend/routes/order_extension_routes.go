@@ -15,8 +15,9 @@ func OrderExtensionRoutes(router *gin.Engine) {
 	router.POST("/api/orders/:id/events", auth, controllers.AddOrderEvent)
 	router.POST("/api/orders/:id/events/admin", auth, middleware.StaffMiddleware(), controllers.AddOrderEvent)
 
-	// Invoice + receipt (HTML, browser-printable)
+	// Invoice + receipt (HTML & TypeScript PDF Microservice)
 	router.GET("/api/orders/:id/invoice", auth, controllers.InvoiceHTML)
+	router.GET("/api/orders/:id/invoice/pdf", auth, controllers.InvoicePDF)
 	router.GET("/api/orders/:id/receipt", auth, controllers.ReceiptHTML)
 
 	// Returns / Refunds / Exchanges

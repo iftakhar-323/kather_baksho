@@ -11,9 +11,11 @@ backend/*.orig
 backend/*.db.bak*
 backend/*.db-preseed*
 
-# Frontend
+# Frontend & Services
 frontend/node_modules/
 frontend/dist/
+services/**/node_modules/
+services/**/dist/
 
 # OS/Editor
 .DS_Store

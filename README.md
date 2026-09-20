@@ -28,6 +28,7 @@ cd kather_baksho
 | **Frontend Web App** | [http://localhost:8082](http://localhost:8082) | Storefront, Customer Portal, Admin Panel, AI Doctor & Algorithm Studio | Public / Demo User |
 | **Algorithm Studio** | [http://localhost:8082/algorithms](http://localhost:8082/algorithms) | Interactive Dijkstra Routing & Bin Packing Visualizer | Direct Navigation |
 | **Backend REST API** | [http://localhost:8081](http://localhost:8081) | High-throughput Go REST API with CORS, Metrics & Caching | `admin@kather_baksho.com` / `Admin@12345` |
+| **TypeScript Worker Service** | [http://localhost:8083](http://localhost:8083) | Node.js & TypeScript microservice for PDF Invoices & Reports | Public API / Inter-service |
 | **Prometheus Telemetry** | [http://localhost:9090](http://localhost:9090) | Scrapes backend `/metrics` every 5 seconds | Direct Access |
 | **Grafana Dashboard** | [http://localhost:3000](http://localhost:3000) | Pre-provisioned Kather_Baksho Observability Dashboard | `admin` / `admin` |
 | **Redis Cache** | `localhost:6380` (Internal `6379`) | In-memory read-through cache & prefix invalidation | Passwordless local |
@@ -114,6 +115,17 @@ Every component below was engineered, tested, and verified:
   - Re-validates tokens against `/api/auth/me` on application mount to prevent stale/invalid `localStorage` sessions.
   - Added explicit Sign-In recovery buttons to cart and error views.
 
+### 7. 🚀 Phase 7: Node.js & TypeScript Worker Microservice
+- **Dedicated Containerized Worker**: Running on port `8083` (`kather_baksho-worker-ts`) built with Node.js, Express, and strict TypeScript.
+- **Enterprise PDF Generation Engine**:
+  - `POST /api/v1/invoices/generate`: Generates branded botanical PDF invoices formatted for print and digital dispatch.
+  - `POST /api/v1/reports/sales-pdf`: Generates executive sales and analytics reports with KPI cards and categorical breakdowns.
+- **Go Backend Microservice Bridge**:
+  - `GET /api/orders/:id/invoice/pdf`: Authenticated endpoint forwarding order data to the TypeScript worker and streaming real `%PDF` bytes back to the user.
+  - `GET /api/analytics/report/pdf`: Admin endpoint compiling real-time database sales data and requesting executive PDF rendering.
+- **Frontend One-Click Download**:
+  - Integrated "Official PDF (TS Worker)" button in order invoice modal with asynchronous stream handling.
+
 ---
 
 ## 🧪 Automated Testing & Verification
@@ -153,16 +165,21 @@ go test -v ./...
 === RUN   TestCircuitBreakerFallback
 --- PASS: TestCircuitBreakerFallback (0.00s)
 PASS
+ok  	kather_baksho/controllers	0.011s
+ok  	kather_baksho/database	(cached)
+ok  	kather_baksho/middleware	(cached)
+ok  	kather_baksho/services	(cached)
+ok  	kather_baksho/utils	(cached)
 ```
 
-### 2. Full End-to-End Regression Test Suite (40/40 Passing)
-Runs complete end-to-end integration tests covering customer journeys, authentication, payments, stock reservation, AI diagnostics, ML benchmarks, Redis caching, and database health:
+### 2. Full End-to-End Regression Suite (44 Tests)
+To run the automated integration test suite across all services:
 
 ```bash
-python3 scratch/e2e_test.py
+python3 tests/e2e_test.py
 ```
 
-**Output:**
+**Results:**
 ```
 Starting E2E test suite...
 [✓] Health / Get Products
@@ -205,8 +222,12 @@ Starting E2E test suite...
 [✓] Redis Read-Through Caching & Cache-HIT
 [✓] Redis Cache Invalidation on Admin Mutation
 [✓] Multi-Database Health & Readiness Probe
+[✓] Node.js & TypeScript Worker Health Probe
+[✓] Node.js & TypeScript Direct PDF Generation
+[✓] Go Backend PDF Invoice Proxy
+[✓] Go Backend Analytics Executive Report PDF
 
-Summary: 40 tests run, 40 passed, 0 failed.
+Summary: 44 tests run, 44 passed, 0 failed.
 ```
 
 ---

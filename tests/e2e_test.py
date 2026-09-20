@@ -486,6 +486,49 @@ def test_multidb_health():
     assert data.get("cache", {}).get("provider") == "redis", "Cache provider must be redis"
     assert data.get("cache", {}).get("status") == "connected", "Redis must be connected"
 
+# 41. Node.js & TypeScript Worker Health Probe
+def test_worker_health():
+    r = requests.get("http://localhost:8083/health", timeout=5)
+    assert r.status_code == 200, f"Worker health failed: {r.status_code}"
+    data = r.json()
+    assert data.get("service") == "kather_baksho-worker-ts"
+    assert data.get("status") == "UP"
+    assert "pdf-invoice-generation" in data.get("features", [])
+
+# 42. Node.js & TypeScript Direct PDF Invoice Generation
+def test_worker_direct_invoice():
+    payload = {
+        "orderId": 777,
+        "customerName": "Botanical Tester",
+        "customerEmail": "tester@kather_baksho.com",
+        "items": [
+            {"id": 1, "productName": "Fiddle Leaf Fig Large", "quantity": 1, "price": 3500, "subtotal": 3500}
+        ],
+        "total": 3500
+    }
+    r = requests.post("http://localhost:8083/api/v1/invoices/generate", json=payload, timeout=8)
+    assert r.status_code == 200, f"Direct PDF generation failed: {r.status_code}"
+    assert r.headers.get("content-type") == "application/pdf"
+    assert r.headers.get("x-generated-by") == "kather_baksho-worker-ts"
+    assert r.content.startswith(b"%PDF"), "Must return valid PDF magic bytes"
+
+# 43. Go Backend Order PDF Invoice Forwarding / Bridge
+def test_go_pdf_invoice_proxy():
+    assert order_id is not None, "Order ID required"
+    r = user_s.get(f"{BASE_URL}/orders/{order_id}/invoice/pdf", timeout=10)
+    assert r.status_code == 200, f"Go PDF invoice proxy failed: {r.status_code} {r.text}"
+    assert r.headers.get("content-type") == "application/pdf"
+    assert r.headers.get("x-generated-by") == "kather_baksho-worker-ts"
+    assert r.content.startswith(b"%PDF"), "Must return valid PDF magic bytes"
+
+# 44. Go Backend Analytics Report PDF Generation
+def test_go_analytics_report_pdf():
+    r = admin_s.get(f"{BASE_URL}/analytics/report/pdf?days=30", timeout=10)
+    assert r.status_code == 200, f"Analytics report PDF failed: {r.status_code} {r.text}"
+    assert r.headers.get("content-type") == "application/pdf"
+    assert r.headers.get("x-generated-by") == "kather_baksho-worker-ts"
+    assert r.content.startswith(b"%PDF"), "Must return valid PDF magic bytes"
+
 tests = [
     ("Health / Get Products", test_get_products),
     ("Login Admin", test_login_admin),
@@ -526,7 +569,11 @@ tests = [
     ("Algorithm Studio Visualizer Route", test_algorithm_visualizer),
     ("Redis Read-Through Caching & Cache-HIT", test_redis_caching),
     ("Redis Cache Invalidation on Admin Mutation", test_cache_invalidation),
-    ("Multi-Database Health & Readiness Probe", test_multidb_health)
+    ("Multi-Database Health & Readiness Probe", test_multidb_health),
+    ("Node.js & TypeScript Worker Health Probe", test_worker_health),
+    ("Node.js & TypeScript Direct PDF Generation", test_worker_direct_invoice),
+    ("Go Backend PDF Invoice Proxy", test_go_pdf_invoice_proxy),
+    ("Go Backend Analytics Executive Report PDF", test_go_analytics_report_pdf)
 ]
 
 print("Starting E2E test suite...")

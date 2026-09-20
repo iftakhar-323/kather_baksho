@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { downloadInvoicePDF } from "../api/orderExt";
 
 // Client-side, fully offline order invoice. Renders from the order object the
 // Orders API already returns (Items.Product preloaded) — no extra network
@@ -61,11 +62,30 @@ export default function Invoice({ order, user, onClose }) {
     /paid/i.test(order.payment_status || "") ||
     (order.payment_method && order.payment_method !== "cod" && !/pending/i.test(order.payment_status || ""));
 
+  const [downloading, setDownloading] = useState(false);
+
   return (
     <div className="kb-print-area">
       <div className="kb-invoice-actions no-print">
         <button className="btn btn-primary" onClick={printNow}>
           🧾 Print / Save as PDF
+        </button>
+        <button
+          className="btn btn-secondary"
+          disabled={downloading}
+          onClick={async () => {
+            try {
+              setDownloading(true);
+              await downloadInvoicePDF(id);
+            } catch (e) {
+              alert("PDF generation failed: " + (e?.response?.data?.error || e.message || e));
+            } finally {
+              setDownloading(false);
+            }
+          }}
+          title="Download official PDF rendered by Node.js & TypeScript microservice"
+        >
+          {downloading ? "⏳ Generating..." : "📥 Official PDF (TS Worker)"}
         </button>
         {onClose && (
           <button className="btn btn-secondary" onClick={onClose}>

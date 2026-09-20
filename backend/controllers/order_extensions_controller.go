@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -104,13 +108,13 @@ func EstimatedDelivery(c *gin.Context) {
 		Order("created_at desc").First(&lastShip).Error == nil
 	now := time.Now()
 	type est struct {
-		Status        string `json:"status"`
-		Earliest      string `json:"earliest"`
-		Latest        string `json:"latest"`
-		BusinessDays  int    `json:"business_days"`
-		ShippedAt     string `json:"shipped_at,omitempty"`
-		DeliveredAt   string `json:"delivered_at,omitempty"`
-		Note          string `json:"note"`
+		Status       string `json:"status"`
+		Earliest     string `json:"earliest"`
+		Latest       string `json:"latest"`
+		BusinessDays int    `json:"business_days"`
+		ShippedAt    string `json:"shipped_at,omitempty"`
+		DeliveredAt  string `json:"delivered_at,omitempty"`
+		Note         string `json:"note"`
 	}
 	out := est{Status: o.Status}
 	switch o.Status {
@@ -341,7 +345,7 @@ th{background:#f6f6f6}
 .btn{background:#2d6a4f;color:#fff;border:none;padding:10px 18px;border-radius:6px;cursor:pointer;margin-top:14px}
 @media print{.btn{display:none}}
 </style></head><body>
-<h1>KatherBox — Invoice</h1>
+<h1>Kather Baksho — Invoice</h1>
 <p class="muted">Invoice #INV-%05d · %s</p>
 <p><strong>Billed to:</strong> %s</p>
 %s
@@ -359,6 +363,131 @@ th{background:#f6f6f6}
 </body></html>`, total, o.Status)
 	c.Header("Content-Type", "text/html; charset=utf-8")
 	c.String(http.StatusOK, html)
+}
+
+// InvoicePDF generates and streams an official branded PDF invoice rendered by the TypeScript worker microservice.
+// GET /api/orders/:id/invoice/pdf
+func InvoicePDF(c *gin.Context) {
+	oid, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid order id"})
+		return
+	}
+	uid := c.GetUint("user_id")
+	var o models.Order
+	if err := database.DB.First(&o, oid).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "order not found"})
+		return
+	}
+	if o.UserID != uid && !userIsAdmin(c) && !userIsStaff(c) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
+
+	var items []models.OrderItem
+	database.DB.Where("order_id = ?", oid).Find(&items)
+
+	type workerItem struct {
+		ID          uint    `json:"id"`
+		ProductID   uint    `json:"productId"`
+		ProductName string  `json:"productName"`
+		Quantity    uint    `json:"quantity"`
+		Price       float64 `json:"price"`
+		Subtotal    float64 `json:"subtotal"`
+	}
+
+	workerItems := make([]workerItem, 0, len(items))
+	var calculatedSubtotal float64
+	for _, it := range items {
+		var p models.Product
+		database.DB.First(&p, it.ProductID)
+		sub := float64(it.Quantity) * it.Price
+		calculatedSubtotal += sub
+		name := p.Name
+		if name == "" {
+			name = fmt.Sprintf("Botanical Item #%d", it.ProductID)
+		}
+		workerItems = append(workerItems, workerItem{
+			ID:          it.ID,
+			ProductID:   it.ProductID,
+			ProductName: name,
+			Quantity:    it.Quantity,
+			Price:       it.Price,
+			Subtotal:    sub,
+		})
+	}
+
+	buyerName := fmt.Sprintf("Customer #%d", o.UserID)
+	buyerEmail := ""
+	if o.UserID > 0 {
+		var u models.User
+		if database.DB.First(&u, o.UserID).Error == nil {
+			if u.Name != "" {
+				buyerName = u.Name
+			}
+			buyerEmail = u.Email
+		}
+	}
+	if o.ShippingName != "" {
+		buyerName = o.ShippingName
+	}
+
+	payload := map[string]interface{}{
+		"orderId":         o.ID,
+		"orderNumber":     fmt.Sprintf("INV-%06d", o.ID),
+		"customerName":    buyerName,
+		"customerEmail":   buyerEmail,
+		"customerPhone":   o.ShippingPhone,
+		"shippingAddress": o.ShippingAddress,
+		"paymentMethod":   o.PaymentMethod,
+		"paymentStatus":   o.PaymentStatus,
+		"createdAt":       o.CreatedAt.Format(time.RFC3339),
+		"items":           workerItems,
+		"subtotal":        calculatedSubtotal,
+		"discount":        o.DiscountAmount,
+		"deliveryFee":     0.0,
+		"total":           o.TotalPrice,
+	}
+
+	workerURL := os.Getenv("WORKER_TS_URL")
+	if workerURL == "" {
+		workerURL = "http://worker-ts:8083"
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to encode payload"})
+		return
+	}
+
+	client := &http.Client{Timeout: 8 * time.Second}
+	resp, err := client.Post(workerURL+"/api/v1/invoices/generate", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		// Fallback to local host port if workerURL is not resolvable outside docker
+		if workerURL != "http://localhost:8083" {
+			resp, err = client.Post("http://localhost:8083/api/v1/invoices/generate", "application/json", bytes.NewBuffer(jsonData))
+		}
+	}
+
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"error":   "TypeScript worker invoice service temporarily unavailable",
+			"details": fmt.Sprintf("%v", err),
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	pdfBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read generated PDF stream"})
+		return
+	}
+
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"invoice_order_%d.pdf\"", o.ID))
+	c.Header("X-Generated-By", "kather_baksho-worker-ts")
+	c.Data(http.StatusOK, "application/pdf", pdfBytes)
 }
 
 // ---------- Receipt (compact) ----------

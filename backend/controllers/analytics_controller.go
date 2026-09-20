@@ -1,7 +1,12 @@
 package controllers
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -86,11 +91,11 @@ func TopCustomers(c *gin.Context) {
 		}
 	}
 	type row struct {
-		UserID       uint    `json:"user_id"`
-		Name         string  `json:"name"`
-		Email        string  `json:"email"`
-		OrderCount   int     `json:"order_count"`
-		TotalSpend   float64 `json:"total_spend"`
+		UserID     uint    `json:"user_id"`
+		Name       string  `json:"name"`
+		Email      string  `json:"email"`
+		OrderCount int     `json:"order_count"`
+		TotalSpend float64 `json:"total_spend"`
 	}
 	var rows []row
 	database.DB.Raw(`
@@ -169,4 +174,97 @@ func CategoryRevenue(c *gin.Context) {
 		rows = []row{}
 	}
 	c.JSON(http.StatusOK, rows)
+}
+
+// AnalyticsReportPDF renders an executive PDF report via the TypeScript worker microservice.
+// GET /api/analytics/report/pdf
+func AnalyticsReportPDF(c *gin.Context) {
+	days := 30
+	if d := c.Query("days"); d != "" {
+		if n, err := strconv.Atoi(d); err == nil && n > 0 && n <= 365 {
+			days = n
+		}
+	}
+	since := time.Now().AddDate(0, 0, -days)
+
+	var totalRevenue float64
+	database.DB.Model(&models.Order{}).
+		Where("created_at >= ? AND status <> ?", since, "cancelled").
+		Select("COALESCE(SUM(total_price),0)").Row().Scan(&totalRevenue)
+
+	var totalOrders int64
+	database.DB.Model(&models.Order{}).Where("created_at >= ?", since).Count(&totalOrders)
+
+	type catRow struct {
+		Category string  `json:"category"`
+		Revenue  float64 `json:"revenue"`
+		Count    int     `json:"count"`
+	}
+	var catRows []catRow
+	database.DB.Raw(`
+		SELECT COALESCE(p.category,'Uncategorized') as category,
+		       COALESCE(SUM(oi.price * oi.quantity),0) as revenue,
+		       COUNT(oi.id) as count
+		FROM order_items oi
+		JOIN products p ON p.id = oi.product_id
+		GROUP BY p.category
+		ORDER BY revenue DESC LIMIT 8`).Scan(&catRows)
+
+	breakdown := make([]map[string]interface{}, 0, len(catRows))
+	for _, cr := range catRows {
+		breakdown = append(breakdown, map[string]interface{}{
+			"category": cr.Category,
+			"count":    cr.Count,
+			"revenue":  cr.Revenue,
+		})
+	}
+
+	payload := map[string]interface{}{
+		"title":             fmt.Sprintf("Business Performance Report (%d Days Window)", days),
+		"generatedBy":       "Admin Analytics Engine",
+		"startDate":         since.Format("02 Jan 2006"),
+		"endDate":           time.Now().Format("02 Jan 2006"),
+		"totalRevenue":      totalRevenue,
+		"totalOrders":       totalOrders,
+		"categoryBreakdown": breakdown,
+	}
+
+	workerURL := os.Getenv("WORKER_TS_URL")
+	if workerURL == "" {
+		workerURL = "http://worker-ts:8083"
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to encode payload"})
+		return
+	}
+
+	client := &http.Client{Timeout: 8 * time.Second}
+	resp, err := client.Post(workerURL+"/api/v1/reports/sales-pdf", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		if workerURL != "http://localhost:8083" {
+			resp, err = client.Post("http://localhost:8083/api/v1/reports/sales-pdf", "application/json", bytes.NewBuffer(jsonData))
+		}
+	}
+
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"error":   "TypeScript worker report service temporarily unavailable",
+			"details": fmt.Sprintf("%v", err),
+		})
+		return
+	}
+	defer resp.Body.Close()
+
+	pdfBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read generated report PDF"})
+		return
+	}
+
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", "inline; filename=\"executive_analytics_report.pdf\"")
+	c.Header("X-Generated-By", "kather_baksho-worker-ts")
+	c.Data(http.StatusOK, "application/pdf", pdfBytes)
 }
