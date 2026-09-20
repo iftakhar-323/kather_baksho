@@ -14,12 +14,12 @@ import (
 )
 
 type CheckoutInput struct {
-	CouponCode     string `json:"coupon_code"`
-	PointsToRedeem uint   `json:"points_to_redeem"`
-	GiftWrap       bool   `json:"gift_wrap"`
-	PaymentMethod  string `json:"payment_method"`
-	PaymentStatus  string `json:"payment_status"`
-	TransactionID  string `json:"transaction_id"`
+	CouponCode      string `json:"coupon_code"`
+	PointsToRedeem  uint   `json:"points_to_redeem"`
+	GiftWrap        bool   `json:"gift_wrap"`
+	PaymentMethod   string `json:"payment_method"`
+	PaymentStatus   string `json:"payment_status"`
+	TransactionID   string `json:"transaction_id"`
 	ShippingName    string `json:"shipping_name"`
 	ShippingPhone   string `json:"shipping_phone"`
 	ShippingAddress string `json:"shipping_address"`
@@ -76,7 +76,7 @@ func Checkout(c *gin.Context) {
 			}
 		}
 	}
-	
+
 	discount := couponDiscount
 
 	// Green Points redemption: 1 point = ৳1 discount
@@ -131,25 +131,25 @@ func Checkout(c *gin.Context) {
 		if payMethod == "cod" {
 			payStatus = "Pending COD"
 		} else {
-			payStatus = "Paid"
+			payStatus = "Pending Payment"
 		}
 	}
 
 	order := models.Order{
-		UserID:        userID,
-		TotalPrice:    finalTotal,
-		Status:        "Pending",
-		PaymentMethod: payMethod,
-		PaymentStatus: payStatus,
-		TransactionID: input.TransactionID,
+		UserID:          userID,
+		TotalPrice:      finalTotal,
+		Status:          "Pending",
+		PaymentMethod:   payMethod,
+		PaymentStatus:   payStatus,
+		TransactionID:   input.TransactionID,
 		ShippingName:    shipName,
 		ShippingPhone:   shipPhone,
 		ShippingAddress: shipAddr,
 		DeliveryNote:    input.DeliveryNote,
-		GiftWrap:      input.GiftWrap,
-		CouponCode:    appliedCouponCode,
-		DiscountAmount: couponDiscount,
-		Items:         orderItems,
+		GiftWrap:        input.GiftWrap,
+		CouponCode:      appliedCouponCode,
+		DiscountAmount:  couponDiscount,
+		Items:           orderItems,
 	}
 	database.DB.Create(&order)
 
@@ -333,10 +333,10 @@ type AdminOrderItemInput struct {
 // CreateAdminOrderInput — payload for POST /api/admin/orders.
 // Admin can place an order on behalf of any user (e.g. phone orders).
 type CreateAdminOrderInput struct {
-	UserID   uint                 `json:"user_id" binding:"required"`
+	UserID   uint                  `json:"user_id" binding:"required"`
 	Items    []AdminOrderItemInput `json:"items" binding:"required,min=1,dive"`
-	Status   string               `json:"status"`
-	GiftWrap bool                 `json:"gift_wrap"`
+	Status   string                `json:"status"`
+	GiftWrap bool                  `json:"gift_wrap"`
 }
 
 // POST /api/admin/orders - admin creates an order on behalf of a user.

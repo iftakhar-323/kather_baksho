@@ -69,6 +69,7 @@ func main() {
 		&models.Review{},
 		&models.Category{},
 		&models.EmailVerification{},
+		&models.IdempotencyRecord{},
 	); err != nil {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
@@ -79,6 +80,7 @@ func main() {
 	router.Use(middleware.StructuredLogger())
 	router.Use(middleware.RateLimiter())
 	router.Use(middleware.PrometheusMetricsMiddleware())
+	router.Use(middleware.IdempotencyMiddleware())
 
 	allowedOrigins := []string{
 		"http://localhost:5173",
@@ -98,8 +100,8 @@ func main() {
 
 	corsConfig := cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID"},
-		ExposeHeaders:    []string{"Content-Length", "X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID", "Idempotency-Key", "X-Idempotency-Key"},
+		ExposeHeaders:    []string{"Content-Length", "X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After", "X-Cache-Lookup", "X-Idempotency-Key"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}
@@ -123,6 +125,7 @@ func main() {
 	routes.AuthRoutes(router)
 	routes.CartRoutes(router)
 	routes.OrderRoutes(router)
+	routes.PaymentRoutes(router)
 	routes.WishlistRoutes(router)
 	routes.NotificationRoutes(router)
 	routes.CouponRoutes(router)

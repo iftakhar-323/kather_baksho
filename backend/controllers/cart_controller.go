@@ -77,6 +77,17 @@ func AddToCart(c *gin.Context) {
 		return
 	}
 
+	// Atomically deduct inventory with condition to guarantee zero overselling
+	res := database.DB.Model(&models.Product{}).
+		Where("id = ? AND stock >= ?", product.ID, input.Quantity).
+		Update("stock", gorm.Expr("stock - ?", input.Quantity))
+	if res.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Not enough stock available",
+		})
+		return
+	}
+
 	if err == nil {
 		// age theke ache, quantity barao
 		existingItem.Quantity = totalRequested
@@ -90,10 +101,6 @@ func AddToCart(c *gin.Context) {
 		}
 		database.DB.Create(&newItem)
 	}
-
-	// stock theke quantity komiye dao (reservation)
-	product.Stock -= input.Quantity
-	database.DB.Model(&models.Product{}).Where("id = ?", product.ID).Update("stock", product.Stock)
 
 	updatedCart := getOrCreateCart(userID)
 	c.JSON(http.StatusOK, updatedCart)
@@ -137,11 +144,23 @@ func UpdateCartItem(c *gin.Context) {
 		return
 	}
 
-	// stock e delta apply koro
+	// stock e delta apply koro atomically
 	delta := int(needed) - int(item.Quantity)
-	if delta != 0 {
-		product.Stock = uint(int(product.Stock) - delta)
-		database.DB.Model(&models.Product{}).Where("id = ?", product.ID).Update("stock", product.Stock)
+	if delta > 0 {
+		res := database.DB.Model(&models.Product{}).
+			Where("id = ? AND stock >= ?", product.ID, uint(delta)).
+			Update("stock", gorm.Expr("stock - ?", uint(delta)))
+		if res.RowsAffected == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Not enough stock available",
+			})
+			return
+		}
+	} else if delta < 0 {
+		release := uint(-delta)
+		database.DB.Model(&models.Product{}).
+			Where("id = ?", product.ID).
+			Update("stock", gorm.Expr("stock + ?", release))
 	}
 
 	item.Quantity = input.Quantity
