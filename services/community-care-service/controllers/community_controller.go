@@ -4,9 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"kather_baksho/database"
-	"kather_baksho/models"
-	"kather_baksho/utils"
+	"kather_baksho/community_care_service/database"
+	"kather_baksho/community_care_service/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,13 +19,9 @@ type CreatePostInput struct {
 
 // GET /api/community/posts
 func ListPosts(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	var posts []models.CommunityPost
 	database.DB.Order("created_at desc").Limit(100).Find(&posts)
 
-	// enrich with like-count + comment-count
 	type PostOut struct {
 		models.CommunityPost
 		LikeCount    int64    `json:"like_count"`
@@ -76,9 +71,6 @@ func ListPosts(c *gin.Context) {
 
 // POST /api/community/posts
 func CreatePost(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	userID := c.GetUint("user_id")
 	var input CreatePostInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -111,9 +103,6 @@ type CommentInput struct {
 
 // GET /api/community/posts/:id/comments
 func ListComments(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	id := c.Param("id")
 	var list []models.CommunityComment
 	database.DB.Where("post_id = ?", id).Order("created_at asc").Find(&list)
@@ -130,9 +119,6 @@ func ListComments(c *gin.Context) {
 
 // POST /api/community/posts/:id/comments
 func AddComment(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	id := c.Param("id")
 	userID := c.GetUint("user_id")
 	var input CommentInput
@@ -158,18 +144,13 @@ func AddComment(c *gin.Context) {
 
 // POST /api/community/posts/:id/like
 func ToggleLike(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	id := c.Param("id")
 	userID := c.GetUint("user_id")
 	postID, _ := strconv.Atoi(id)
 
-	// check existing
 	var existing models.CommunityLike
 	err := database.DB.Where("post_id = ? AND user_id = ?", postID, userID).First(&existing).Error
 	if err == nil {
-		// already exists → unlike
 		database.DB.Delete(&existing)
 		c.JSON(http.StatusOK, gin.H{"liked": false})
 		return
@@ -179,13 +160,9 @@ func ToggleLike(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"liked": true})
 }
 
-// DELETE /api/community/posts/:id  (author or admin)
+// DELETE /api/community/posts/:id
 func DeletePost(c *gin.Context) {
-	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
-		return
-	}
 	id := c.Param("id")
-
 	userID := c.GetUint("user_id")
 	role := c.GetString("role")
 

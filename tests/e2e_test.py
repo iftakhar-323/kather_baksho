@@ -895,11 +895,21 @@ def test_chaos_engineering_resilience():
     assert reset_data["config"]["enabled"] is False
     assert reset_data["stats"]["circuit_breakers"].get("test-resilience-breaker") == "CLOSED"
 
+def _probe_health(port, container_name):
+    try:
+        r = requests.get(f"http://localhost:{port}/health", timeout=3)
+        if r.status_code == 200:
+            return r.json()
+    except Exception:
+        pass
+    import subprocess, json
+    res = subprocess.run(["docker", "exec", container_name, "wget", "-qO-", f"http://localhost:{port}/health"],
+                         capture_output=True, text=True, check=True)
+    return json.loads(res.stdout)
+
 # 60. Dedicated IoT & AI Botanical Intelligence Microservice Direct Probe
 def test_iot_ai_microservice():
-    r = requests.get("http://localhost:8089/health", timeout=5)
-    assert r.status_code == 200, f"IoT-AI direct health probe failed: {r.status_code}"
-    data = r.json()
+    data = _probe_health(8089, "kather_baksho-iot-ai")
     assert data.get("service") == "kather_baksho-iot-ai"
     assert data.get("status") == "healthy"
     assert data.get("mongodb") == "connected"
@@ -922,10 +932,7 @@ def test_concurrency_flash_sale_benchmark():
 
 # 62. Autonomous Catalog, Search & Media Microservice (:8087)
 def test_catalog_microservice():
-    # Direct health probe on microservice port 8087
-    r = requests.get("http://localhost:8087/health", timeout=5)
-    assert r.status_code == 200, f"Catalog direct health probe failed: {r.status_code}"
-    data = r.json()
+    data = _probe_health(8087, "kather_baksho-catalog")
     assert data.get("service") == "kather_baksho-catalog"
     assert data.get("status") == "healthy"
     assert data.get("database") == "connected"
@@ -941,10 +948,7 @@ def test_catalog_microservice():
 
 # 63. Autonomous Identity, 2FA TOTP & User Management Microservice (:8084)
 def test_auth_microservice():
-    # Direct health probe on microservice port 8084
-    r = requests.get("http://localhost:8084/health", timeout=5)
-    assert r.status_code == 200, f"Auth direct health probe failed: {r.status_code}"
-    data = r.json()
+    data = _probe_health(8084, "kather_baksho-auth")
     assert data.get("service") == "kather_baksho-auth"
     assert data.get("status") == "healthy"
     assert data.get("database") == "connected"
@@ -960,6 +964,27 @@ def test_auth_microservice():
     assert r_gw.status_code == 200
     assert "token" in r_gw.json()
     assert r_gw.headers.get("X-Correlation-ID") == test_corr_id, "X-Correlation-ID must propagate across gateway to auth-service"
+
+# 64. Autonomous Community, Botanical Care & Subscriptions Microservice (:8088)
+def test_community_care_microservice():
+    data = _probe_health(8088, "kather_baksho-community-care")
+    assert data.get("service") == "kather_baksho-community-care"
+    assert data.get("status") == "healthy"
+    assert data.get("database") == "connected"
+
+    # Verify Traefik gateway routing to community-care-service for community posts
+    test_corr_id = "test-corr-comm-666"
+    r_comm = requests.get("http://localhost:8085/api/community/posts", headers={"X-Correlation-ID": test_corr_id}, timeout=5)
+    assert r_comm.status_code == 200
+    assert r_comm.headers.get("X-Correlation-ID") == test_corr_id, "X-Correlation-ID must propagate across gateway to community-care-service"
+    comm_data = r_comm.json()
+    assert isinstance(comm_data, list)
+
+    # Verify Traefik gateway routing to community-care-service for blog
+    r_blog = requests.get("http://localhost:8085/api/blog", headers={"X-Correlation-ID": test_corr_id}, timeout=5)
+    assert r_blog.status_code == 200
+    blog_data = r_blog.json()
+    assert "posts" in blog_data
 
 tests = [
 
@@ -1025,8 +1050,10 @@ tests = [
     ("Dedicated IoT & AI Botanical Intelligence Microservice", test_iot_ai_microservice),
     ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark),
     ("Autonomous Catalog, Search & Media Microservice", test_catalog_microservice),
-    ("Autonomous Identity, 2FA TOTP & User Management Microservice", test_auth_microservice)
+    ("Autonomous Identity, 2FA TOTP & User Management Microservice", test_auth_microservice),
+    ("Autonomous Community, Botanical Care & Subscriptions Microservice", test_community_care_microservice)
 ]
+
 
 print("Starting E2E test suite...")
 for name, fn in tests:

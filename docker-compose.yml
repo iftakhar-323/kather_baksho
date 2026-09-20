@@ -23,6 +23,7 @@ services:
       - IOT_AI_SERVICE_URL=http://iot-ai-service:8089
       - CATALOG_SERVICE_URL=http://catalog-service:8087
       - AUTH_SERVICE_URL=http://auth-service:8084
+      - COMMUNITY_CARE_SERVICE_URL=http://community-care-service:8088
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
@@ -40,6 +41,8 @@ services:
       catalog-service:
         condition: service_healthy
       auth-service:
+        condition: service_healthy
+      community-care-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8081/api/products || exit 1"]
@@ -180,6 +183,36 @@ services:
       - "traefik.http.routers.auth.entrypoints=web"
       - "traefik.http.routers.auth.priority=25"
       - "traefik.http.services.auth.loadbalancer.server.port=8084"
+
+  community-care-service:
+    build:
+      context: ./services/community-care-service
+      dockerfile: Dockerfile
+    container_name: kather_baksho-community-care
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - PORT=8088
+      - DB_DRIVER=sqlite
+      - DB_PATH=/app/data/kather_baksho.db
+      - GIN_MODE=release
+      - ALLOWED_ORIGINS=*
+      - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+    volumes:
+      - sqlite_data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8088/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.community-care.rule=PathPrefix(`/api/community`) || PathPrefix(`/api/blog`) || PathPrefix(`/api/journal`) || PathPrefix(`/api/care-schedule`) || PathPrefix(`/api/care-calendar`) || PathPrefix(`/api/consultations`) || PathPrefix(`/api/subscriptions`)"
+      - "traefik.http.routers.community-care.entrypoints=web"
+      - "traefik.http.routers.community-care.priority=25"
+      - "traefik.http.services.community-care.loadbalancer.server.port=8088"
 
   frontend:
     build:

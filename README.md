@@ -4,12 +4,13 @@
 > **100% Localhost Enterprise Architecture** built with **Go (Gin + GORM)**, **React 18 (Vite)**, **Node.js & TypeScript 5.5 Microservices**, **Polyglot Persistence (SQLite, Redis, MongoDB 7.0, MinIO S3)**, **Traefik Cloud-Native Ingress Gateway**, **Real-Time Goroutine WebSockets**, **Prometheus & Grafana Observability**, **Atomic Concurrency Control**, **RFC 6238 TOTP 2FA**, and **Chaos Engineering Studio**.
 
 [![Backend Go Tests](https://img.shields.io/badge/Go%20Unit%20Tests-Passing-brightgreen?style=flat-square&logo=go)](https://github.com/iftakhar-323/kather_baksho)
-[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-63%2F63%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
+[![E2E Regression](https://img.shields.io/badge/E2E%20Regression-64%2F64%20Passing-success?style=flat-square&logo=python)](https://github.com/iftakhar-323/kather_baksho)
 [![Go Report](https://img.shields.io/badge/Go%20Backend-Production%20Ready-blue?style=flat-square&logo=go)](https://golang.org)
 [![TypeScript Worker](https://img.shields.io/badge/TypeScript%20Worker-Microservice-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
-[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-12%20Containers-blue?style=flat-square&logo=docker)](https://docker.com)
+[![Docker Compose](https://img.shields.io/badge/Docker%20Compose-13%20Containers-blue?style=flat-square&logo=docker)](https://docker.com)
 [![Traefik](https://img.shields.io/badge/API%20Gateway-Traefik%20v3.1-informational?style=flat-square&logo=traefik)](https://traefik.io)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
 
 > A modern, enterprise-grade, cloud-native botanical e-commerce and smart plant care platform designed with a high-throughput **Event-Driven Microservices Architecture**, polyglot persistence, real-time rider tracking, RFC 6238 TOTP two-factor authentication, and chaos engineering resilience. Built for **100% localhost execution** with zero external cloud fees or paid third-party API dependencies.
 
@@ -122,6 +123,11 @@ Here are the enterprise-grade features implemented in this repository:
 - **Domain Decoupling**: Dedicated microservice running on port `8084` (`services/auth-service`) managing user registration, authentication, pure-Go RFC 6238 TOTP 2FA, customer addresses CRUD, and Admin RBAC.
 - **Stateless JWT Claims**: Distributed shared-secret stateless JWT verification eliminates cross-service DB query bottlenecks while keeping user security boundaries airtight.
 
+### 13. 🌱 Autonomous Community, Botanical Care & Subscriptions Microservice
+- **Domain Decoupling**: Dedicated microservice running on port `8088` (`services/community-care-service`) managing community social discussions, Q&A forums with accepted answers, social gardening groups, user follows, and bookmarks.
+- **Botanical Parenting & Care**: Botanical growth journal with photo logs, seasonal monthly care schedules, and aggregated multi-plant care calendars.
+- **Care Subscriptions & Consultations**: Automated plant delivery subscriptions (pause, resume, manual renewal) and botanical expert consultation bookings.
+
 ---
 
 <a name="-tech-stack--tools"></a>
@@ -134,6 +140,7 @@ flowchart TD
     Traefik -->|/| Frontend["⚛️ React 18 + Vite (Port 8082)"]
     Traefik -->|/api/auth, /api/addresses| AuthMicro["🔐 Auth & 2FA TOTP Microservice (Port 8084)"]
     Traefik -->|/api/products, /api/categories, /api/media, /api/reviews| CatalogMicro["🛍️ Catalog, Search & Media Microservice (Port 8087)"]
+    Traefik -->|/api/community, /api/blog, /api/journal, /api/care-*, /api/consultations, /api/subscriptions| CommunityMicro["🌱 Community, Care & Subscriptions (Port 8088)"]
     Traefik -->|/api/iot, /api/ai, /api/ml| IoTMicro["🌿 IoT & AI Botanical Microservice (Port 8089)"]
     Traefik -->|/worker| Worker["🟦 Node.js + TypeScript 5.5 Worker (Port 8083)"]
     Traefik -->|/api/orders, /ws, /health| Backend["🐹 Go Core Order & Checkout Engine (Port 8081)"]
@@ -141,6 +148,7 @@ flowchart TD
     Backend -->|Relational Data| SQLite["📁 SQLite (WAL Mode)"]
     CatalogMicro -->|Search Index & Data| SQLite
     AuthMicro -->|Identity & Users| SQLite
+    CommunityMicro -->|Community & Care Data| SQLite
     CatalogMicro -->|Redis Cache| Redis["⚡ Redis 7 (Cache + Streams + DLQ)"]
     CatalogMicro -->|Media Objects| MinIO["🪣 MinIO S3 Object Storage (Port 9005)"]
     IoTMicro -->|IoT Telemetry| Mongo["🍃 MongoDB 7.0 (Time-Series Datastore)"]
@@ -156,6 +164,7 @@ flowchart TD
 | **Order & Checkout Engine** | **Go 1.22+ (Gin, GORM)** | Core checkout transaction engine, WebSocket rider radar, flash sale atomic locking, and coupons. |
 | **Catalog & Search Service** | **Go 1.22+ Microservice** | Autonomous catalog, BM25 FTS5 search, category management, and MinIO S3 media pipeline. |
 | **Auth & Identity Service** | **Go 1.22+ Microservice** | Autonomous user management, RFC 6238 TOTP 2FA, customer addresses, and Admin RBAC. |
+| **Community & Care Service** | **Go 1.22+ Microservice** | Autonomous community forums, botanical care journals, expert consultations, and subscriptions. |
 | **IoT & AI Microservice** | **Go 1.22+ Microservice** | Autonomous plant sensor telemetry ingestion, alert dispatch, AI diagnostics & ML benchmarking. |
 | **Worker Service** | **Node.js 20, TypeScript 5.5, PDFKit** | Vector PDF invoice generation and executive analytics reporting microservice. |
 | **Frontend SPA** | **React 18, Vite, React Router v7** | Modern responsive storefront, admin back-office, and interactive studios. |
@@ -167,6 +176,7 @@ flowchart TD
 | **Observability** | **Prometheus 2.54 + Grafana 11.2** | Automated metrics collection and pre-provisioned executive dashboard. |
 | **API Documentation** | **OpenAPI 3.0.3 + Swagger UI** | Self-documenting API schemas and browser-based interactive test console. |
 | **Infrastructure-as-Code**| **Terraform + Bash** | Complete AWS EC2 VPC, Subnet, and Security Group provisioning templates. |
+
 
 ---
 
@@ -203,6 +213,7 @@ When the stack is running, all services are accessible on your local machine:
 | **Storefront Web App** | [http://localhost:8082](http://localhost:8082) | React 18 SPA | Storefront, Admin Panel, AI Plant Doctor & Chaos Studio | Public |
 | **Catalog & Search Microservice** | [http://localhost:8087](http://localhost:8087) | Go 1.22 Gin | Products, Categories, FTS5 Search, MinIO Media, Wishlist | Public / Admin |
 | **Auth & 2FA Microservice** | [http://localhost:8084](http://localhost:8084) | Go 1.22 Gin | User Registration, Login, RFC 6238 TOTP 2FA, Addresses | Public / JWT |
+| **Community & Care Microservice** | [http://localhost:8088](http://localhost:8088) | Go 1.22 Gin | Community Forums, Care Journals, Subscriptions, Consultations | Public / JWT |
 | **Backend Core Engine** | [http://localhost:8081](http://localhost:8081) | Go 1.22 Gin | Core Orders, Checkout, Flash Sale Mutex, WS Radar | JWT / Session |
 | **IoT & AI Microservice** | [http://localhost:8089](http://localhost:8089) | Go 1.22 Gin | Autonomous plant sensor telemetry, AI doctor & ML comparisons | Public / JWT |
 | **Interactive Swagger UI** | [http://localhost:8085/docs](http://localhost:8085/docs) | OpenAPI 3.0 | Complete interactive API explorer with parameter schemas | Direct |
@@ -239,7 +250,7 @@ The system comes pre-seeded with test accounts representing different authorizat
 - Python 3.9+ (for running automated tests).
 
 ### Start the Entire Stack
-Clone the repository and launch all 12 containerized services with a single command:
+Clone the repository and launch all 13 containerized services with a single command:
 
 ```bash
 git clone https://github.com/iftakhar-323/kather_baksho.git
@@ -247,7 +258,7 @@ cd kather_baksho
 docker compose up -d --build
 ```
 
-Within ~30 seconds, all 12 containers will be healthy and accessible at `http://localhost:8085`!
+Within ~30 seconds, all 13 containers will be healthy and accessible at `http://localhost:8085`!
 
 To stop the containers:
 ```bash
@@ -257,10 +268,10 @@ docker compose down
 ---
 
 <a name="-automated-testing--verification"></a>
-## 🧪 9. Automated Testing & Verification Suite (63/63 Tests)
+## 🧪 9. Automated Testing & Verification Suite (64/64 Tests)
 
-### 1. Complete End-to-End Regression Suite (63 Tests)
-Tests all 12 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
+### 1. Complete End-to-End Regression Suite (64 Tests)
+Tests all 13 microservices, databases, authentication, event streams, FTS5 search, S3 storage, 2FA, and chaos injection:
 
 ```bash
 python3 tests/e2e_test.py
@@ -332,11 +343,13 @@ Starting E2E test suite...
 [✓] Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)
 [✓] Autonomous Catalog, Search & Media Microservice
 [✓] Autonomous Identity, 2FA TOTP & User Management Microservice
+[✓] Autonomous Community, Botanical Care & Subscriptions Microservice
 
 ==================================================
-Summary: 63 tests run, 63 passed, 0 failed. (100% Pass Rate)
+Summary: 64 tests run, 64 passed, 0 failed. (100% Pass Rate)
 ==================================================
 ```
+
 
 ### 2. High-Concurrency Flash Sale Stress Benchmark
 Simulates race condition attacks where multiple shoppers compete for limited stock:
@@ -399,6 +412,7 @@ kather_baksho/
 ├── services/
 │   ├── auth-service/               # Autonomous Identity, 2FA TOTP & User Management Microservice (Go)
 │   ├── catalog-service/            # Autonomous Botanical Catalog, FTS5 Search & Media Microservice (Go)
+│   ├── community-care-service/     # Autonomous Community, Botanical Care & Subscriptions Microservice (Go)
 │   ├── iot-ai-service/             # Autonomous Botanical Intelligence & IoT Microservice (Go)
 │   └── worker-ts/                  # Document Generation Microservice (Node.js 20, TypeScript 5.5)
 │       └── src/                    # Vector PDF invoice & sales report generators
@@ -411,10 +425,11 @@ kather_baksho/
 ├── deploy/
 │   └── ec2-setup.sh                # 1-Click production Ubuntu automation script
 ├── tests/
-│   ├── e2e_test.py                 # Comprehensive 63-test automated E2E test suite
+│   ├── e2e_test.py                 # Comprehensive 64-test automated E2E test suite
 │   └── stress_test.py              # Flash Sale concurrency benchmark engine
-├── docker-compose.yml              # 12-Container local microservices orchestration stack
+├── docker-compose.yml              # 13-Container local microservices orchestration stack
 └── README.md                       # ← You are here!
+
 ```
 
 ---

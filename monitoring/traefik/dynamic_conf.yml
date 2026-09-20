@@ -44,6 +44,13 @@ http:
       service: "auth-svc"
       priority: 25
 
+    community-care:
+      rule: "PathPrefix(`/api/community`) || PathPrefix(`/api/blog`) || PathPrefix(`/api/journal`) || PathPrefix(`/api/care-schedule`) || PathPrefix(`/api/care-calendar`) || PathPrefix(`/api/consultations`) || PathPrefix(`/api/subscriptions`)"
+      entryPoints:
+        - "web"
+      service: "community-care-svc"
+      priority: 25
+
   middlewares:
     worker-strip:
       stripPrefix:
@@ -80,3 +87,9 @@ http:
       loadBalancer:
         servers:
           - url: "http://auth-service:8084"
+
+    community-care-svc:
+      loadBalancer:
+        servers:
+          - url: "http://community-care-service:8088"
+

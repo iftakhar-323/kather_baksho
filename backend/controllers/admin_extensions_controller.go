@@ -5,6 +5,7 @@ import (
 
 	"kather_baksho/database"
 	"kather_baksho/models"
+	"kather_baksho/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +50,9 @@ func AdminCompleteReminder(c *gin.Context) {
 
 // GET /api/admin/subscriptions
 func AdminListSubscriptions(c *gin.Context) {
+	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
+		return
+	}
 	var list []models.Subscription
 	database.DB.Order("created_at desc").Find(&list)
 
@@ -67,6 +71,9 @@ func AdminListSubscriptions(c *gin.Context) {
 
 // POST /api/admin/subscriptions/:id/cancel
 func AdminCancelSubscription(c *gin.Context) {
+	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
+		return
+	}
 	id := c.Param("id")
 	var s models.Subscription
 	if err := database.DB.First(&s, id).Error; err != nil {
@@ -87,6 +94,9 @@ func AdminCancelSubscription(c *gin.Context) {
 
 // GET /api/admin/consultations
 func AdminListConsultations(c *gin.Context) {
+	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
+		return
+	}
 	var list []models.Consultation
 	database.DB.Order("scheduled_at desc").Find(&list)
 
@@ -105,6 +115,9 @@ func AdminListConsultations(c *gin.Context) {
 
 // POST /api/admin/consultations/:id/confirm
 func AdminConfirmConsultation(c *gin.Context) {
+	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
+		return
+	}
 	id := c.Param("id")
 	var con models.Consultation
 	if err := database.DB.First(&con, id).Error; err != nil {
@@ -124,7 +137,11 @@ func AdminConfirmConsultation(c *gin.Context) {
 
 // POST /api/admin/consultations/:id/cancel
 func AdminCancelConsultation(c *gin.Context) {
+	if utils.ProxyToService(c, "COMMUNITY_CARE_SERVICE_URL") {
+		return
+	}
 	id := c.Param("id")
+
 	var con models.Consultation
 	if err := database.DB.First(&con, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Consultation not found"})
@@ -144,8 +161,9 @@ func AdminCancelConsultation(c *gin.Context) {
 
 // GET /api/admin/analytics
 // Returns the aggregate stats the Admin DashboardTab renders:
-//   revenue, total_orders, total_users, total_products, total_reminders,
-//   top_products[], orders_by_status[]
+//
+//	revenue, total_orders, total_users, total_products, total_reminders,
+//	top_products[], orders_by_status[]
 func GetAdminAnalytics(c *gin.Context) {
 	var revenue float64
 	database.DB.Model(&models.Order{}).
