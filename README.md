@@ -16,8 +16,10 @@ Run the complete multi-service stack (Frontend, Backend, Redis, Prometheus, Graf
 ```bash
 git clone https://github.com/iftakhar-323/kather_baksho.git
 cd kather_baksho
-docker compose up -d --build
+./run.sh
 ```
+
+*(Alternatively, you can also run `docker compose up -d --build`)*
 
 ### 🌐 Local Service Map & Credentials
 
