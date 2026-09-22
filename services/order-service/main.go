@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"strings"
@@ -54,8 +55,13 @@ func main() {
 		log.Fatalf("[Order-Service] Auto-migrate failed: %v", err)
 	}
 
+	// Initialize OpenTelemetry Distributed Tracing
+	shutdownTracer := middleware.InitTracer("order-service")
+	defer shutdownTracer(context.Background())
+
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.Use(middleware.OpenTelemetryMiddleware("order-service"))
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.StructuredLogger())
 	router.Use(middleware.RateLimiter())
@@ -81,8 +87,8 @@ func main() {
 
 	corsConfig := cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID", "Idempotency-Key", "X-Idempotency-Key"},
-		ExposeHeaders:    []string{"Content-Length", "X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After", "X-Cache-Lookup", "X-Idempotency-Key"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "X-Request-ID", "Idempotency-Key", "X-Idempotency-Key", "traceparent", "tracestate"},
+		ExposeHeaders:    []string{"Content-Length", "X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After", "X-Cache-Lookup", "X-Idempotency-Key", "traceparent", "X-Trace-ID"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}

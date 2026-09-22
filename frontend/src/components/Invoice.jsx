@@ -42,6 +42,8 @@ function printNow() {
 }
 
 export default function Invoice({ order, user, onClose }) {
+  const [downloading, setDownloading] = useState(false);
+
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose?.();
     window.addEventListener("keydown", onKey);
@@ -61,8 +63,6 @@ export default function Invoice({ order, user, onClose }) {
   const paid =
     /paid/i.test(order.payment_status || "") ||
     (order.payment_method && order.payment_method !== "cod" && !/pending/i.test(order.payment_status || ""));
-
-  const [downloading, setDownloading] = useState(false);
 
   return (
     <div className="kb-print-area">

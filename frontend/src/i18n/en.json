@@ -25,7 +25,8 @@
     "more": "More",
     "profile": "Profile",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "monitor": "Monitor"
   },
   "actions": {
     "save": "Save",
@@ -556,13 +557,12 @@
       "formTitle": "New care schedule",
       "productId": "Product ID",
       "task": "Task",
-      "everyDays": "Every (days)",
+      "everyDays": "Every {{n}} days",
       "submit": "Create schedule",
       "empty": "No schedules yet",
       "created": "Schedule created",
       "deleted": "Schedule removed",
       "everyDay": "Every {{n}} day",
-      "everyDays": "Every {{n}} days",
       "next": "next:"
     },
     "tasks": {
@@ -947,21 +947,48 @@
         "title": "About Kather Baksho",
         "intro": "Hand-curated indoor plants, subscriptions, expert consultations and corporate gifting — grown with love in Dhaka.",
         "sections": [
-          { "h": "Our story", "p": "Kather Baksho began as a small stall at Dhanmondi Lake. Today we ship 200+ plant species to homes and offices across Bangladesh, supported by a growing team of horticulturists, designers and engineers." },
-          { "h": "What we believe", "p": "Plants change rooms — and rooms change people. Every plant we sell is nursery-fresh, ethically sourced, and backed by our 7-day plant guarantee." },
-          { "h": "By the numbers", "p": "1,100+ plant SKUs · 4.9★ from 8,200 reviews · 24-hour delivery in Dhaka · 7-day plant guarantee · 95% plastic-free packaging." },
-          { "h": "Sustainability", "p": "We use compostable coir pots, kraft sleeves, and zero air-freight. 1% of every order funds urban greening projects in Dhaka schools." }
+          {
+            "h": "Our story",
+            "p": "Kather Baksho began as a small stall at Dhanmondi Lake. Today we ship 200+ plant species to homes and offices across Bangladesh, supported by a growing team of horticulturists, designers and engineers."
+          },
+          {
+            "h": "What we believe",
+            "p": "Plants change rooms — and rooms change people. Every plant we sell is nursery-fresh, ethically sourced, and backed by our 7-day plant guarantee."
+          },
+          {
+            "h": "By the numbers",
+            "p": "1,100+ plant SKUs · 4.9★ from 8,200 reviews · 24-hour delivery in Dhaka · 7-day plant guarantee · 95% plastic-free packaging."
+          },
+          {
+            "h": "Sustainability",
+            "p": "We use compostable coir pots, kraft sleeves, and zero air-freight. 1% of every order funds urban greening projects in Dhaka schools."
+          }
         ]
       },
       "contact": {
         "title": "Contact us",
         "intro": "We respond to every message within 24 hours, Mon–Sat.",
         "sections": [
-          { "h": "Email", "p": "hello@kather_baksho.com · support@kather_baksho.com" },
-          { "h": "Phone & WhatsApp", "p": "+880 1700 000 000 (10am–8pm BST)" },
-          { "h": "Studio", "p": "House 12, Road 7, Dhanmondi, Dhaka 1205, Bangladesh" },
-          { "h": "Press & partnerships", "p": "press@kather_baksho.com" },
-          { "h": "Send a message", "p": "Use the form below and we'll route your note to the right person." }
+          {
+            "h": "Email",
+            "p": "hello@kather_baksho.com · support@kather_baksho.com"
+          },
+          {
+            "h": "Phone & WhatsApp",
+            "p": "+880 1700 000 000 (10am–8pm BST)"
+          },
+          {
+            "h": "Studio",
+            "p": "House 12, Road 7, Dhanmondi, Dhaka 1205, Bangladesh"
+          },
+          {
+            "h": "Press & partnerships",
+            "p": "press@kather_baksho.com"
+          },
+          {
+            "h": "Send a message",
+            "p": "Use the form below and we'll route your note to the right person."
+          }
         ],
         "form": true
       },
@@ -969,63 +996,162 @@
         "title": "Frequently Asked Questions",
         "intro": "Quick answers to the questions we hear most.",
         "sections": [
-          { "h": "How do I care for my plant?", "p": "Every plant ships with a species-specific care card. You can also browse the Care tab in the navbar — your dashboard auto-generates a watering, fertilizing and repotting schedule for every plant you buy." },
-          { "h": "Do you ship outside Dhaka?", "p": "Yes — same-day inside Dhaka (order by 4pm); 2-3 days to major cities like Chittagong, Sylhet, Khulna; 4-5 days nationwide." },
-          { "h": "What if my plant arrives unhealthy?", "p": "Send a photo within 48 hours and we'll either replace it from the next batch or refund 100%. No paperwork, no forms." },
-          { "h": "Can I cancel my subscription?", "p": "Anytime — pause, skip a month, change frequency, or cancel from the Boxes tab. No commitment." },
-          { "h": "Do you offer corporate gifting?", "p": "Yes — visit the Corporate tab for bulk pricing, branded sleeves, employee gift requests, and invoice billing." },
-          { "h": "Are you on social media?", "p": "Yes — Instagram @kather_baksho, Facebook /kather_baksho, TikTok @kather_baksho. Plant care videos every week." }
+          {
+            "h": "How do I care for my plant?",
+            "p": "Every plant ships with a species-specific care card. You can also browse the Care tab in the navbar — your dashboard auto-generates a watering, fertilizing and repotting schedule for every plant you buy."
+          },
+          {
+            "h": "Do you ship outside Dhaka?",
+            "p": "Yes — same-day inside Dhaka (order by 4pm); 2-3 days to major cities like Chittagong, Sylhet, Khulna; 4-5 days nationwide."
+          },
+          {
+            "h": "What if my plant arrives unhealthy?",
+            "p": "Send a photo within 48 hours and we'll either replace it from the next batch or refund 100%. No paperwork, no forms."
+          },
+          {
+            "h": "Can I cancel my subscription?",
+            "p": "Anytime — pause, skip a month, change frequency, or cancel from the Boxes tab. No commitment."
+          },
+          {
+            "h": "Do you offer corporate gifting?",
+            "p": "Yes — visit the Corporate tab for bulk pricing, branded sleeves, employee gift requests, and invoice billing."
+          },
+          {
+            "h": "Are you on social media?",
+            "p": "Yes — Instagram @kather_baksho, Facebook /kather_baksho, TikTok @kather_baksho. Plant care videos every week."
+          }
         ]
       },
       "privacy": {
         "title": "Privacy Policy",
         "intro": "Effective July 5, 2026. Plain-English summary + full policy below.",
         "sections": [
-          { "h": "Short version", "p": "We collect only the data we need to ship plants, send reminders, and improve our service. We never sell your data. You can delete everything from My Account → Delete Account." },
-          { "h": "What we collect", "p": "Account info (name, email, phone), shipping addresses, order history, plant care logs, and basic analytics (page views, anonymous IDs)." },
-          { "h": "Why we need it", "p": "To fulfill orders, send watering reminders, ship boxes, run the points program, and prevent fraud." },
-          { "h": "Who we share with", "p": "Couriers (just name/phone/address for the boxes they deliver), payment processors (PCI scope, never see raw cards), and no one else." },
-          { "h": "Your rights", "p": "View, edit, export, or delete your data any time from My Account → Edit Profile, or email privacy@kather_baksho.com." },
-          { "h": "Cookies", "p": "We use first-party cookies for session/auth only. No third-party trackers." },
-          { "h": "Changes", "p": "We email every user before any material change takes effect." }
+          {
+            "h": "Short version",
+            "p": "We collect only the data we need to ship plants, send reminders, and improve our service. We never sell your data. You can delete everything from My Account → Delete Account."
+          },
+          {
+            "h": "What we collect",
+            "p": "Account info (name, email, phone), shipping addresses, order history, plant care logs, and basic analytics (page views, anonymous IDs)."
+          },
+          {
+            "h": "Why we need it",
+            "p": "To fulfill orders, send watering reminders, ship boxes, run the points program, and prevent fraud."
+          },
+          {
+            "h": "Who we share with",
+            "p": "Couriers (just name/phone/address for the boxes they deliver), payment processors (PCI scope, never see raw cards), and no one else."
+          },
+          {
+            "h": "Your rights",
+            "p": "View, edit, export, or delete your data any time from My Account → Edit Profile, or email privacy@kather_baksho.com."
+          },
+          {
+            "h": "Cookies",
+            "p": "We use first-party cookies for session/auth only. No third-party trackers."
+          },
+          {
+            "h": "Changes",
+            "p": "We email every user before any material change takes effect."
+          }
         ]
       },
       "terms": {
         "title": "Terms & Conditions",
         "intro": "By using kather_baksho.com you agree to these terms.",
         "sections": [
-          { "h": "Eligibility", "p": "You must be 18+ or have a parent/guardian make purchases on your behalf." },
-          { "h": "Account", "p": "Keep your password safe — you're responsible for activity on your account. Lost a password? Use the Forgot Password link on the login page." },
-          { "h": "Pricing", "p": "All prices include VAT. Delivery fees are calculated at checkout." },
-          { "h": "Cancellations & refunds", "p": "See our Refund Policy — most unfulfilled orders can be cancelled within 12 hours of placement." },
-          { "h": "Plant health guarantee", "p": "Plants are living things. We guarantee delivery health for 7 days. After that we provide ongoing care support." },
-          { "h": "Subscriptions", "p": "Recurring boxes are billed at signup and then monthly until paused or cancelled. Skip a month anytime." },
-          { "h": "Limitation of liability", "p": "Kather Baksho is not liable for plant damage caused by neglect, environmental factors outside our care guides, or unauthorized repottings." }
+          {
+            "h": "Eligibility",
+            "p": "You must be 18+ or have a parent/guardian make purchases on your behalf."
+          },
+          {
+            "h": "Account",
+            "p": "Keep your password safe — you're responsible for activity on your account. Lost a password? Use the Forgot Password link on the login page."
+          },
+          {
+            "h": "Pricing",
+            "p": "All prices include VAT. Delivery fees are calculated at checkout."
+          },
+          {
+            "h": "Cancellations & refunds",
+            "p": "See our Refund Policy — most unfulfilled orders can be cancelled within 12 hours of placement."
+          },
+          {
+            "h": "Plant health guarantee",
+            "p": "Plants are living things. We guarantee delivery health for 7 days. After that we provide ongoing care support."
+          },
+          {
+            "h": "Subscriptions",
+            "p": "Recurring boxes are billed at signup and then monthly until paused or cancelled. Skip a month anytime."
+          },
+          {
+            "h": "Limitation of liability",
+            "p": "Kather Baksho is not liable for plant damage caused by neglect, environmental factors outside our care guides, or unauthorized repottings."
+          }
         ]
       },
       "shipping": {
         "title": "Shipping Policy",
         "intro": "Fast, careful, plastic-free.",
         "sections": [
-          { "h": "Inside Dhaka", "p": "Same-day delivery if you order before 4pm BST. Standard delivery is next-day. Free above ৳1,500." },
-          { "h": "Major cities", "p": "2–3 working days to Chittagong, Sylhet, Khulna, Rajshahi, Barisal, Rangpur." },
-          { "h": "Nationwide", "p": "4–5 working days. We work with Sundarbans Courier and Steadfast." },
-          { "h": "Packaging", "p": "Compostable coir pots, kraft sleeves, shredded paper padding. Plants travel in vented boxes with humidity gel." },
-          { "h": "Heat & monsoon handling", "p": "Summer orders get insulated sleeves + gel packs. Monsoon orders get extra drainage ventilation." },
-          { "h": "Tracking", "p": "Every order gets an SMS + email tracking link once shipped." },
-          { "h": "Failed delivery", "p": "If we're unable to reach you after 2 attempts, the box returns to our studio for free re-delivery scheduling." }
+          {
+            "h": "Inside Dhaka",
+            "p": "Same-day delivery if you order before 4pm BST. Standard delivery is next-day. Free above ৳1,500."
+          },
+          {
+            "h": "Major cities",
+            "p": "2–3 working days to Chittagong, Sylhet, Khulna, Rajshahi, Barisal, Rangpur."
+          },
+          {
+            "h": "Nationwide",
+            "p": "4–5 working days. We work with Sundarbans Courier and Steadfast."
+          },
+          {
+            "h": "Packaging",
+            "p": "Compostable coir pots, kraft sleeves, shredded paper padding. Plants travel in vented boxes with humidity gel."
+          },
+          {
+            "h": "Heat & monsoon handling",
+            "p": "Summer orders get insulated sleeves + gel packs. Monsoon orders get extra drainage ventilation."
+          },
+          {
+            "h": "Tracking",
+            "p": "Every order gets an SMS + email tracking link once shipped."
+          },
+          {
+            "h": "Failed delivery",
+            "p": "If we're unable to reach you after 2 attempts, the box returns to our studio for free re-delivery scheduling."
+          }
         ]
       },
       "refund": {
         "title": "Refund Policy",
         "intro": "We want you to love every plant.",
         "sections": [
-          { "h": "Plant health guarantee (7 days)", "p": "If a plant arrives damaged, diseased or dies within 7 days, send a photo within 48 hours of noticing and we'll either send a replacement at our cost or refund 100% — your choice." },
-          { "h": "Wrong / damaged item", "p": "Email a photo within 48 hours of delivery. We cover return shipping." },
-          { "h": "Changed your mind", "p": "Non-plant items (pots, accessories, subscriptions not yet started) can be returned within 14 days in original condition. Buyer pays return shipping." },
-          { "h": "Subscriptions", "p": "Cancel anytime. Already-shipped boxes are non-refundable; future boxes are fully refundable until they're packed." },
-          { "h": "Processing time", "p": "Approved refunds are processed within 5 business days back to the original payment method." },
-          { "h": "How to start", "p": "Email refunds@kather_baksho.com with your order number + a photo. We respond within 24 hours." }
+          {
+            "h": "Plant health guarantee (7 days)",
+            "p": "If a plant arrives damaged, diseased or dies within 7 days, send a photo within 48 hours of noticing and we'll either send a replacement at our cost or refund 100% — your choice."
+          },
+          {
+            "h": "Wrong / damaged item",
+            "p": "Email a photo within 48 hours of delivery. We cover return shipping."
+          },
+          {
+            "h": "Changed your mind",
+            "p": "Non-plant items (pots, accessories, subscriptions not yet started) can be returned within 14 days in original condition. Buyer pays return shipping."
+          },
+          {
+            "h": "Subscriptions",
+            "p": "Cancel anytime. Already-shipped boxes are non-refundable; future boxes are fully refundable until they're packed."
+          },
+          {
+            "h": "Processing time",
+            "p": "Approved refunds are processed within 5 business days back to the original payment method."
+          },
+          {
+            "h": "How to start",
+            "p": "Email refunds@kather_baksho.com with your order number + a photo. We respond within 24 hours."
+          }
         ]
       }
     }
@@ -1126,5 +1252,82 @@
     "typeDeleteRequired": "Type DELETE (all caps) to confirm.",
     "passwordRequired": "Enter your password."
   },
-  "lang": "en"
+  "lang": "en",
+  "userDashboard": {
+    "welcome": "Welcome back, {{name}}! 🌿",
+    "pleaseLogin": "Please log in",
+    "loginToView": "Sign in to view your dashboard.",
+    "signIn": "Sign In",
+    "loading": "Loading your dashboard…",
+    "totalOrders": "Total Orders",
+    "totalSpent": "Total Spent",
+    "pendingDelivery": "Pending Delivery",
+    "delivered": "Delivered",
+    "quickActions": "Quick Actions",
+    "myOrders": "My Orders",
+    "wishlist": "Wishlist",
+    "subscriptions": "Subscriptions",
+    "growthJournal": "Growth Journal",
+    "careReminders": "Care Reminders",
+    "expertHelp": "Expert Help",
+    "loyaltyClub": "Green Rewards Loyalty",
+    "tier": "Tier: {{tier}}",
+    "points": "{{points}} pts",
+    "pointsAway": "{{spend}} away from {{tier}} status",
+    "topTier": "You are at our highest VIP tier! Enjoy free shipping & gifts.",
+    "activeSubs": "Active Plant Subscriptions",
+    "nextDelivery": "Next delivery: {{date}}",
+    "recentOrders": "Recent Orders",
+    "viewAllOrders": "View all orders →",
+    "noOrdersYet": "No orders placed yet",
+    "startShopping": "Explore plants & decor"
+  },
+  "aiDoctor": {
+    "modalTitle": "AI Botanical Doctor & Plant Health Clinic",
+    "tabDiagnose": "Symptom Diagnosis",
+    "tabChat": "Ask AI Botanist",
+    "tabEdge": "On-Device Instant AI (Offline)",
+    "plantName": "Plant species / name",
+    "plantNamePlaceholder": "e.g. Monstera, Money Plant, Fiddle Leaf Fig…",
+    "symptomsLabel": "Describe the symptoms or problems",
+    "symptomsPlaceholder": "e.g. Yellow leaves with brown spots on lower stems…",
+    "quickPicks": "Quick Symptoms:",
+    "environmentLabel": "Environment / Placement",
+    "envLivingRoom": "Indoor Living Room (Indirect light)",
+    "envBalcony": "Balcony / Veranda (Partial sun)",
+    "envOffice": "Air-Conditioned Office",
+    "envRooftop": "Rooftop Garden (Full sun)",
+    "envBathroom": "Bathroom / High Humidity",
+    "btnDiagnose": "Analyze Plant Health",
+    "btnAnalyzing": "Consulting AI Botanical Model…",
+    "diagnosisReport": "Botanical Diagnostic Report",
+    "confidence": "Diagnosis Confidence",
+    "likelyIssue": "Identified Issue",
+    "remedy": "Prescribed Treatment",
+    "preventativeCare": "Preventative Recommendations",
+    "chatPlaceholder": "Ask questions about fertilizer, repotting, pruning, sunlight…",
+    "btnSend": "Send",
+    "doctorIntro": "Hello! I am your AI Botanical Doctor. Ask me anything about watering routines, light requirements, pest remedies, or plant recovery!"
+  },
+  "pwa": {
+    "offlineBanner": "You are currently offline. Showing cached botanical guides & content.",
+    "reconnected": "Back online! Syncing latest data…",
+    "installPromptTitle": "Install KatherBaksho App",
+    "installPromptDesc": "Add to your home screen for instant access, offline care journals & plant alerts.",
+    "installBtn": "Install App",
+    "dismiss": "Later"
+  },
+  "iot": {
+    "liveTelemetry": "Real-Time IoT Planter Telemetry",
+    "soilMoisture": "Soil Moisture",
+    "ambientTemp": "Ambient Temp",
+    "humidity": "Humidity",
+    "lightLux": "Sunlight Lux",
+    "battery": "Battery",
+    "statusOptimal": "Optimal",
+    "statusNeedsWater": "Needs Water",
+    "statusLowLight": "Low Light",
+    "statusCriticallyDry": "Critically Dry",
+    "lastUpdated": "Last updated: {{time}}"
+  }
 }

@@ -146,3 +146,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     split_database(args.source, args.output_dir)
+

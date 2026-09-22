@@ -54,9 +54,12 @@ const OrderDetail = lazy(() => import("./pages/OrderDetail"));
 const GiftCards = lazy(() => import("./pages/GiftCards"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AlgorithmVisualizer = lazy(() => import("./pages/AlgorithmVisualizer"));
+const Monitor = lazy(() => import("./pages/Monitor"));
 import GlobalSearch from "./components/GlobalSearch";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LangToggle from "./components/LangToggle";
+import OfflineBanner from "./components/OfflineBanner";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import { I18nProvider, useTranslation } from "./i18n/I18nProvider";
 
 // Primary (always-visible) nav links — keep these short so the bar stays compact.
@@ -71,6 +74,7 @@ const PRIMARY_NAV_ITEMS = [
 // Overflow items — surfaced through a single "More" dropdown so the bar stays
 // tidy. Admin link is appended dynamically when the user has admin role.
 const MORE_NAV_ITEMS = [
+  { key: "monitor",       tKey: "nav.monitor",       emoji: "📡" },
   { key: "algorithms",    tKey: "nav.algorithms",    emoji: "⚡" },
   { key: "subscriptions", tKey: "nav.subscriptions", emoji: "📦" },
   { key: "consultations", tKey: "nav.consultations", emoji: "🌱" },
@@ -694,6 +698,7 @@ function MainApp() {
           <Route path="/gift-cards"    element={<CustomerOnly isAdmin={isAdmin}><GiftCards /></CustomerOnly>} />
           <Route path="/dashboard"    element={<CustomerOnly isAdmin={isAdmin}><Dashboard /></CustomerOnly>} />
           <Route path="/algorithms"   element={<CustomerOnly isAdmin={isAdmin}><AlgorithmVisualizer /></CustomerOnly>} />
+          <Route path="/monitor"      element={<CustomerOnly isAdmin={isAdmin}><Monitor /></CustomerOnly>} />
 
           {/* Merged pages — old bookmarked URLs redirect into the new tabs */}
           <Route path="/reminders"   element={<Navigate to="/care" replace />} />
@@ -772,8 +777,10 @@ function AppShell() {
   return (
     <ToastProvider>
       <ConfirmProvider>
+        <OfflineBanner />
         <ScrollProgress />
         <MainApp />
+        <PWAInstallPrompt />
         {!isAdmin && <CompareBar />}
         {!isAdmin && <Onboarding />}
       </ConfirmProvider>

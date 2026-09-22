@@ -46,6 +46,7 @@ import { useToast } from "../components/Toast";
 import { useConfirm } from "../components/Confirm";
 import MiniBarChart from "../components/MiniBarChart";
 import Avatar from "../components/Avatar";
+import AdminInventoryAI from "../components/AdminInventoryAI";
 
 const STATUS_OPTIONS = [
   "Pending",
@@ -58,6 +59,7 @@ const STATUS_OPTIONS = [
 // Human-readable title + one-line description for each workspace tab.
 const TAB_META = {
   dashboard:     { title: "Dashboard",         desc: "Revenue, traffic and top performers at a glance." },
+  inventory_ai:  { title: "AI Inventory & Reordering", desc: "Predictive stockout runway, daily burn rates, and automated supplier purchase orders." },
   products:      { title: "Products",          desc: "Add, edit and manage the product catalogue." },
   orders:        { title: "Orders",            desc: "Track, fulfil and update customer orders." },
   corporate:    { title: "Corporate Orders",  desc: "Review and progress bulk corporate enquiries." },
@@ -78,6 +80,7 @@ const TAB_META = {
 // may also open; every other tab is admin-only.
 const NAV_ITEMS = [
   { key: "dashboard",     emoji: "📊", label: "Dashboard" },
+  { key: "inventory_ai",  emoji: "🤖", label: "AI Inventory" },
   { key: "products",      emoji: "📦", label: "Products" },
   { key: "orders",        emoji: "🛒", label: "Orders", staff: true },
   { key: "corporate",     emoji: "🏢", label: "Corporate" },
@@ -182,6 +185,7 @@ export default function Admin() {
 
         <div className="admin-content">
           {tab === "dashboard" && <DashboardTab />}
+          {tab === "inventory_ai" && <AdminInventoryAI />}
           {tab === "products" && <ProductsTab />}
           {tab === "orders" && <OrdersTab />}
           {tab === "corporate" && <AdminCorporateTab />}

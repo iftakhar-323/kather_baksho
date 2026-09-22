@@ -126,6 +126,18 @@ func ConnectDatabase() {
 		}
 	}
 
+	// Drop stale empty shadow tables from orders.db that could shadow attached catalog_db and auth_db
+	for _, tbl := range []string{"products", "users", "categories", "reviews", "wishlist_items"} {
+		var cnt int64
+		if err := db.Raw(fmt.Sprintf("SELECT count(*) FROM main.sqlite_master WHERE type='table' AND name='%s'", tbl)).Scan(&cnt).Error; err == nil && cnt > 0 {
+			var rowCount int64
+			if err := db.Raw(fmt.Sprintf("SELECT count(*) FROM main.%s", tbl)).Scan(&rowCount).Error; err == nil && rowCount == 0 {
+				db.Exec(fmt.Sprintf("DROP TABLE main.%s", tbl))
+				log.Printf("[Database] Dropped stale 0-row shadow table: %s", tbl)
+			}
+		}
+	}
+
 	if sqlDB, err := db.DB(); err == nil {
 		// SQLite permits many readers but only one writer; a single pooled
 		// connection plus busy_timeout avoids "database is locked" errors.

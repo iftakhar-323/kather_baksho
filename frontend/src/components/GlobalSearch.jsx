@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import VoiceSearchButton from "./VoiceSearchButton";
 
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
@@ -72,6 +73,13 @@ export default function GlobalSearch() {
           onFocus={() => {
             if (query.trim()) setIsOpen(true);
           }}
+        />
+        <VoiceSearchButton
+          onTranscript={(text) => {
+            setQuery(text);
+            setIsOpen(true);
+          }}
+          style={{ marginRight: "0.5rem" }}
         />
         {loading && <div className="nav-search-spinner" />}
       </div>

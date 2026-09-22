@@ -21,6 +21,7 @@ services/**/auth_service
 services/**/catalog_service
 services/**/community_care_service
 services/**/order_service
+services/**/kather_baksho
 services/**/*.exe
 
 # OS/Editor

@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"os"
+
+	"gorm.io/gorm"
+)
 
 // User is the central auth/account record.
 // Points is the "Green Points" loyalty balance earned on every order.
@@ -42,4 +46,20 @@ type Address struct {
 	PostalCode string `json:"postal_code"`
 	Country    string `json:"country" gorm:"default:'Bangladesh'"`
 	IsDefault  bool   `json:"is_default" gorm:"default:false"`
+}
+
+// TableName resolves to auth_db.users in SQLite microservices federation, or users in PostgreSQL.
+func (User) TableName() string {
+	if os.Getenv("DB_DRIVER") == "postgres" {
+		return "users"
+	}
+	return "auth_db.users"
+}
+
+// TableName resolves to auth_db.addresses in SQLite microservices federation, or addresses in PostgreSQL.
+func (Address) TableName() string {
+	if os.Getenv("DB_DRIVER") == "postgres" {
+		return "addresses"
+	}
+	return "auth_db.addresses"
 }

@@ -27,6 +27,7 @@ func AdminRoutes(router *gin.Engine) {
 	// ---- Admin-only ----
 	g.DELETE("/orders/:id", admin, controllers.DeleteOrder)
 	g.GET("/analytics", admin, controllers.GetAdminAnalytics)
+	g.GET("/analytics/inventory-forecast", admin, controllers.InventoryForecast)
 
 	// reminders
 	g.GET("/reminders", admin, controllers.AdminListReminders)

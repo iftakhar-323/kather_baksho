@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"os"
+
+	"gorm.io/gorm"
+)
 
 // Product represents a single sellable item in the catalogue.
 // Fields below support nested categories, search filters, related products,
@@ -31,4 +35,12 @@ type Product struct {
 	ViewCount      uint    `json:"view_count" gorm:"default:0"`
 	RelatedIDs     string  `json:"related_ids"`                         // JSON array of product ids (comma-separated for simplicity)
 	FbtIDs         string  `json:"fbt_ids"`                             // frequently-bought-together product ids
+}
+
+// TableName resolves to catalog_db.products in SQLite microservices federation, or products in PostgreSQL.
+func (Product) TableName() string {
+	if os.Getenv("DB_DRIVER") == "postgres" {
+		return "products"
+	}
+	return "catalog_db.products"
 }

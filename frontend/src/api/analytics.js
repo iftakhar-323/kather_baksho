@@ -11,6 +11,10 @@ export const getTopCustomers = (limit = 10) =>
 // GET /api/analytics/inventory
 export const getInventoryReport = () => API.get("/analytics/inventory");
 
+// GET /api/analytics/inventory-forecast?days=30
+export const getInventoryForecast = (days = 30) =>
+  API.get("/analytics/inventory-forecast", { params: { days } });
+
 // GET /api/analytics/traffic?days=30
 export const getTrafficReport = (days = 30) =>
   API.get("/analytics/traffic", { params: { days } });

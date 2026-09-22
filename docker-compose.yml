@@ -18,6 +18,7 @@ services:
       - DB_USER=${DB_USER:-kather_baksho}
       - DB_PASSWORD=${DB_PASSWORD:-kather_baksho_secret}
       - DB_NAME=${DB_NAME:-kather_baksho}
+      - DB_PATH=/app/data/orders.db
       - REDIS_ADDR=redis:6379
       - MONGO_URI=mongodb://mongo:27017
       - MONGO_DB_NAME=kather_baksho_iot
@@ -29,6 +30,7 @@ services:
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     volumes:
       - sqlite_data:/app/data
     networks:
@@ -106,6 +108,8 @@ services:
       - GIN_MODE=release
       - ALLOWED_ORIGINS=*
       - JWT_SECRET=${JWT_SECRET:-kather_baksho_docker_default_change_me}
+      - MQTT_BROKER_URL=tcp://mosquitto:1883
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
     depends_on:
       mongo:
         condition: service_healthy
@@ -294,6 +298,7 @@ services:
       - "9090:9090"
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/spm_rules.yml:/etc/prometheus/spm_rules.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -351,6 +356,34 @@ services:
       retries: 3
       start_period: 5s
 
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: kather_baksho-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9002:9001"
+    volumes:
+      - ./monitoring/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    container_name: kather_baksho-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+      - METRICS_STORAGE_TYPE=prometheus
+      - PROMETHEUS_SERVER_URL=http://prometheus:9090
+      - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
+      - LOG_LEVEL=debug
+    depends_on:
+      - prometheus
+
 volumes:
   sqlite_data:
     driver: local
@@ -365,4 +398,6 @@ volumes:
   grafana_data:
     driver: local
   minio_data:
+    driver: local
+  mosquitto_data:
     driver: local

@@ -183,7 +183,6 @@ func main() {
 		subs.POST("/admin/:id/cancel", admin, controllers.AdminCancelSubscription)
 	}
 
-
 	// 12. Direct admin routes mirror for backward compatibility
 	adminRoutes := router.Group("/api/admin", auth, admin)
 	{

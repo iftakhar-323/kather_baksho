@@ -103,6 +103,7 @@ func AddToCart(c *gin.Context) {
 	}
 
 	updatedCart := getOrCreateCart(userID)
+	database.InvalidateCachePrefix("products:")
 	c.JSON(http.StatusOK, updatedCart)
 }
 
@@ -165,6 +166,7 @@ func UpdateCartItem(c *gin.Context) {
 
 	item.Quantity = input.Quantity
 	database.DB.Save(&item)
+	database.InvalidateCachePrefix("products:")
 
 	c.JSON(http.StatusOK, item)
 }
@@ -184,5 +186,6 @@ func RemoveCartItem(c *gin.Context) {
 		Update("stock", gorm.Expr("stock + ?", item.Quantity))
 
 	database.DB.Delete(&item)
+	database.InvalidateCachePrefix("products:")
 	c.JSON(http.StatusOK, gin.H{"message": "Item removed from cart"})
 }

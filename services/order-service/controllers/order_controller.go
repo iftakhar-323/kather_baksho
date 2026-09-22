@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"kather_baksho/mailer"
 	"kather_baksho/models"
 	"kather_baksho/services"
+	"kather_baksho/sms"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -195,6 +197,11 @@ func Checkout(c *gin.Context) {
 		_ = mailer.Send(mailer.OrderPlaced(u.Email, uintToStr(order.ID), finalTotal))
 	}
 
+	// Dispatch asynchronous SMS confirmation
+	if shipPhone != "" {
+		sms.SendAsync(sms.BuildOrderMessage(shipPhone, uintToStr(order.ID), fmt.Sprintf("%.2f", finalTotal), sms.EventOrderPlaced, "bn"))
+	}
+
 	// Publish asynchronous 'order.created' event to Redis Streams message bus
 	_, _ = services.PublishEvent("order.created", map[string]interface{}{
 		"order_id":    order.ID,
@@ -284,6 +291,15 @@ func UpdateOrderStatus(c *gin.Context) {
 		Type:    "order_update",
 	})
 	log.Printf("Notify user %d: order #%d status changed to %s", order.UserID, order.ID, order.Status)
+
+	if order.ShippingPhone != "" {
+		switch input.Status {
+		case "Processing", "Shipped":
+			sms.SendAsync(sms.BuildOrderMessage(order.ShippingPhone, uintToStr(order.ID), "", sms.EventOutForDelivery, "bn"))
+		case "Delivered":
+			sms.SendAsync(sms.BuildOrderMessage(order.ShippingPhone, uintToStr(order.ID), "", sms.EventOrderDelivered, "bn"))
+		}
+	}
 
 	c.JSON(http.StatusOK, order)
 }

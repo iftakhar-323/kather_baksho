@@ -13,6 +13,7 @@ import Breadcrumbs from "../components/Breadcrumbs";
 import ProductCard from "../components/ProductCard";
 import { SkeletonDetail } from "../components/Skeleton";
 import { useConfirm } from "../components/Confirm";
+import Plant3DViewer from "../components/Plant3DViewer";
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
@@ -27,6 +28,7 @@ export default function ProductDetail({ productId, onBack }) {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("idle");
   const [qty, setQty] = useState(1);
+  const [show3DViewer, setShow3DViewer] = useState(false);
   const [inCompare, setInCompare] = useState(CompareStore.has(productId));
   const [inSaved, setInSaved] = useState(SaveForLaterStore.has(productId));
   const [related, setRelated] = useState([]);
@@ -167,7 +169,7 @@ export default function ProductDetail({ productId, onBack }) {
         <div>
           <h1 className="pdp-name">{product.name}</h1>
 
-          <div className="row gap-8 row-wrap">
+          <div className="row gap-8 row-wrap" style={{ alignItems: "center" }}>
             <span className="tag">{product.category}</span>
             {product.subcategory && (
               <span className="tag tag-bark">
@@ -177,6 +179,26 @@ export default function ProductDetail({ productId, onBack }) {
             {product.indoor_outdoor && (
               <span className="tag tag-info">{product.indoor_outdoor}</span>
             )}
+            <button
+              type="button"
+              onClick={() => setShow3DViewer(true)}
+              style={{
+                marginLeft: "auto",
+                background: "linear-gradient(135deg, rgba(45, 106, 79, 0.15), rgba(82, 183, 136, 0.2))",
+                border: "1px solid rgba(82, 183, 136, 0.4)",
+                color: "#2d6a4f",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                padding: "0.35rem 0.85rem",
+                borderRadius: "2rem",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.35rem"
+              }}
+            >
+              <span>🪴 View in 3D & AR</span>
+            </button>
           </div>
 
           <div className="pdp-price">
@@ -342,10 +364,17 @@ export default function ProductDetail({ productId, onBack }) {
           <h2>{t("productDetail.relatedHeading")}</h2>
           <div className="product-grid">
             {related.slice(0, 4).map((p) => (
-              <ProductCard key={p.ID} product={p} />
-            ))}
+               <ProductCard key={p.ID} product={p} />
+             ))}
           </div>
         </section>
+      )}
+
+      {show3DViewer && (
+        <Plant3DViewer
+          plantName={product.name}
+          onClose={() => setShow3DViewer(false)}
+        />
       )}
     </div>
   );

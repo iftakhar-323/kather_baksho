@@ -1,19 +1,50 @@
 {
-  "name": "KatherBox — Plants, planters & care",
-  "short_name": "KatherBox",
-  "description": "Hand-curated plants, handcrafted planters and gentle care essentials — delivered in Dhaka and beyond.",
+  "name": "Kather Baksho — Nature at your home",
+  "short_name": "KatherBaksho",
+  "description": "Hand-curated plants, handcrafted planters, botanical IoT and gentle care essentials — delivered in Dhaka and beyond.",
   "start_url": "/",
   "scope": "/",
+  "id": "/",
   "display": "standalone",
   "background_color": "#fafaf6",
-  "theme_color": "#5e8b56",
+  "theme_color": "#2d6a4f",
   "orientation": "portrait-primary",
+  "categories": ["shopping", "lifestyle", "utilities"],
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Plant Shop",
+      "short_name": "Shop",
+      "description": "Explore indoor plants and artisanal planters",
+      "url": "/?view=shop",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Plant Care Journal",
+      "short_name": "Care",
+      "description": "Check watering schedules & botanical health",
+      "url": "/care",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "description": "Track your plant deliveries",
+      "url": "/orders",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
     }
   ]
 }

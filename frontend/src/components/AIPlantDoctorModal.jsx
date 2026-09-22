@@ -1,7 +1,11 @@
 import { useState } from "react";
 import API from "../api/axios";
+import { useTranslation } from "../i18n/I18nProvider";
+import { diagnoseOffline } from "../utils/edgePlantDoctor";
+import VoiceSearchButton from "./VoiceSearchButton";
 
 export default function AIPlantDoctorModal({ isOpen, onClose }) {
+  const { t, lang } = useTranslation();
   const [tab, setTab] = useState("diagnose"); // 'diagnose' or 'chat'
   const [plantName, setPlantName] = useState("");
   const [symptoms, setSymptoms] = useState("");
@@ -9,6 +13,16 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+
+  const speakText = (text) => {
+    if (!window.speechSynthesis || !text) return;
+    window.speechSynthesis.cancel();
+    const cleanText = text.replace(/[*#_`]/g, "");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.lang = lang === "bn" ? "bn-BD" : "en-US";
+    utterance.rate = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
 
   // Chat tab states
   const [question, setQuestion] = useState("");
@@ -41,6 +55,20 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
     setError("");
     setResult(null);
 
+    if (!navigator.onLine) {
+      const offlineRes = diagnoseOffline(symptoms, plantName || "Houseplant", null, lang);
+      setResult({
+        diagnosis: offlineRes.diagnosis,
+        confidence: offlineRes.confidence,
+        severity: offlineRes.severity,
+        remedy: offlineRes.remedy,
+        preventative_care: offlineRes.prevention,
+        is_edge_ai: true,
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await API.post("/ai/diagnose", {
         plant_name: plantName || "Houseplant",
@@ -49,7 +77,16 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
       });
       setResult(res.data);
     } catch (err) {
-      setError(err?.response?.data?.error || "Failed to diagnose symptoms.");
+      console.warn("[AI Doctor] Server diagnosis failed, using offline Edge AI:", err);
+      const offlineRes = diagnoseOffline(symptoms, plantName || "Houseplant", null, lang);
+      setResult({
+        diagnosis: offlineRes.diagnosis,
+        confidence: offlineRes.confidence,
+        severity: offlineRes.severity,
+        remedy: offlineRes.remedy,
+        preventative_care: offlineRes.prevention,
+        is_edge_ai: true,
+      });
     } finally {
       setLoading(false);
     }
@@ -275,17 +312,21 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
                 </div>
 
                 <div style={{ marginBottom: "16px" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "13px",
-                      fontWeight: "600",
-                      marginBottom: "6px",
-                      color: "#374151",
-                    }}
-                  >
-                    Observed Symptoms / Notes *
-                  </label>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                    <label
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        color: "#374151",
+                        margin: 0
+                      }}
+                    >
+                      Observed Symptoms / Notes *
+                    </label>
+                    <VoiceSearchButton
+                      onTranscript={(txt) => setSymptoms((prev) => (prev ? `${prev} ${txt}` : txt))}
+                    />
+                  </div>
                   <textarea
                     rows={3}
                     placeholder="Describe what you see: discoloration, spots, bugs, leaf curling..."
@@ -391,15 +432,36 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
                       marginBottom: "12px",
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: "18px",
-                        fontWeight: "700",
-                        color: "#0f172a",
-                      }}
-                    >
-                      {result.diagnosis}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span
+                        style={{
+                          fontSize: "18px",
+                          fontWeight: "700",
+                          color: "#0f172a",
+                        }}
+                      >
+                        {result.diagnosis}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => speakText(`${result.diagnosis}. ${result.remedy || ""} ${result.preventative_care || ""}`)}
+                        title="Listen to diagnosis"
+                        style={{
+                          background: "#f0fdf4",
+                          border: "1px solid #86efac",
+                          color: "#166534",
+                          padding: "2px 8px",
+                          borderRadius: "12px",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px"
+                        }}
+                      >
+                        🔊 Listen
+                      </button>
+                    </div>
                     <span
                       style={{
                         padding: "4px 10px",
@@ -420,7 +482,22 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
                             : "#15803d",
                       }}
                     >
-                      {result.severity} Severity ({Math.round(result.confidence * 100)}% Confidence)
+                      {result.is_edge_ai && (
+                        <span
+                          style={{
+                            marginRight: "8px",
+                            padding: "4px 8px",
+                            borderRadius: "12px",
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            background: "#e0e7ff",
+                            color: "#4338ca",
+                          }}
+                        >
+                          ⚡ {t("aiDoctor.tabEdge")}
+                        </span>
+                      )}
+                      {result.severity} Severity ({Math.round((result.confidence || 0.85) * 100)}% Confidence)
                     </span>
                   </div>
 
@@ -548,9 +625,34 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
                       fontSize: "14px",
                       boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                       lineHeight: "1.4",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "4px"
                     }}
                   >
-                    {msg.text}
+                    <div>{msg.text}</div>
+                    {msg.sender === "doctor" && (
+                      <button
+                        type="button"
+                        onClick={() => speakText(msg.text)}
+                        title="Listen to this message"
+                        style={{
+                          alignSelf: "flex-start",
+                          background: "none",
+                          border: "none",
+                          color: "#16a34a",
+                          fontSize: "11px",
+                          cursor: "pointer",
+                          padding: "2px 4px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "3px",
+                          marginTop: "2px"
+                        }}
+                      >
+                        🔊 Listen
+                      </button>
+                    )}
                   </div>
                 ))}
                 {chatLoading && (
@@ -571,21 +673,29 @@ export default function AIPlantDoctorModal({ isOpen, onClose }) {
 
               <form
                 onSubmit={handleSendChat}
-                style={{ display: "flex", gap: "8px" }}
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
-                <input
-                  type="text"
-                  placeholder="Ask a question (e.g. How often to water Snake Plant?)"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    border: "1px solid #d1d5db",
-                    fontSize: "14px",
-                  }}
-                />
+                <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    placeholder="Ask a question (e.g. How often to water Snake Plant?)"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 42px 10px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #d1d5db",
+                      fontSize: "14px",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                  <div style={{ position: "absolute", right: "8px" }}>
+                    <VoiceSearchButton
+                      onTranscript={(txt) => setQuestion(txt)}
+                    />
+                  </div>
+                </div>
                 <button
                   type="submit"
                   disabled={chatLoading}

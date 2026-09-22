@@ -9,6 +9,7 @@ import (
 	"kather_baksho/iot_ai_service/controllers"
 	"kather_baksho/iot_ai_service/database"
 	"kather_baksho/iot_ai_service/middleware"
+	"kather_baksho/iot_ai_service/services"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,10 @@ import (
 func main() {
 	log.Println("[IoT-AI-Service] Starting Botanical Intelligence & IoT Telemetry Microservice...")
 
-	// 1. Initialize databases
+	// 1. Initialize databases & MQTT subscriber
 	database.ConnectMongoDB()
 	database.ConnectRedis()
+	services.StartMQTTSubscriber()
 
 	// 2. Set Gin mode
 	ginMode := os.Getenv("GIN_MODE")

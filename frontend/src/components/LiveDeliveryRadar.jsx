@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function LiveDeliveryRadar({ orderId = 1 }) {
-  const [status, setStatus] = useState("Connecting to live GPS stream...");
+  const [_status, setStatus] = useState("Connecting to live GPS stream...");
   const [checkpoint, setCheckpoint] = useState(null);
   const [connected, setConnected] = useState(false);
   const [logs, setLogs] = useState([]);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
-
+import { useTranslation } from "../i18n/I18nProvider";
 
 function fmtBDT(n) {
   return "৳" + Number(n || 0).toLocaleString(undefined, {
@@ -27,6 +27,7 @@ function timeAgo(dateStr) {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
 
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -85,10 +86,10 @@ export default function Dashboard() {
     return (
       <div className="empty empty-gate">
         <div className="emoji">🔒</div>
-        <h3>Please log in</h3>
-        <p>Sign in to view your dashboard.</p>
+        <h3>{t("userDashboard.pleaseLogin")}</h3>
+        <p>{t("userDashboard.loginToView")}</p>
         <button className="btn btn-primary mt-16" onClick={() => window.__katherboxSetView?.("login")}>
-          Sign In
+          {t("userDashboard.signIn")}
         </button>
       </div>
     );
@@ -98,7 +99,7 @@ export default function Dashboard() {
     return (
       <div className="empty">
         <div className="emoji">📊</div>
-        <h3>Loading your dashboard...</h3>
+        <h3>{t("userDashboard.loading")}</h3>
       </div>
     );
   }
@@ -119,7 +120,7 @@ export default function Dashboard() {
         </div>
         <div>
           <h1 className="dash-greeting">
-            Welcome back, {user.name || user.email?.split("@")[0]}! 🌿
+            {t("userDashboard.welcome", { name: user.name || user.email?.split("@")[0] || "" })}
           </h1>
           <p className="dash-sub">{user.email}</p>
         </div>
@@ -130,52 +131,52 @@ export default function Dashboard() {
         <div className="dash-stat-card">
           <div className="dash-stat-icon">📦</div>
           <div className="dash-stat-value">{stats?.totalOrders || 0}</div>
-          <div className="dash-stat-label">Total Orders</div>
+          <div className="dash-stat-label">{t("userDashboard.totalOrders")}</div>
         </div>
         <div className="dash-stat-card">
           <div className="dash-stat-icon">💰</div>
           <div className="dash-stat-value">{fmtBDT(stats?.totalSpent || 0)}</div>
-          <div className="dash-stat-label">Total Spent</div>
+          <div className="dash-stat-label">{t("userDashboard.totalSpent")}</div>
         </div>
         <div className="dash-stat-card">
           <div className="dash-stat-icon">🚚</div>
           <div className="dash-stat-value">{stats?.pendingDeliveries || 0}</div>
-          <div className="dash-stat-label">Pending Delivery</div>
+          <div className="dash-stat-label">{t("userDashboard.pendingDelivery")}</div>
         </div>
         <div className="dash-stat-card">
           <div className="dash-stat-icon">✅</div>
           <div className="dash-stat-value">{stats?.delivered || 0}</div>
-          <div className="dash-stat-label">Delivered</div>
+          <div className="dash-stat-label">{t("userDashboard.delivered")}</div>
         </div>
       </div>
 
       {/* Quick Actions */}
       <div className="dash-section">
-        <h3 className="dash-section-title">Quick Actions</h3>
+        <h3 className="dash-section-title">{t("userDashboard.quickActions")}</h3>
         <div className="dash-actions-grid">
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("orders")}>
             <span className="dash-action-icon">📋</span>
-            <span>My Orders</span>
+            <span>{t("userDashboard.myOrders")}</span>
           </button>
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("wishlist")}>
             <span className="dash-action-icon">❤️</span>
-            <span>Wishlist</span>
+            <span>{t("userDashboard.wishlist")}</span>
           </button>
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("cart")}>
             <span className="dash-action-icon">🛒</span>
-            <span>Cart</span>
+            <span>{t("nav.cart")}</span>
           </button>
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("profile")}>
             <span className="dash-action-icon">👤</span>
-            <span>Profile</span>
+            <span>{t("nav.profile")}</span>
           </button>
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("loyalty")}>
             <span className="dash-action-icon">🏆</span>
-            <span>Rewards</span>
+            <span>{t("nav.loyalty")}</span>
           </button>
           <button className="dash-action-btn" onClick={() => window.__katherboxSetView?.("subscriptions")}>
             <span className="dash-action-icon">📦</span>
-            <span>Subscriptions</span>
+            <span>{t("userDashboard.subscriptions")}</span>
           </button>
         </div>
       </div>
@@ -183,13 +184,13 @@ export default function Dashboard() {
       <div className="dash-two-col">
         {/* Recent Orders */}
         <div className="dash-section">
-          <h3 className="dash-section-title">Recent Orders</h3>
+          <h3 className="dash-section-title">{t("userDashboard.recentOrders")}</h3>
           {recentOrders.length === 0 ? (
             <div className="dash-empty-card">
               <span>🛒</span>
-              <p>No orders yet. Start shopping!</p>
+              <p>{t("userDashboard.noOrdersYet")}</p>
               <button className="btn btn-primary btn-sm" onClick={() => window.__katherboxSetView?.("home")}>
-                Browse Plants
+                {t("userDashboard.startShopping")}
               </button>
             </div>
           ) : (
@@ -222,20 +223,21 @@ export default function Dashboard() {
 
         {/* Loyalty & Tier */}
         <div className="dash-section">
-          <h3 className="dash-section-title">Loyalty & Rewards</h3>
+          <h3 className="dash-section-title">{t("userDashboard.loyaltyClub")}</h3>
           <div className="dash-loyalty-card">
             <div className="dash-loyalty-tier">
               <span className="dash-tier-badge">🏆</span>
               <div>
                 <div className="dash-tier-name">{loyalty?.tier}</div>
                 <div className="dash-tier-next">
-                  {loyalty?.nextTier ? `Next: ${loyalty.nextTier}` : "Top tier reached 🎉"}
+                  {loyalty?.nextTier
+                    ? t("userDashboard.pointsAway", { tier: loyalty.nextTier, spend: fmtBDT(need || 0) })
+                    : t("userDashboard.topTier")}
                 </div>
               </div>
             </div>
             <div className="dash-points-row">
-              <span className="dash-points-label">Green Points</span>
-              <strong className="dash-points-value">🌱 {loyalty?.points || 0}</strong>
+              <span className="dash-points-label">{t("userDashboard.points", { points: loyalty?.points || 0 })}</span>
             </div>
             <div className="dash-progress-bar">
               <div
@@ -253,7 +255,7 @@ export default function Dashboard() {
           {/* Active Subscriptions */}
           {activeSubs.length > 0 && (
             <>
-              <h3 className="dash-section-title mt-16">Active Subscriptions</h3>
+              <h3 className="dash-section-title mt-16">{t("userDashboard.activeSubs")}</h3>
               <div className="dash-subs-list">
                 {activeSubs.map((s) => (
                   <div key={s.ID} className="dash-sub-row">
@@ -261,7 +263,7 @@ export default function Dashboard() {
                     <div className="dash-sub-info">
                       <div className="dash-sub-name">{s.plan_name}</div>
                       <div className="dash-sub-meta">
-                        Next delivery: {s.next_delivery || "TBD"}
+                        {t("userDashboard.nextDelivery", { date: s.next_delivery || "TBD" })}
                       </div>
                     </div>
                     <div className="dash-sub-price">{fmtBDT(s.price)}/mo</div>
