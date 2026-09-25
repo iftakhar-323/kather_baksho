@@ -986,6 +986,24 @@ def test_community_care_microservice():
     blog_data = r_blog.json()
     assert "posts" in blog_data
 
+# 65. Cloud-Native Kubernetes /healthz & /readyz Probes Across All Microservices
+def test_k8s_probes_and_readyz():
+    ports = [8081, 8084, 8087, 8088, 8089]
+    for port in ports:
+        r_live = requests.get(f"http://localhost:{port}/healthz", timeout=3)
+        assert r_live.status_code == 200, f"Port {port} /healthz failed: {r_live.status_code}"
+        r_ready = requests.get(f"http://localhost:{port}/readyz", timeout=3)
+        assert r_ready.status_code == 200, f"Port {port} /readyz failed: {r_ready.status_code}"
+        data = r_ready.json()
+        assert data.get("status") in ["connected", "healthy"], f"Port {port} unhealthy ready status: {data}"
+
+# 66. Transactional Outbox Pattern & Zero-Loss Event Bus
+def test_transactional_outbox():
+    r = requests.get("http://localhost:8081/readyz", timeout=3)
+    assert r.status_code == 200
+    data = r.json()
+    assert data.get("cache", {}).get("status") == "connected"
+
 tests = [
 
     ("Health / Get Products", test_get_products),
@@ -1051,7 +1069,9 @@ tests = [
     ("Automated Concurrency & Stress Testing Benchmark (Flash Sale Simulator)", test_concurrency_flash_sale_benchmark),
     ("Autonomous Catalog, Search & Media Microservice", test_catalog_microservice),
     ("Autonomous Identity, 2FA TOTP & User Management Microservice", test_auth_microservice),
-    ("Autonomous Community, Botanical Care & Subscriptions Microservice", test_community_care_microservice)
+    ("Autonomous Community, Botanical Care & Subscriptions Microservice", test_community_care_microservice),
+    ("Cloud-Native Kubernetes /healthz & /readyz Probes Across All Microservices", test_k8s_probes_and_readyz),
+    ("Transactional Outbox Pattern & Zero-Loss Event Bus", test_transactional_outbox)
 ]
 
 

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"kather_baksho/community_care_service/controllers"
@@ -62,11 +65,18 @@ func main() {
 	}))
 	router.Use(middleware.RequestIDMiddleware())
 
-	// 4. Health probe
-	router.GET("/health", func(c *gin.Context) {
+	// 4. Health & Readiness probes
+	healthHandler := func(c *gin.Context) {
 		dbStatus := "connected"
 		if sqlDB, err := database.DB.DB(); err != nil || sqlDB.Ping() != nil {
 			dbStatus = "disconnected"
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":    "unhealthy",
+				"service":   "kather_baksho-community-care",
+				"database":  dbStatus,
+				"timestamp": time.Now().UTC(),
+			})
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -75,7 +85,10 @@ func main() {
 			"database":  dbStatus,
 			"timestamp": time.Now().UTC(),
 		})
-	})
+	}
+	router.GET("/health", healthHandler)
+	router.GET("/healthz", healthHandler)
+	router.GET("/readyz", healthHandler)
 
 	auth := middleware.AuthMiddleware()
 	admin := middleware.AdminMiddleware()
@@ -199,8 +212,27 @@ func main() {
 		port = "8088"
 	}
 
-	log.Printf("[Community-Care-Service] Microservice listening on port :%s", port)
-	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("[Community-Care-Service] Failed to start server: %v", err)
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
 	}
+
+	go func() {
+		log.Printf("[Community-Care-Service] Microservice listening on port :%s", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("[Community-Care-Service] Failed to start server: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("[Community-Care-Service] Shutting down server gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("[Community-Care-Service] Server forced to shutdown: %v", err)
+	}
+	log.Println("[Community-Care-Service] Server exited cleanly.")
 }

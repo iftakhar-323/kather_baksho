@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"kather_baksho/iot_ai_service/controllers"
@@ -44,8 +47,8 @@ func main() {
 	}))
 	router.Use(middleware.RequestIDMiddleware())
 
-	// 4. Health probe
-	router.GET("/health", func(c *gin.Context) {
+	// 4. Health & Readiness probes
+	healthHandler := func(c *gin.Context) {
 		mongoStatus := "connected"
 		if err := database.MongoPing(); err != nil {
 			mongoStatus = "disconnected"
@@ -56,14 +59,24 @@ func main() {
 			redisStatus = "disconnected"
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"status":    "healthy",
+		status := "healthy"
+		httpCode := http.StatusOK
+		if mongoStatus == "disconnected" {
+			status = "unhealthy"
+			httpCode = http.StatusServiceUnavailable
+		}
+
+		c.JSON(httpCode, gin.H{
+			"status":    status,
 			"service":   "kather_baksho-iot-ai",
 			"mongodb":   mongoStatus,
 			"redis":     redisStatus,
 			"timestamp": time.Now().UTC(),
 		})
-	})
+	}
+	router.GET("/health", healthHandler)
+	router.GET("/healthz", healthHandler)
+	router.GET("/readyz", healthHandler)
 
 	// 5. IoT Telemetry Routes
 	iot := router.Group("/api/iot")
@@ -93,8 +106,27 @@ func main() {
 		port = "8089"
 	}
 
-	log.Printf("[IoT-AI-Service] Microservice listening on port :%s", port)
-	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("[IoT-AI-Service] Failed to start server: %v", err)
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
 	}
+
+	go func() {
+		log.Printf("[IoT-AI-Service] Microservice listening on port :%s", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("[IoT-AI-Service] Server error: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("[IoT-AI-Service] Shutting down server gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("[IoT-AI-Service] Server forced to shutdown: %v", err)
+	}
+	log.Println("[IoT-AI-Service] Server exited cleanly.")
 }

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"kather_baksho/auth_service/controllers"
@@ -49,11 +52,18 @@ func main() {
 	}))
 	router.Use(middleware.RequestIDMiddleware())
 
-	// 4. Health probe
-	router.GET("/health", func(c *gin.Context) {
+	// 4. Health & Readiness probes
+	healthHandler := func(c *gin.Context) {
 		dbStatus := "connected"
 		if sqlDB, err := database.DB.DB(); err != nil || sqlDB.Ping() != nil {
 			dbStatus = "disconnected"
+			c.JSON(http.StatusServiceUnavailable, gin.H{
+				"status":    "unhealthy",
+				"service":   "kather_baksho-auth",
+				"database":  dbStatus,
+				"timestamp": time.Now().UTC(),
+			})
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -62,7 +72,10 @@ func main() {
 			"database":  dbStatus,
 			"timestamp": time.Now().UTC(),
 		})
-	})
+	}
+	router.GET("/health", healthHandler)
+	router.GET("/healthz", healthHandler)
+	router.GET("/readyz", healthHandler)
 
 	// 5. Auth Routes
 	auth := router.Group("/api/auth")
@@ -118,8 +131,27 @@ func main() {
 		port = "8084"
 	}
 
-	log.Printf("[Auth-Service] Microservice listening on port :%s", port)
-	if err := router.Run(":" + port); err != nil {
-		log.Fatalf("[Auth-Service] Failed to start server: %v", err)
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
 	}
+
+	go func() {
+		log.Printf("[Auth-Service] Microservice listening on port :%s", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("[Auth-Service] Failed to start server: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("[Auth-Service] Shutting down server gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("[Auth-Service] Server forced to shutdown: %v", err)
+	}
+	log.Println("[Auth-Service] Server exited cleanly.")
 }

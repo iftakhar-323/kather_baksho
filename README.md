@@ -128,6 +128,16 @@ Here are the enterprise-grade features implemented in this repository:
 - **Botanical Parenting & Care**: Botanical growth journal with photo logs, seasonal monthly care schedules, and aggregated multi-plant care calendars.
 - **Care Subscriptions & Consultations**: Automated plant delivery subscriptions (pause, resume, manual renewal) and botanical expert consultation bookings.
 
+### 14. 📦 Transactional Outbox Pattern & Zero-Loss Event Architecture
+- **Dual-Write Mitigation**: In `order-service`, domain events (`order.created`) are recorded in an ACID `outbox_events` table in the same database transaction as the order creation.
+- **Asynchronous Outbox Worker**: Background worker polls pending events and delivers them to Redis Streams (`kb:events:stream`) with at-least-once delivery guarantee, ensuring zero event loss even during broker restarts.
+
+### 15. 🛡️ Cloud-Native Microservices Hardening, Health Probes & Graceful Shutdown
+- **Kubernetes Probes**: All 5 Go microservices expose `/healthz` (liveness) and `/readyz` (readiness with deep DB/cache ping).
+- **Graceful Shutdown**: All microservices intercept `SIGINT` and `SIGTERM` signals and execute standard 5-second context HTTP server drain (`srv.Shutdown`).
+- **OWASP Security Hardening**: Security headers middleware enforces `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, and 10MB payload size limits.
+- **SQLite Multi-Database Resilience**: Automated attachment verification (`EnsureAttached`) and zero-lifetime connection recycling (`ConnMaxLifetime(0)`) prevents cross-database disconnection.
+
 ---
 
 <a name="-tech-stack--tools"></a>
